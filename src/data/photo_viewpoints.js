@@ -1,6 +1,7 @@
 // Where each photo was taken from, what it looks at, the photo's vertical field of view in
-// degrees and its roll: the degrees that turn the photo level. Each camera was fitted to
-// points of the model seen in its photo; "esquina_calle_12" is still estimated by eye.
+// degrees and its roll: how many degrees the phone was tilted, which the 3D camera copies.
+// Each camera was fitted to points of the model seen in its photo; "esquina_calle_12" is
+// still estimated by eye.
 export const photo_viewpoints = [
   { key: 'costado', title: 'Fachada sobre la Calle 12', camera_position: [-3.4, 1.69, 11.06], look_at: [-3.39, 1.65, 1.07], fov: 28.1, roll: -0.1 },
   { key: 'lado', title: 'Esquina desde el frente', camera_position: [-0.48, 1.5, 8.72], look_at: [-0.77, 0.77, -1.25], fov: 58.1, roll: 0.3 },

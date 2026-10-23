@@ -3,8 +3,13 @@ export const photo_overlay_styles = new CSSStyleSheet();
 photo_overlay_styles.replaceSync(/* css */ `
   :host { position: fixed; inset: 0; pointer-events: none; }
   :host([hidden]) { display: none; }
-  .photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-  .photo.concealed { visibility: hidden; }
+  .layer, .photo, .edges { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .photo { object-fit: contain; }
+  .layer.concealed { visibility: hidden; }
+  .edges { display: none; overflow: visible; }
+  .edges line { stroke: #39ff88; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+  .layer.showing_edges .photo { display: none; }
+  .layer.showing_edges .edges { display: block; }
   .controls {
     position: absolute; top: 16px; right: 16px; width: min(300px, calc(100% - 32px)); pointer-events: auto;
     padding: 10px 12px; background: var(--panel); color: var(--text); border: 1px solid var(--line);

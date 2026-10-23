@@ -6,9 +6,10 @@
 python -m venv .venv
 .venv/Scripts/python -m pip install -r tools/requirements.txt
 .venv/Scripts/python tools/build_photo_bundle.py
+.venv/Scripts/python tools/build_photo_edges.py
 ```
 
-Run the build again after changing anything in `images/`.
+Run both builds again after changing anything in `images/`. The second one lists the straight edges of every photo (Canny + Hough) in `src/generated/photo_edges.js`.
 
 ## View
 
