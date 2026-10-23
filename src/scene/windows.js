@@ -6,14 +6,14 @@ import { brick_texture, canvas_texture } from './textures.js';
 const frame_thickness = 0.07;
 const facades = {
   calle_12: { to_position: (distance, height) => [-distance, height, 0.02], rotation_y: 0 },
-  carrera_7_arcade: { to_position: (distance, height) => [-building.arcade_depth + 0.02, height, -distance], rotation_y: Math.PI / 2 },
-  carrera_7_upper: { to_position: (distance, height) => [0.02, height, -distance], rotation_y: Math.PI / 2 },
+  carrera_7_ground: { to_position: (distance, height) => [0.02, height, -distance], rotation_y: Math.PI / 2 },
+  carrera_7_upper: { to_position: (distance, height) => [building.carrera_7_overhang + 0.02, height, -distance], rotation_y: Math.PI / 2 },
 };
 const interior_textures = new Map();
 
 export function build_windows(scene) {
   calle_12_windows.forEach(window_spec => add_window(scene, window_spec, facades.calle_12));
-  carrera_7_windows.forEach(window_spec => add_window(scene, window_spec, facades.carrera_7_arcade));
+  carrera_7_windows.forEach(window_spec => add_window(scene, window_spec, facades.carrera_7_ground));
   upper_window_specs().forEach(([window_spec, facade_name]) => add_window(scene, window_spec, facades[facade_name]));
 }
 
@@ -39,10 +39,13 @@ function add_window(scene, window_spec, facade) {
 }
 
 // Bars in the window's own frame: outer frame, vertical mullions, then the transom.
+// The outer frame sits inside width and height, so they match a tape across the frame.
 function frame_bars({ width, height, mullions, transom_from_top }) {
   const vertical = (offset_x) => ({ size: [frame_thickness, height], position: [offset_x, 0] });
-  const horizontal = (offset_y) => ({ size: [width + frame_thickness, frame_thickness], position: [0, offset_y] });
-  const bars = [horizontal(height / 2), horizontal(-height / 2), vertical(-width / 2), vertical(width / 2)];
+  const horizontal = (offset_y) => ({ size: [width, frame_thickness], position: [0, offset_y] });
+  const inner_x = width / 2 - frame_thickness / 2;
+  const inner_y = height / 2 - frame_thickness / 2;
+  const bars = [horizontal(inner_y), horizontal(-inner_y), vertical(-inner_x), vertical(inner_x)];
   mullions.forEach(from_left => bars.push(vertical(-width / 2 + from_left)));
   if (transom_from_top) bars.push(horizontal(height / 2 - transom_from_top));
   return bars;

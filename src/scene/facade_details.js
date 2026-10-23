@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { esika_shop, streets } from '../data/building_measurements.js';
+import { building, esika_shop, streets } from '../data/building_measurements.js';
 import { add_box, add_wall_plane, standard_material } from './primitives.js';
 import { canvas_texture } from './textures.js';
 
@@ -12,7 +12,7 @@ export function build_facade_details(scene) {
   add_riviera_sign(scene);
   add_street_plate(scene);
   add_one_way_signs(scene);
-  add_round_sign(scene, { position: [0.4, 3.0, -1.2], rotation_y: Math.PI / 2 });
+  add_round_sign(scene, { position: [0.4, 3.0, -building.corner_pier_depth / 2], rotation_y: Math.PI / 2 });
   add_round_sign(scene, { position: [-3.95, 3.2, 0.6], rotation_y: 0 });
 }
 

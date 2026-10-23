@@ -17,7 +17,8 @@ const template = /* html */ `
     </div>
     <p class="hint">Arrastra para girar · rueda o pellizco para acercar · clic derecho para desplazar.<br>
       Arrastra un letrero sobre la pared para moverlo. La figura azul mide 1,70 m.<br>
-      Medir: activa 📏 y haz clic en dos puntos del modelo; arrastra los puntos azules para ajustarlos.<br>
+      Medir: activa 📏 y haz clic en dos puntos del modelo. Los puntos se pegan a bordes y esquinas,<br>
+      y la medida va siempre recta (horizontal o vertical). Arrastra los puntos azules para ajustarlos.<br>
       Un clic fuera de los puntos empieza otra medida. «Copiar coordenadas» copia el resultado.</p>
   </div>
 `;

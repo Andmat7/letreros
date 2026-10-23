@@ -15,9 +15,9 @@ const walls = {
     to_position: (distance, height) => new THREE.Vector3(-distance, height, wall_offset), to_distance: point => -point.x,
   },
   carrera_7: {
-    plane: new THREE.Plane(new THREE.Vector3(1, 0, 0), building.arcade_depth - wall_offset), normal: new THREE.Vector3(1, 0, 0), rotation_y: Math.PI / 2,
+    plane: new THREE.Plane(new THREE.Vector3(1, 0, 0), -wall_offset), normal: new THREE.Vector3(1, 0, 0), rotation_y: Math.PI / 2,
     nearest: building.corner_pier_depth + 0.2, farthest: building.carrera_7_facade_length - 0.5, top: building.ground_floor_height,
-    to_position: (distance, height) => new THREE.Vector3(-building.arcade_depth + wall_offset, height, -distance), to_distance: point => -point.z,
+    to_position: (distance, height) => new THREE.Vector3(wall_offset, height, -distance), to_distance: point => -point.z,
   },
 };
 

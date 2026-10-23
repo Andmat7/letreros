@@ -2,8 +2,11 @@ import * as THREE from 'three';
 import { canvas_texture } from '../scene/textures.js';
 
 const tape_color = '#0b6bcb';
+const snap_distance = 0.12;
+const axes = ['x', 'y', 'z'];
 
-// Two clicks on any surface give the distance between them, split into horizontal and height.
+// Two clicks on any surface give the distance between them. Points stick to nearby edges and
+// corners, and the second point is locked to a straight horizontal or vertical line from the first.
 // Every tape part is a line or sprite, so surface hits never land on the tape itself.
 // on_change receives the placed points (not the live preview) as [x, y, z] arrays.
 export function create_measuring_tape(scene, on_change) {
@@ -27,7 +30,7 @@ export function set_measuring(tape, active) {
 
 // The first click sets the start, the second the end, and a third starts over.
 export function add_tape_point(tape, raycaster) {
-  const point = surface_point(tape, raycaster);
+  const point = surface_point(tape, raycaster, tape.points.length === 1 && tape.points[0]);
   if (!point) return;
   tape.points = tape.points.length === 1 ? [tape.points[0], point] : [point];
   show_points(tape, tape.points);
@@ -41,20 +44,45 @@ export function grab_tape_point(tape, raycaster) {
 }
 
 export function move_tape_point(tape, index, raycaster) {
-  const point = surface_point(tape, raycaster);
+  const point = surface_point(tape, raycaster, tape.points[1 - index]);
   if (!point) return;
   tape.points[index] = point;
   show_points(tape, tape.points);
 }
 
 export function preview_tape_end(tape, raycaster) {
-  const point = tape.points.length === 1 && surface_point(tape, raycaster);
+  const point = tape.points.length === 1 && surface_point(tape, raycaster, tape.points[0]);
   if (point) show_points(tape, [tape.points[0], point]);
 }
 
-function surface_point(tape, raycaster) {
+// anchor: the other tape point, if any, that this one is lined up with.
+function surface_point(tape, raycaster, anchor) {
   const hit = raycaster.intersectObjects(tape.scene.children, true).find(candidate => candidate.object.isMesh);
-  return hit && hit.point.clone();
+  if (!hit) return null;
+  const point = snap_to_edges(hit);
+  return anchor ? line_up(point, anchor) : point;
+}
+
+// The model is made of boxes and planes along the street axes, so moving each coordinate
+// onto the bounds of the surface that was hit lands on its edges and corners.
+function snap_to_edges(hit) {
+  const bounds = new THREE.Box3().setFromObject(hit.object);
+  const point = hit.point.clone();
+  axes.forEach(axis => {
+    const gap_to = (value) => Math.abs(point[axis] - value);
+    const edge = gap_to(bounds.min[axis]) < gap_to(bounds.max[axis]) ? bounds.min[axis] : bounds.max[axis];
+    if (gap_to(edge) < snap_distance) point[axis] = edge;
+  });
+  return point;
+}
+
+// Keeps only the largest change from the anchor, so the tape runs along x, y or z.
+function line_up(point, anchor) {
+  const offset = point.clone().sub(anchor);
+  const main_axis = axes.reduce((best, axis) => Math.abs(offset[axis]) > Math.abs(offset[best]) ? axis : best);
+  const lined_up = anchor.clone();
+  lined_up[main_axis] = point[main_axis];
+  return lined_up;
 }
 
 function show_points(tape, points) {
