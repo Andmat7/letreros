@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Esquina Letreros 3D</title>
+<style>
+  :root {
+    --bg: #eef0f3; --panel: rgba(255,255,255,.94); --text: #1d2229; --muted: #5d6673;
+    --line: #d5d9df; --accent: #c8102e; --chip: #f3f4f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c; --panel: rgba(28,32,39,.94); --text: #e9ecf0; --muted: #9aa3ae;
+      --line: #343a44; --accent: #ff5a6e; --chip: #262b33;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #scene { position: fixed; inset: 0; }
+  .panel { position: fixed; top: 16px; left: 16px; width: 290px; max-height: calc(100% - 32px); overflow: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 14px 10px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.15); backdrop-filter: blur(6px); }
+  h1 { font-size: 16px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 12px; margin: 0 0 10px; }
+  h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 12px 0 6px; }
+  .list { display: grid; gap: 6px; }
+  .item { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 8px; border: 1px solid transparent;
+    background: var(--chip); cursor: pointer; text-align: left; color: inherit; font: inherit; width: 100%; }
+  .item:hover, .item.active { border-color: var(--accent); }
+  .item img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; flex: none; background: #fff; }
+  .item small { display: block; color: var(--muted); font-size: 11px; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  button.btn { border: 1px solid var(--line); background: var(--chip); color: inherit; border-radius: 8px;
+    padding: 6px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+  button.btn:hover { border-color: var(--accent); }
+  .hint { color: var(--muted); font-size: 11px; margin: 10px 0 0; }
+  #viewer { position: fixed; right: 16px; bottom: 16px; width: min(420px, calc(100% - 32px)); background: var(--panel);
+    border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: none; box-shadow: 0 6px 24px rgba(0,0,0,.2); }
+  #viewer.show { display: block; }
+  #viewer img { width: 100%; max-height: 55vh; object-fit: contain; border-radius: 8px; display: block; background: #000; }
+  #viewer .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  #viewer b { font-size: 13px; }
+  #label { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line);
+    padding: 3px 8px; border-radius: 6px; font-size: 12px; display: none; transform: translate(12px, 12px); }
+  #toggle { display: none; }
+  @media (max-width: 640px) {
+    .panel { width: auto; right: 16px; max-height: 45%; }
+    .panel.collapsed .body { display: none; }
+    #toggle { display: block; float: right; }
+  }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div class="panel" id="panel">
+  <button class="btn" id="toggle">☰</button>
+  <h1>Carrera 7 con Calle 12</h1>
+  <p class="sub">Modelo 3D aproximado de la esquina de La Riviera</p>
+  <div class="body">
+    <h2>Fotos del lugar</h2>
+    <div class="list" id="photos"></div>
+    <h2>Letreros</h2>
+    <div class="list" id="signs"></div>
+    <div class="row">
+      <button class="btn" id="home">Vista general</button>
+      <button class="btn" id="top">Desde arriba</button>
+      <button class="btn" id="reset">Reiniciar letreros</button>
+    </div>
+    <p class="hint">Arrastra para girar · rueda o pellizco para acercar · clic derecho para desplazar.<br>
+      Arrastra un letrero sobre la pared para moverlo. Los íconos 📷 marcan desde dónde se tomó cada foto.</p>
+  </div>
+</div>
+
+<div id="viewer">
+  <div class="top"><b id="vtitle"></b><button class="btn" id="vclose">Cerrar</button></div>
+  <img id="vimg" alt="">
+</div>
+<div id="label"></div>
+
+<script src="fotos.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const F = window.FOTOS;
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xc9d3dd);
+scene.fog = new THREE.Fog(0xc9d3dd, 60, 140);
+
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI / 2 - 0.03;
+controls.minDistance = 2; controls.maxDistance = 90;
+
+scene.add(new THREE.HemisphereLight(0xe8eef5, 0x6b5a4a, 1.1));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(25, 40, 30);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45 });
+scene.add(sun);
+
+// ---------- texturas procedurales ----------
+function canvasTex(w, h, draw, repeat) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(...repeat); }
+  return t;
+}
+function brick(base, mortar) {
+  return (g, w, h) => {
+    g.fillStyle = mortar; g.fillRect(0, 0, w, h);
+    const bh = 16, bw = 48;
+    for (let y = 0, r = 0; y < h; y += bh, r++) {
+      for (let x = (r % 2) * -bw / 2; x < w; x += bw) {
+        const v = (Math.random() - .5) * 22;
+        g.fillStyle = shade(base, v);
+        g.fillRect(x + 2, y + 2, bw - 3, bh - 3);
+      }
+    }
+  };
+}
+function shade(hex, v) {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [n >> 16, (n >> 8) & 255, n & 255].map(x => Math.max(0, Math.min(255, x + v)));
+  return `rgb(${c.join(',')})`;
+}
+const texBrickDark = (rx, ry) => canvasTex(256, 256, brick('#7a3328', '#5c2a22'), [rx, ry]);
+const texBrickLight = (rx, ry) => canvasTex(256, 256, brick('#b5583f', '#8d4835'), [rx, ry]);
+const texPaver = (rx, ry) => canvasTex(256, 256, brick('#b0584a', '#8e4a3f'), [rx, ry]);
+const texAsphalt = (rx, ry) => canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#5b5e62'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 4000; i++) { g.fillStyle = `rgba(${Math.random() > .5 ? 255 : 0},${Math.random() > .5 ? 255 : 0},${Math.random() > .5 ? 255 : 0},0.05)`;
+    g.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
+}, [rx, ry]);
+
+const mat = (o) => new THREE.MeshStandardMaterial({ roughness: .9, ...o });
+function box(w, h, d, material, x, y, z, parent = scene) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.position.set(x, y, z); m.castShadow = m.receiveShadow = true;
+  parent.add(m); return m;
+}
+function plane(w, h, material, x, y, z, ry = 0, parent = scene) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), material);
+  m.position.set(x, y, z); m.rotation.y = ry; m.receiveShadow = true;
+  parent.add(m); return m;
+}
+function textTex(w, h, draw) { return canvasTex(w, h, draw); }
+
+// ---------- suelo: calles y andenes ----------
+// Esquina del edificio en (0,0). Fachada A (La Riviera) mira a +z a lo largo de x<0.
+// Fachada B (soportal) mira a +x a lo largo de z<0.
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), mat({ color: 0x8a8f86 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; ground.receiveShadow = true; scene.add(ground);
+
+function flat(w, d, material, x, z, y = 0) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), material);
+  m.rotation.x = -Math.PI / 2; m.position.set(x, y, z); m.receiveShadow = true; scene.add(m); return m;
+}
+// Calle 12 (a lo largo de x) y Carrera 7 (a lo largo de z, más ancha)
+flat(120, 8, mat({ map: texAsphalt(30, 2) }), -10, 7.5);
+flat(12, 120, mat({ map: texAsphalt(3, 30) }), 9.5, -10);
+// Andenes de ladrillo
+const sw = 0.15;
+box(60, sw, 3.5, mat({ map: texPaver(40, 3) }), -30, sw / 2, 1.75);
+box(3.5, sw, 60, mat({ map: texPaver(3, 40) }), 1.75, sw / 2, -30);
+box(3.5, sw, 3.5, mat({ map: texPaver(3, 3) }), 1.75, sw / 2, 1.75);
+// Andenes de enfrente
+box(60, sw, 4, mat({ map: texPaver(40, 3) }), -30, sw / 2, 13.5);
+box(4, sw, 60, mat({ map: texPaver(3, 40) }), 17.5, sw / 2, -30);
+// Línea azul de la vía (foto "lado")
+flat(60, 0.3, mat({ color: 0x3f6fa8 }), -30, 6.2, 0.01);
+// Líneas de la carrera
+for (let z = -60; z < 0; z += 6) flat(0.15, 3, mat({ color: 0xf2f2f2 }), 9.5, z, 0.01);
+
+// Etiquetas de calles en el piso
+function groundLabel(text, x, z, rot) {
+  const t = textTex(1024, 160, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(255,255,255,.85)';
+    g.font = 'bold 110px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(text, w / 2, h / 2);
+  });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(9, 1.4), new THREE.MeshBasicMaterial({ map: t, transparent: true }));
+  m.rotation.x = -Math.PI / 2; m.rotation.z = rot; m.position.set(x, 0.02, z); scene.add(m);
+}
+groundLabel('CALLE 12', -30, 7.5, 0);
+groundLabel('CARRERA 7', 9.5, -28, Math.PI / 2);
+
+// ---------- edificio esquinero ----------
+const B = new THREE.Group(); scene.add(B);
+const LEN_A = 14, LEN_B = 18, H1 = 3.4, H = 10;
+const ARC = 2.4; // profundidad del soportal en fachada B
+
+// pisos superiores (ladrillo claro)
+box(LEN_A, H - H1, LEN_B, mat({ map: texBrickLight(10, 3) }), -LEN_A / 2, H1 + (H - H1) / 2, -LEN_B / 2, B);
+// primer piso (ladrillo oscuro), retrocedido en fachada B por el soportal
+box(LEN_A - ARC, H1, LEN_B, mat({ map: texBrickDark(10, 1.6) }), -(LEN_A - ARC) / 2 - ARC, H1 / 2, -LEN_B / 2, B);
+// tramo frontal bajo la esquina (columna/esquina hasta el soportal)
+box(ARC, H1, 1.2, mat({ map: texBrickDark(1, 1.6) }), -ARC / 2, H1 / 2, -0.6, B);
+// cornisa / placa
+box(LEN_A + 0.3, 0.35, 0.5, mat({ color: 0x8c8378 }), -LEN_A / 2, H1 + 0.05, 0.1, B);
+box(0.5, 0.35, LEN_B + 0.3, mat({ color: 0x8c8378 }), 0.1, H1 + 0.05, -LEN_B / 2, B);
+// columnas del soportal
+for (let z = -4.5; z > -LEN_B; z -= 4) {
+  box(0.45, H1, 0.45, mat({ map: texBrickDark(.3, 1.6) }), -0.25, H1 / 2, z, B);
+}
+// bolardos rojo/blanco en el andén B
+for (let z = -5; z > -LEN_B; z -= 4) {
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, 2.6, 12), mat({ color: 0xb0322c }));
+  p.position.set(0.9, 1.3, z); p.castShadow = true; scene.add(p);
+}
+// sombrillas de colores (vendedores)
+function umbrella(x, z) {
+  const g = new THREE.Group();
+  const cols = [0xd8342a, 0xf0c419, 0x2e9e5b, 0x2c6db5];
+  for (let i = 0; i < 8; i++) {
+    const s = new THREE.Mesh(new THREE.ConeGeometry(1.4, 0.6, 8, 1, true, i * Math.PI / 4, Math.PI / 4),
+      mat({ color: cols[i % 4], side: THREE.DoubleSide }));
+    s.position.y = 2.3; s.castShadow = true; g.add(s);
+  }
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, 2.3), mat({ color: 0xdddddd }));
+  pole.position.y = 1.15; g.add(pole);
+  g.position.set(x, 0.15, z); scene.add(g);
+}
+umbrella(1.6, -11); umbrella(1.6, -14.5);
+
+// ventanas — medidas tomadas de la foto "costado" (escala: primer piso = 3,4 m)
+// opts.cols: posiciones de los parales verticales (fracción del ancho, desde la izquierda)
+// opts.transom: posición del travesaño horizontal (fracción de la altura, desde arriba)
+function windowPane(w, h, x, y, z, ry, frameColor, inner, opts = {}) {
+  const g = new THREE.Group();
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+    inner ? new THREE.MeshBasicMaterial({ map: inner }) :
+    new THREE.MeshStandardMaterial({ color: 0x3b4450, roughness: .15, metalness: .4 }));
+  g.add(glass);
+  const fm = mat({ color: frameColor, roughness: .5 });
+  const t = 0.07;
+  const bars = [[w + t, t, 0, h / 2], [w + t, t, 0, -h / 2], [t, h, -w / 2, 0], [t, h, w / 2, 0]];
+  (opts.cols || [0.5]).forEach(c => bars.push([t, h, -w / 2 + c * w, 0]));
+  if (opts.transom) bars.push([w, t, 0, h / 2 - opts.transom * h]);
+  bars.forEach(([fw, fh, fx, fy]) => {
+    const f = new THREE.Mesh(new THREE.BoxGeometry(fw, fh, 0.08), fm); f.position.set(fx, fy, 0.02); g.add(f);
+  });
+  if (opts.ledge) { // repisa de ladrillo bajo la ventana
+    const l = new THREE.Mesh(new THREE.BoxGeometry(w + 0.3, 0.22, 0.25), mat({ map: texBrickDark(1, .2) }));
+    l.position.set(0, -h / 2 - 0.11, 0.1); l.castShadow = true; g.add(l);
+  }
+  g.position.set(x, y, z); g.rotation.y = ry; scene.add(g); return g;
+}
+const shopInterior = (neon) => textTex(512, 256, (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#5a5f66'); gr.addColorStop(1, '#2a2d31');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 4; i++) { g.fillStyle = 'rgba(255,255,240,.8)'; g.beginPath(); g.ellipse(70 + i * 120, 18, 22, 6, 0, 0, 7); g.fill(); }
+  if (neon) { g.font = 'italic 70px Georgia, serif'; g.fillStyle = '#6f8bff'; g.shadowColor = '#4c6bff'; g.shadowBlur = 20;
+    g.fillText('La Riviera', 60, 150); }
+});
+const menuPoster = textTex(512, 256, (g, w, h) => {
+  g.fillStyle = '#3a3f46'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#16181b'; g.fillRect(20, 60, 200, 190);
+  g.fillStyle = '#f1c232'; g.font = 'bold 22px system-ui'; g.fillText('MENÚ', 85, 95);
+  for (let i = 0; i < 14; i++) { g.fillStyle = ['#e06c3c', '#f1c232', '#ffffff'][i % 3]; g.beginPath(); g.arc(270 + (i % 5) * 50, 90 + Math.floor(i / 5) * 55, 20, 0, 7); g.fill(); }
+});
+// Fachada A (z = 0): sillar a 1,45 m, alto 1,8 m (de la esquina hacia la izquierda)
+windowPane(2.2, 1.8, -2.25, 2.35, 0.02, 0, 0x8a7d70, menuPoster, { cols: [0.16, 0.58], transom: 0.38, ledge: true });
+windowPane(2.1, 1.8, -5.65, 2.35, 0.02, 0, 0x8a7d70, menuPoster, { cols: [0.59], transom: 0.38, ledge: true });
+windowPane(1.5, 1.8, -7.85, 2.35, 0.02, 0, 0x8a7d70, shopInterior(true), { cols: [], transom: 0.22, ledge: true });
+// cortina metálica
+plane(2.4, 2.6, mat({ map: textTex(64, 256, (g, w, h) => { g.fillStyle = '#d7d9db'; g.fillRect(0, 0, w, h);
+  for (let y = 0; y < h; y += 8) { g.fillStyle = '#b4b7ba'; g.fillRect(0, y, w, 2); } }) }), -10.3, 1.3, 0.02);
+// ventanas en pisos superiores: alineadas con las del primer piso
+[[-2.25, 2.2], [-5.65, 2.1], [-7.85, 1.5], [-11.2, 2.2]].forEach(([x, w]) => {
+  windowPane(w, 1.6, x, 5.8, 0.02, 0, 0x2a2a2a);
+  windowPane(w, 1.6, x, 8.7, 0.02, 0, 0x2a2a2a);
+});
+for (let z = -2.5; z > -LEN_B + 1; z -= 3.8) {
+  windowPane(2.2, 1.6, 0.02, 5.8, z - 1.1, Math.PI / 2, 0x2a2a2a);
+  windowPane(2.2, 1.6, 0.02, 8.7, z - 1.1, Math.PI / 2, 0x2a2a2a);
+}
+// Fachada B (bajo soportal, x = -ARC) — ventanas con marco amarillo (foto "frente"):
+// paño izquierdo angosto y travesaño alto; sillar a 1,1 m
+windowPane(2.6, 2.1, -ARC + 0.02, 2.15, -3.0, Math.PI / 2, 0xe0b326, shopInterior(false), { cols: [0.35], transom: 0.4 });
+windowPane(2.6, 2.1, -ARC + 0.02, 2.15, -6.8, Math.PI / 2, 0xe0b326, shopInterior(false), { cols: [0.35], transom: 0.4 });
+windowPane(2.6, 2.1, -ARC + 0.02, 2.15, -10.6, Math.PI / 2, 0xe0b326, shopInterior(false), { cols: [0.35], transom: 0.4 });
+
+// Aviso amarillo "La Riviera"
+plane(3.0, 0.86, new THREE.MeshStandardMaterial({ map: textTex(1024, 290, (g, w, h) => {
+  g.fillStyle = '#f6e81c'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#d1281f'; g.font = 'bold italic 150px Georgia, serif'; g.textAlign = 'center';
+  g.fillText('La Riviera', w / 2 + 50, 165);
+  g.fillStyle = '#7a2b14'; g.font = 'italic 46px Georgia, serif'; g.fillText('Pollo Asado y Restaurante', w / 2 + 50, 250);
+  g.fillStyle = '#d1281f'; g.beginPath(); g.arc(90, 140, 70, 0, 7); g.fill();
+}), emissive: 0x333300 }), -8.45, 4.2, 0.08);
+// Placa de nomenclatura
+plane(0.75, 0.35, mat({ map: textTex(420, 196, (g, w, h) => {
+  g.fillStyle = '#5b2a3b'; g.fillRect(0, 0, w, h); g.strokeStyle = '#fff'; g.lineWidth = 6; g.strokeRect(6, 6, w - 12, h - 12);
+  g.fillStyle = '#fff'; g.font = '20px system-ui'; g.fillText('AV. JULIO CÉSAR TURBAY', 24, 42);
+  g.font = 'bold 44px system-ui'; g.fillText('Carrera   7', 24, 105); g.fillText('Calle     12', 24, 165);
+}) }), -1.45, 4.05, 0.04);
+// Flecha de sentido único en la pared
+const arrowTex = textTex(256, 80, (g, w, h) => {
+  g.fillStyle = '#111'; g.fillRect(0, 0, w, h); g.fillStyle = '#fff';
+  g.beginPath(); g.moveTo(20, 40); g.lineTo(70, 12); g.lineTo(70, 30); g.lineTo(236, 30); g.lineTo(236, 50); g.lineTo(70, 50); g.lineTo(70, 68); g.closePath(); g.fill();
+});
+plane(0.9, 0.3, mat({ map: arrowTex }), -5.35, 3.85, 0.04);
+// Poste con flecha en la esquina
+const post = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, 2.8), mat({ color: 0xcfcfcf })); post.position.set(1.0, 1.4, 0.8); post.castShadow = true; scene.add(post);
+const sign = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.45, 0.03), [mat({ color: 0x111 }), mat({ color: 0x111 }), mat({ color: 0x111 }), mat({ color: 0x111 }), mat({ map: arrowTex }), mat({ map: arrowTex })]);
+sign.position.set(1.0, 2.9, 0.8); sign.castShadow = true; scene.add(sign);
+// Avisos redondos "24 horas"
+const roundTex = textTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(128, 128, 124, 0, 7); g.fill();
+  g.strokeStyle = '#222'; g.lineWidth = 10; g.stroke();
+  g.fillStyle = '#d1281f'; g.font = 'bold 64px system-ui'; g.textAlign = 'center'; g.fillText('24', 128, 150); g.font = 'bold 36px system-ui'; g.fillText('HORAS', 128, 195);
+  g.fillStyle = '#f0b51e'; g.beginPath(); g.arc(128, 70, 26, 0, 7); g.fill();
+});
+function roundSign(x, z, ry) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(.5, .5, .12, 32), [mat({ color: 0x222 }), mat({ map: roundTex }), mat({ map: roundTex })]);
+  m.rotation.set(Math.PI / 2, 0, 0); const g = new THREE.Group(); g.add(m); g.rotation.y = ry; g.position.set(x, 3.0, z); scene.add(g);
+}
+roundSign(0.4, -1.2, Math.PI / 2);
+roundSign(-12, 0.6, 0);
+
+// Edificios vecinos (bloques simples)
+const neighbor = (w, h, d, x, z, color) => box(w, h, d, mat({ color }), x, h / 2, z);
+neighbor(14, 7, 18, -LEN_A - 7.5, -9, 0xcfc4b3);
+neighbor(12, 12, 16, -8, -LEN_B - 9, 0xb5634a);
+neighbor(16, 6, 14, -10, 23, 0xd9d2c4);
+neighbor(10, 9, 14, -28, 23, 0xb86b52);
+neighbor(14, 5, 14, 26, 6, 0xe0d6c4);
+neighbor(14, 14, 18, 26, -16, 0xc9c1b2);
+// árboles en la carrera
+function tree(x, z) {
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(.15, .2, 2.5), mat({ color: 0x6b4f3a })); t.position.set(x, 1.25, z); t.castShadow = true; scene.add(t);
+  const c = new THREE.Mesh(new THREE.SphereGeometry(1.6, 12, 10), mat({ color: 0x4f7d45 })); c.position.set(x, 3.6, z); c.castShadow = true; scene.add(c);
+}
+for (let z = 6; z > -40; z -= 9) tree(18, z);
+
+// ---------- letreros (las imágenes del usuario) ----------
+const loader = new THREE.TextureLoader();
+const SIGNS = [
+  { key: 'bancolombia', name: 'Bancolombia – Retiros y consignaciones', wall: 'A', w: 1.1, pos: [-4.0, 2.3] },
+  { key: 'tarjeta', name: 'Tarjeta débito Bancolombia', wall: 'A', w: 0.8, pos: [-0.55, 2.3] },
+  { key: 'nequi', name: 'Nequi – app', wall: 'B', w: 0.9, pos: [-13.2, 1.9] },
+  { key: 'mano', name: 'Nequi – celular en la mano', wall: 'B', w: 0.7, pos: [-15.4, 1.8] },
+];
+// Paredes donde se pueden poner: A (z=0, x de -LEN_A a 0) y B (x=-ARC, z de 0 a -LEN_B)
+const WALLS = {
+  A: { normal: new THREE.Vector3(0, 0, 1), plane: new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.06), min: -LEN_A + 0.5, max: -0.2, ry: 0,
+       place: (m, u, y) => m.position.set(u, y, 0.06) },
+  B: { normal: new THREE.Vector3(1, 0, 0), plane: new THREE.Plane(new THREE.Vector3(1, 0, 0), ARC - 0.06), min: -LEN_B + 0.5, max: -1.4, ry: Math.PI / 2,
+       place: (m, u, y) => m.position.set(-ARC + 0.06, y, u) },
+};
+const signMeshes = [];
+function buildSign(s) {
+  const img = F[s.key];
+  const tex = loader.load(img.src); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  const h = s.w * img.h / img.w;
+  const g = new THREE.Group();
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(s.w, h), new THREE.MeshStandardMaterial({ map: tex, transparent: s.key === 'mano', roughness: .6 }));
+  face.position.z = 0.03;
+  const back = new THREE.Mesh(new THREE.BoxGeometry(s.w + .08, h + .08, .04), mat({ color: 0x222222 }));
+  if (s.key !== 'mano') g.add(back);
+  g.add(face);
+  g.rotation.y = WALLS[s.wall].ry;
+  g.userData = { sign: s, h };
+  face.userData.group = g; back.userData.group = g;
+  scene.add(g);
+  s.mesh = g; signMeshes.push(face); if (back.parent) signMeshes.push(back);
+  placeSign(s, s.pos[0], s.pos[1]);
+}
+function placeSign(s, u, y) {
+  const W = WALLS[s.wall], half = s.w / 2, hh = s.mesh.userData.h / 2;
+  u = THREE.MathUtils.clamp(u, W.min + half, W.max - half);
+  y = THREE.MathUtils.clamp(y, 0.4 + hh, (s.wall === 'A' ? H : H1) - 0.2 - hh);
+  s.cur = [u, y]; W.place(s.mesh, u, y);
+}
+const DEFAULTS = SIGNS.map(s => [...s.pos]);
+function loadSaved() {
+  try { const d = JSON.parse(localStorage.getItem('letreros-pos-v2') || 'null'); if (d) SIGNS.forEach(s => { if (d[s.key]) s.pos = d[s.key]; }); } catch (e) {}
+}
+function save() {
+  try { localStorage.setItem('letreros-pos-v2', JSON.stringify(Object.fromEntries(SIGNS.map(s => [s.key, s.cur])))); } catch (e) {}
+}
+loadSaved();
+SIGNS.forEach(buildSign);
+
+// ---------- marcadores de fotos ----------
+const PHOTOS = [
+  { key: 'costado', name: 'Fachada sobre la Calle 12', cam: [-5.5, 1.7, 10.5], look: [-5.5, 2.2, 0] },
+  { key: 'lado', name: 'Esquina desde el frente', cam: [-6, 1.7, 9], look: [1.5, 2.6, -5] },
+  { key: 'frente', name: 'Columna de la esquina', cam: [4.5, 1.7, 3.6], look: [-1, 2.2, -2.5] },
+];
+const camIconTex = textTex(128, 128, (g, w, h) => {
+  g.fillStyle = '#c8102e'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.fillRect(28, 44, 72, 46); g.fillRect(50, 34, 28, 14);
+  g.fillStyle = '#c8102e'; g.beginPath(); g.arc(64, 67, 15, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(64, 67, 8, 0, 7); g.fill();
+});
+const photoSprites = [];
+PHOTOS.forEach(p => {
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: camIconTex, depthTest: false }));
+  sp.scale.set(1, 1, 1); sp.position.set(p.cam[0], p.cam[1] + 1.2, p.cam[2]); sp.renderOrder = 10;
+  sp.userData.photo = p; scene.add(sp); photoSprites.push(sp);
+  // línea de visión
+  const pts = [new THREE.Vector3(...p.cam), new THREE.Vector3(...p.look)];
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineDashedMaterial({ color: 0xc8102e, dashSize: .4, gapSize: .25 }));
+  line.computeLineDistances(); scene.add(line);
+});
+
+// ---------- UI ----------
+const $ = (id) => document.getElementById(id);
+const viewer = $('viewer');
+function showImage(title, src) { $('vtitle').textContent = title; $('vimg').src = src; viewer.classList.add('show'); }
+$('vclose').onclick = () => { viewer.classList.remove('show'); setActive(null); };
+
+let anim = null;
+function flyTo(pos, target, ms = 1100) {
+  anim = { t0: performance.now(), ms, p0: camera.position.clone(), t0v: controls.target.clone(),
+    p1: new THREE.Vector3(...pos), t1: new THREE.Vector3(...target) };
+}
+function setActive(el) { document.querySelectorAll('.item').forEach(i => i.classList.toggle('active', i === el)); }
+
+function makeItem(parent, src, title, sub, onclick) {
+  const b = document.createElement('button'); b.className = 'item';
+  b.innerHTML = `<img src="${src}" alt=""><span>${title}<small>${sub}</small></span>`;
+  b.onclick = () => { setActive(b); onclick(); };
+  parent.appendChild(b); return b;
+}
+PHOTOS.forEach(p => {
+  p.el = makeItem($('photos'), F[p.key].src, p.name, p.key + ' · ver desde donde se tomó', () => openPhoto(p));
+});
+function openPhoto(p) { flyTo(p.cam, p.look); showImage(p.name, F[p.key].src); setActive(p.el); }
+SIGNS.forEach(s => {
+  s.el = makeItem($('signs'), F[s.key].src, s.name, s.wall === 'A' ? 'Fachada Calle 12' : 'Soportal Carrera 7', () => openSign(s));
+});
+function openSign(s) {
+  const W = WALLS[s.wall], c = s.mesh.position;
+  const off = W.normal.clone().multiplyScalar(4.5);
+  flyTo([c.x + off.x, c.y + 0.6, c.z + off.z], [c.x, c.y, c.z]);
+  showImage(s.name, F[s.key].src); setActive(s.el);
+}
+const HOME = { pos: [22, 17, 24], target: [-8, 2, -6] };
+$('home').onclick = () => flyTo(HOME.pos, HOME.target);
+$('top').onclick = () => flyTo([-6, 55, 8], [-6, 0, -2]);
+$('reset').onclick = () => { SIGNS.forEach((s, i) => placeSign(s, ...DEFAULTS[i])); save(); };
+$('toggle').onclick = () => $('panel').classList.toggle('collapsed');
+
+camera.position.set(...HOME.pos); controls.target.set(...HOME.target);
+
+// ---------- interacción: clic, hover y arrastre ----------
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2(), label = $('label');
+let drag = null, downAt = null;
+function setMouse(e) { const r = canvas.getBoundingClientRect(); mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(mouse, camera); }
+canvas.addEventListener('pointerdown', (e) => {
+  setMouse(e); downAt = [e.clientX, e.clientY];
+  const hit = ray.intersectObjects(signMeshes)[0];
+  if (hit && e.button === 0) {
+    const g = hit.object.userData.group, s = g.userData.sign, W = WALLS[s.wall];
+    const p = new THREE.Vector3(); ray.ray.intersectPlane(W.plane, p);
+    drag = { s, W, du: (s.wall === 'A' ? p.x : p.z) - s.cur[0], dy: p.y - s.cur[1], moved: false };
+    controls.enabled = false; canvas.setPointerCapture(e.pointerId);
+  }
+});
+canvas.addEventListener('pointermove', (e) => {
+  setMouse(e);
+  if (drag) {
+    const p = new THREE.Vector3();
+    if (ray.ray.intersectPlane(drag.W.plane, p)) {
+      placeSign(drag.s, (drag.s.wall === 'A' ? p.x : p.z) - drag.du, p.y - drag.dy); drag.moved = true;
+    }
+    return;
+  }
+  const hs = ray.intersectObjects(photoSprites)[0], hg = ray.intersectObjects(signMeshes)[0];
+  const txt = hs ? '📷 ' + hs.object.userData.photo.name : hg ? hg.object.userData.group.userData.sign.name + ' (arrastrar para mover)' : '';
+  canvas.style.cursor = txt ? 'pointer' : '';
+  label.style.display = txt ? 'block' : 'none'; label.textContent = txt;
+  label.style.left = e.clientX + 'px'; label.style.top = e.clientY + 'px';
+});
+canvas.addEventListener('pointerup', (e) => {
+  const click = downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) < 5;
+  if (drag) { controls.enabled = true; const s = drag.s; if (drag.moved) save(); drag = null; if (click) openSign(s); return; }
+  if (click) { setMouse(e); const hs = ray.intersectObjects(photoSprites)[0]; if (hs) openPhoto(hs.object.userData.photo); }
+});
+
+// ---------- bucle ----------
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+const ease = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+renderer.setAnimationLoop((now) => {
+  if (anim) {
+    const k = Math.min(1, (now - anim.t0) / anim.ms), e = ease(k);
+    camera.position.lerpVectors(anim.p0, anim.p1, e); controls.target.lerpVectors(anim.t0v, anim.t1, e);
+    if (k === 1) anim = null;
+  }
+  controls.update(); renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
