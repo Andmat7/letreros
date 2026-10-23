@@ -13,9 +13,12 @@ const template = /* html */ `
       <button class="command" data-command="home">Vista general</button>
       <button class="command" data-command="top">Desde arriba</button>
       <button class="command" data-command="reset">Reiniciar letreros</button>
+      <button class="command" data-command="measure">📏 Medir</button>
     </div>
     <p class="hint">Arrastra para girar · rueda o pellizco para acercar · clic derecho para desplazar.<br>
-      Arrastra un letrero sobre la pared para moverlo. La figura azul mide 1,70 m.</p>
+      Arrastra un letrero sobre la pared para moverlo. La figura azul mide 1,70 m.<br>
+      Medir: activa 📏 y haz clic en dos puntos del modelo; arrastra los puntos azules para ajustarlos.<br>
+      Un clic fuera de los puntos empieza otra medida. «Copiar coordenadas» copia el resultado.</p>
   </div>
 `;
 
@@ -37,6 +40,10 @@ export class SitePanel extends HTMLElement {
 
   set_active(key) {
     this.shadowRoot.querySelectorAll('.item').forEach(element => element.classList.toggle('active', element.dataset.key === key));
+  }
+
+  set_pressed(command, is_pressed) {
+    this.shadowRoot.querySelector(`[data-command="${command}"]`).classList.toggle('pressed', is_pressed);
   }
 
   #create_item({ kind, key, title, subtitle, image }) {

@@ -23,6 +23,7 @@ site_panel_styles.replaceSync(/* css */ `
     padding: 6px 10px; font: inherit; font-size: 12px; cursor: pointer;
   }
   button.command:hover { border-color: var(--accent); }
+  button.command.pressed { background: var(--accent); border-color: var(--accent); color: #fff; }
   .hint { color: var(--muted); font-size: 11px; margin: 10px 0 0; }
   .toggle { display: none; float: right; }
   @media (max-width: 640px) {

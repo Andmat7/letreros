@@ -7,20 +7,24 @@ import { build_streets } from './scene/street.js';
 import { build_surroundings } from './scene/surroundings.js';
 import { build_windows } from './scene/windows.js';
 import { create_camera_flight } from './interaction/camera_flight.js';
+import { create_measuring_tape, set_measuring } from './interaction/measuring_tape.js';
 import { build_photo_markers } from './interaction/photo_markers.js';
 import { attach_pointer_controller } from './interaction/pointer_controller.js';
 import { build_wall_signs, reset_signs } from './interaction/wall_signs.js';
 import './components/image_viewer.js';
+import './components/measure_readout.js';
 import './components/site_panel.js';
 
 const stage = create_stage(document.getElementById('scene'));
 const panel = document.querySelector('site-panel');
 const viewer = document.querySelector('image-viewer');
+const readout = document.querySelector('measure-readout');
 build_world(stage.scene);
 const signs = build_wall_signs(stage.scene);
 const markers = build_photo_markers(stage.scene);
+const tape = create_measuring_tape(stage.scene, points => readout.show(points));
 const flight = create_camera_flight(stage.camera, stage.controls);
-attach_pointer_controller(stage, { signs, markers }, { on_photo: show_photo, on_sign: show_sign });
+attach_pointer_controller(stage, { signs, markers, tape }, { on_photo: show_photo, on_sign: show_sign });
 connect_panel();
 start(overview_views.home);
 
@@ -46,7 +50,13 @@ function connect_panel() {
 
 function run_command(command) {
   if (command === 'reset') return reset_signs(signs);
+  if (command === 'measure') return toggle_measuring();
   flight.fly_to(overview_views[command]);
+}
+
+function toggle_measuring() {
+  set_measuring(tape, !tape.active);
+  panel.set_pressed('measure', tape.active);
 }
 
 function show_photo(viewpoint) {
