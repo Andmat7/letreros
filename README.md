@@ -13,7 +13,7 @@ Run the build again after changing anything in `images/`.
 ## View
 
 - Online: https://andmat7.github.io/letreros/
-- Locally: `.venv/Scripts/python -m http.server 8000`, then open http://localhost:8000 (ES modules do not load from `file://`).
+- Locally: `.venv/Scripts/python tools/dev_server.py`, then open http://localhost:8000 (ES modules do not load from `file://`; this server turns off browser caching so old modules never mix with new ones).
 
 ## What it is
 
