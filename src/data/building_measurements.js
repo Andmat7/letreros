@@ -13,7 +13,7 @@ export const building = {
   ground_floor_height: 3.4, // estimated
   total_height: 10, // estimated
   brick_course_height: 0.075, // estimated: one brick plus its mortar joint
-  calle_12_facade_length: 14, // estimated
+  calle_12_facade_length: 16.5, // estimated: up to the glass building, past the Ésika shop
   carrera_7_facade_length: 18, // estimated
   corner_pier_depth: 1.2, // estimated: corner column width seen from Carrera 7
   arcade_depth: 2.4, // estimated: column face to the wall under the arcade
@@ -63,4 +63,14 @@ export const upper_windows = {
     { width: 2.2, distance_from_corner: 10.1, mullions: [1.1] },
     { width: 2.2, distance_from_corner: 13.9, mullions: [1.1] },
   ],
+};
+
+// Shop with the red ÉSIKA sign, next to the AIDEV shop on Calle 12. Estimated from
+// the photos "calle_12_frontal" and "calle_12_diagonal". Heights from the sidewalk.
+export const esika_shop = {
+  door: { distance_from_corner: 11.7, width: 2.2, height: 2.25 },
+  display: { distance_from_corner: 13.95, width: 1.5, height: 2.25 },
+  red_sign: { distance_from_corner: 13.95, width: 1.4, height: 0.45, bottom_height: 1.8 },
+  services_sign: { distance_from_corner: 11.8, width: 2.0, height: 0.45, bottom_height: 2.45 },
+  brand_sign: { distance_from_corner: 12.4, width: 4.4, height: 1.2, bottom_height: 2.95 },
 };
