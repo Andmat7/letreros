@@ -15,7 +15,8 @@ const template = /* html */ `
       <button class="command" data-command="reset">Reiniciar letreros</button>
       <button class="command" data-command="measure">📏 Medir</button>
     </div>
-    <p class="hint">Arrastra para girar · rueda o pellizco para acercar · clic derecho para desplazar.<br>
+    <p class="hint">Al elegir una foto, se pone encima del modelo desde el mismo punto: compáralas con la tecla F.<br>
+      Arrastra para girar · rueda o pellizco para acercar · clic derecho para desplazar.<br>
       Arrastra un letrero sobre la pared para moverlo. La figura azul mide 1,70 m.<br>
       Medir: activa 📏 y haz clic en dos puntos del modelo. Los puntos se pegan a bordes y esquinas,<br>
       y la medida va siempre recta (horizontal o vertical). Arrastra los puntos azules para ajustarlos.<br>

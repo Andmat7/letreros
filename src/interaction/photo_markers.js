@@ -13,9 +13,15 @@ export function build_photo_markers(scene) {
     marker.position.set(x, y + 1.2, z);
     marker.renderOrder = 10;
     marker.userData.viewpoint = viewpoint;
-    scene.add(marker, sight_line(viewpoint));
+    marker.userData.sight_line = sight_line(viewpoint);
+    scene.add(marker, marker.userData.sight_line);
     return marker;
   });
+}
+
+// Hidden while a photo is laid over the view, so the icons do not cover it.
+export function set_markers_visible(markers, is_visible) {
+  markers.forEach(marker => { marker.visible = marker.userData.sight_line.visible = is_visible; });
 }
 
 function sight_line({ camera_position, look_at }) {

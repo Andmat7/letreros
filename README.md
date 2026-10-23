@@ -19,6 +19,8 @@ Run the build again after changing anything in `images/`.
 
 An approximate 3D model of the La Riviera corner (Carrera 7 con Calle 12) with proposed sign placements (Bancolombia, Nequi). The scene can be rotated and zoomed, signs can be dragged along the walls, and camera icons mark where each photo was taken. A 1.70 m figure gives scale.
 
+Choosing a photo moves the camera to where it was taken, with the same lens, and lays the photo over the view: the F key hides or shows it, "Foto" sets its transparency, "Lente" the field of view, and "Copiar cámara" copies the adjusted camera as a line for `src/data/photo_viewpoints.js`.
+
 The 📏 Medir button measures between two clicked points; points stick to nearby edges and corners, the measurement runs straight along x, y or z, the dots can be dragged and "Copiar coordenadas" copies the result. Coordinates are in meters from the outer building corner: x goes negative along Calle 12, z goes negative along Carrera 7, y is the height above the road (the sidewalk is at 0.15).
 
 ## Layout

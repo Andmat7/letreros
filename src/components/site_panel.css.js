@@ -25,10 +25,9 @@ site_panel_styles.replaceSync(/* css */ `
   button.command:hover { border-color: var(--accent); }
   button.command.pressed { background: var(--accent); border-color: var(--accent); color: #fff; }
   .hint { color: var(--muted); font-size: 11px; margin: 10px 0 0; }
-  .toggle { display: none; float: right; }
+  .toggle { float: right; }
+  :host(.collapsed) .body { display: none; }
   @media (max-width: 640px) {
     :host { width: auto; right: 16px; max-height: 45%; }
-    :host(.collapsed) .body { display: none; }
-    .toggle { display: block; }
   }
 `);

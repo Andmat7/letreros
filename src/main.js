@@ -8,22 +8,26 @@ import { build_surroundings } from './scene/surroundings.js';
 import { build_windows } from './scene/windows.js';
 import { create_camera_flight } from './interaction/camera_flight.js';
 import { create_measuring_tape, set_measuring } from './interaction/measuring_tape.js';
-import { build_photo_markers } from './interaction/photo_markers.js';
+import { create_photo_comparison } from './interaction/photo_comparison.js';
+import { build_photo_markers, set_markers_visible } from './interaction/photo_markers.js';
 import { attach_pointer_controller } from './interaction/pointer_controller.js';
 import { build_wall_signs, reset_signs } from './interaction/wall_signs.js';
 import './components/image_viewer.js';
 import './components/measure_readout.js';
+import './components/photo_overlay/photo_overlay.js';
 import './components/site_panel.js';
 
 const stage = create_stage(document.getElementById('scene'));
 const panel = document.querySelector('site-panel');
 const viewer = document.querySelector('image-viewer');
 const readout = document.querySelector('measure-readout');
+const overlay = document.querySelector('photo-overlay');
 build_world(stage.scene);
 const signs = build_wall_signs(stage.scene);
 const markers = build_photo_markers(stage.scene);
 const tape = create_measuring_tape(stage.scene, points => readout.show(points));
 const flight = create_camera_flight(stage.camera, stage.controls);
+const comparison = create_photo_comparison({ stage, flight, overlay }, end_photo);
 attach_pointer_controller(stage, { signs, markers, tape }, { on_photo: show_photo, on_sign: show_sign });
 connect_panel();
 start(overview_views.home);
@@ -51,6 +55,7 @@ function connect_panel() {
 function run_command(command) {
   if (command === 'reset') return reset_signs(signs);
   if (command === 'measure') return toggle_measuring();
+  comparison.close();
   flight.fly_to(overview_views[command]);
 }
 
@@ -59,13 +64,22 @@ function toggle_measuring() {
   panel.set_pressed('measure', tape.active);
 }
 
+// The panel folds away so it does not cover the photo laid over the view.
 function show_photo(viewpoint) {
-  flight.fly_to(viewpoint);
-  viewer.show({ title: viewpoint.title, image: photo_bundle[viewpoint.key].source });
+  viewer.hide();
+  panel.classList.add('collapsed');
+  set_markers_visible(markers, false);
+  comparison.open(viewpoint);
   panel.set_active(viewpoint.key);
 }
 
+function end_photo() {
+  set_markers_visible(markers, true);
+  panel.set_active('');
+}
+
 function show_sign(sign) {
+  comparison.close();
   const center = sign.group.position;
   const camera_position = center.clone().addScaledVector(sign.wall.normal, 4.5);
   flight.fly_to({ camera_position: [camera_position.x, center.y + 0.6, camera_position.z], look_at: center.toArray() });

@@ -53,7 +53,7 @@ function handle_release(state, event) {
   if (!is_click) return;
   aim(state, event);
   if (state.targets.tape.active) return add_tape_point(state.targets.tape, state.raycaster);
-  const marker_hit = state.raycaster.intersectObjects(state.targets.markers)[0];
+  const marker_hit = state.raycaster.intersectObjects(visible_markers(state))[0];
   if (marker_hit) state.callbacks.on_photo(marker_hit.object.userData.viewpoint);
 }
 
@@ -71,7 +71,7 @@ function release_tape_dot(state) {
 }
 
 function show_hover_label(state, event) {
-  const marker_hit = state.raycaster.intersectObjects(state.targets.markers)[0];
+  const marker_hit = state.raycaster.intersectObjects(visible_markers(state))[0];
   const sign_hit = state.raycaster.intersectObjects(sign_meshes(state))[0];
   const text = marker_hit ? `📷 ${marker_hit.object.userData.viewpoint.title}`
     : sign_hit ? `${sign_hit.object.userData.sign.entry.title} (arrastrar para mover)` : '';
@@ -104,6 +104,11 @@ function aim(state, event) {
 
 function wall_point(state, sign) {
   return state.raycaster.ray.intersectPlane(sign.wall.plane, new THREE.Vector3());
+}
+
+// Raycasts also hit hidden objects, so hidden markers are left out by hand.
+function visible_markers(state) {
+  return state.targets.markers.filter(marker => marker.visible);
 }
 
 function sign_meshes(state) {
