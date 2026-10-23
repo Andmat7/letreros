@@ -19,6 +19,8 @@ class PhotoBundleBuilder:
         "costado": "images/photos/costado.webp",
         "frente": "images/photos/frente.webp",
         "lado": "images/photos/lado.webp",
+        "calle_12_frontal": "images/photos/calle_12_frontal.jpg",
+        "calle_12_diagonal": "images/photos/calle_12_diagonal.jpg",
         "bancolombia_retiros": "images/signs/bancolombia_retiros.webp",
         "nequi": "images/signs/nequi.png",
         "mano": "images/signs/mano.webp",

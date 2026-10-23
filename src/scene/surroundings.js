@@ -3,7 +3,7 @@ import { building, reference_person, streets } from '../data/building_measuremen
 import { add_box, standard_material } from './primitives.js';
 import { canvas_texture } from './textures.js';
 
-const curb_height = 0.15;
+const curb_height = streets.curb_height;
 const umbrella_colors = [0xd8342a, 0xf0c419, 0x2e9e5b, 0x2c6db5];
 
 export function build_surroundings(scene) {

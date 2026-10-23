@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { building, calle_12_windows, carrera_7_windows, upper_windows } from '../data/building_measurements.js';
+import { building, calle_12_windows, carrera_7_windows, streets, upper_windows } from '../data/building_measurements.js';
 import { standard_material } from './primitives.js';
 import { brick_texture, canvas_texture } from './textures.js';
 
@@ -33,7 +33,7 @@ function add_window(scene, window_spec, facade) {
   frame_bars(window_spec).forEach(bar => group.add(create_bar(bar, frame_material)));
   if (window_spec.has_ledge) group.add(create_ledge(window_spec));
   const center_distance = window_spec.distance_from_corner + window_spec.width / 2;
-  group.position.set(...facade.to_position(center_distance, window_spec.sill_height + window_spec.height / 2));
+  group.position.set(...facade.to_position(center_distance, streets.curb_height + window_spec.sill_height + window_spec.height / 2));
   group.rotation.y = facade.rotation_y;
   scene.add(group);
 }

@@ -1,5 +1,6 @@
 // Every size is in meters. Values marked "estimated" come from the photos and
 // should be replaced with tape measurements taken on site.
+// Window heights are measured from the sidewalk surface, as with a tape on site.
 // Origin: outer corner of the building at road level. Calle 12 runs along -x,
 // Carrera 7 runs along -z.
 
@@ -22,6 +23,7 @@ export const building = {
 };
 
 export const streets = {
+  curb_height: 0.15, // estimated: sidewalk surface above the road
   calle_12_sidewalk_width: 3.5, // estimated
   calle_12_road_width: 8, // estimated
   carrera_7_sidewalk_width: 3.5, // estimated
@@ -31,10 +33,11 @@ export const streets = {
 // distance_from_corner: from the building corner to the window edge nearest to it.
 // mullions: vertical bars, measured from the left edge as seen from the street.
 // transom_from_top: horizontal bar, measured down from the top edge.
+// Measured on site: sill_height. Everything else on these windows is still estimated.
 export const calle_12_windows = [
-  { width: 2.2, height: 1.8, sill_height: 1.45, distance_from_corner: 1.15, mullions: [0.35, 1.28], transom_from_top: 0.68, frame_color: 0x8a7d70, interior: 'menu', has_ledge: true },
-  { width: 2.1, height: 1.8, sill_height: 1.45, distance_from_corner: 4.6, mullions: [1.24], transom_from_top: 0.68, frame_color: 0x8a7d70, interior: 'menu', has_ledge: true },
-  { width: 1.5, height: 1.8, sill_height: 1.45, distance_from_corner: 7.1, mullions: [], transom_from_top: 0.4, frame_color: 0x8a7d70, interior: 'neon', has_ledge: true },
+  { width: 2.2, height: 1.8, sill_height: 1.20, distance_from_corner: 1.15, mullions: [0.35, 1.28], transom_from_top: 0.68, frame_color: 0x8a7d70, interior: 'menu', has_ledge: true },
+  { width: 2.1, height: 1.8, sill_height: 1.20, distance_from_corner: 4.6, mullions: [1.24], transom_from_top: 0.68, frame_color: 0x8a7d70, interior: 'menu', has_ledge: true },
+  { width: 1.5, height: 1.8, sill_height: 1.20, distance_from_corner: 7.1, mullions: [], transom_from_top: 0.4, frame_color: 0x8a7d70, interior: 'neon', has_ledge: true },
 ];
 
 // Yellow-framed windows under the Carrera 7 arcade, measured along the wall.
@@ -45,7 +48,7 @@ export const carrera_7_windows = [
 ];
 
 export const upper_windows = {
-  sill_heights: [5.0, 7.9], // estimated
+  sill_heights: [4.85, 7.75], // estimated
   height: 1.6, // estimated
   frame_color: 0x2a2a2a,
   calle_12: [

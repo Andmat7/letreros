@@ -5,7 +5,7 @@ import { asphalt_texture, brick_texture, canvas_texture } from './textures.js';
 
 const street_length = 120;
 const block_length = 60;
-const curb_height = 0.15;
+const curb_height = streets.curb_height;
 const far_sidewalk_width = 4;
 
 export function build_streets(scene) {

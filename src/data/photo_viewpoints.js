@@ -7,6 +7,8 @@ export const photo_viewpoints = [
   { key: 'costado', title: 'Fachada sobre la Calle 12', camera_position: [-5.5, eye, 10.5], look_at: [-5.5, 2.2, 0] },
   { key: 'lado', title: 'Esquina desde el frente', camera_position: [-6, eye, 9], look_at: [1.5, 2.6, -5] },
   { key: 'frente', title: 'Columna de la esquina', camera_position: [4.5, eye, 3.6], look_at: [-1, 2.2, -2.5] },
+  { key: 'calle_12_frontal', title: 'Calle 12 desde la acera opuesta', camera_position: [-4, eye, 12], look_at: [-7, 2.4, 0] },
+  { key: 'calle_12_diagonal', title: 'Calle 12 desde la esquina opuesta', camera_position: [2, 1.3, 12.5], look_at: [-12, 2.2, 1] },
 ];
 
 export const overview_views = {
