@@ -2,8 +2,42 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="0; url=mapa3d.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Esquina Letreros 3D</title>
+<style>
+  :root {
+    --bg: #eef0f3; --panel: rgba(255, 255, 255, 0.94); --text: #1d2229; --muted: #5d6673;
+    --line: #d5d9df; --accent: #c8102e; --chip: #f3f4f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c; --panel: rgba(28, 32, 39, 0.94); --text: #e9ecf0; --muted: #9aa3ae;
+      --line: #343a44; --accent: #ff5a6e; --chip: #262b33;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  #scene { position: fixed; inset: 0; }
+  #hover_label {
+    position: fixed; pointer-events: none; transform: translate(12px, 12px); padding: 3px 8px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 6px; font-size: 12px;
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 </head>
-<body><a href="mapa3d.html">Abrir el mapa 3D</a></body>
+<body>
+<canvas id="scene"></canvas>
+<site-panel></site-panel>
+<image-viewer></image-viewer>
+<div id="hover_label" hidden></div>
+<script type="module" src="src/main.js"></script>
+</body>
 </html>
