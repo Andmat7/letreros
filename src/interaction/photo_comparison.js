@@ -22,7 +22,7 @@ function open_photo(comparison, flight, viewpoint) {
   comparison.active_photo = { viewpoint, fov: viewpoint.fov, aspect: image.width / image.height };
   flight.fly_to(viewpoint);
   match_lens(comparison);
-  comparison.overlay.show({ title: viewpoint.title, image: image.source, fov: viewpoint.fov });
+  comparison.overlay.show({ title: viewpoint.title, image: image.source, fov: viewpoint.fov, roll: viewpoint.roll });
 }
 
 function close_photo(comparison) {
@@ -51,7 +51,7 @@ function match_lens({ stage, active_photo }) {
 // Copies the adjusted camera as a line for photo_viewpoints.js.
 async function copy_camera({ stage, overlay, active_photo }) {
   const rounded = (vector) => vector.toArray().map(value => Number(value.toFixed(2))).join(', ');
-  const text = `{ key: '${active_photo.viewpoint.key}', camera_position: [${rounded(stage.camera.position)}], look_at: [${rounded(stage.controls.target)}], fov: ${active_photo.fov} },`;
+  const text = `{ key: '${active_photo.viewpoint.key}', camera_position: [${rounded(stage.camera.position)}], look_at: [${rounded(stage.controls.target)}], fov: ${active_photo.fov}, roll: ${active_photo.viewpoint.roll} },`;
   try {
     await navigator.clipboard.writeText(text);
     overlay.set_status('Cámara copiada ✓ Pégamela para dejarla fija.');

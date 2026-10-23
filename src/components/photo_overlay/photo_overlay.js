@@ -27,10 +27,12 @@ export class PhotoOverlay extends HTMLElement {
     this.#connect_controls(root);
   }
 
-  show({ title, image, fov }) {
+  // roll: degrees that turn the photo level, for photos taken with the phone tilted.
+  show({ title, image, fov, roll }) {
     const root = this.shadowRoot;
     root.querySelector('.title').textContent = title;
     root.querySelector('.photo').src = image;
+    root.querySelector('.photo').style.transform = `rotate(${roll}deg)`;
     root.querySelector('.fov').value = fov;
     root.querySelector('.fov_value').textContent = `${fov}°`;
     this.#set_concealed(false);

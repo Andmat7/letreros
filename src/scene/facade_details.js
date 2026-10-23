@@ -3,7 +3,8 @@ import { building, esika_shop, streets } from '../data/building_measurements.js'
 import { add_box, add_wall_plane, standard_material } from './primitives.js';
 import { canvas_texture } from './textures.js';
 
-// Positions on Calle 12 are distances from the corner, estimated from the photo "costado".
+// Positions on Calle 12 are distances from the corner, fitted from the photos "costado" and
+// "calle_12_frontal"; heights are above the road.
 const on_calle_12 = (distance, height, offset) => [-distance, height, offset];
 
 export function build_facade_details(scene) {
@@ -12,8 +13,9 @@ export function build_facade_details(scene) {
   add_riviera_sign(scene);
   add_street_plate(scene);
   add_one_way_signs(scene);
-  add_round_sign(scene, { position: [0.4, 3.0, -building.corner_pier_depth / 2], rotation_y: Math.PI / 2 });
-  add_round_sign(scene, { position: [-3.95, 3.2, 0.6], rotation_y: 0 });
+  // Both round signs stick out from the wall, facing along the street.
+  add_round_sign(scene, { position: [0.41, 2.78, -building.corner_pier_depth / 2], rotation_y: 0 });
+  add_round_sign(scene, { position: [-3.1, 2.65, 0.45], rotation_y: Math.PI / 2 });
 }
 
 function add_shutter(scene) {
@@ -22,7 +24,7 @@ function add_shutter(scene) {
     context.fillStyle = '#b4b7ba';
     for (let slat = 0; slat < height; slat += 8) context.fillRect(0, slat, width, 2);
   });
-  add_wall_plane(scene, { size: [2.4, 2.6], position: on_calle_12(10.3, 1.3, 0.02), material: standard_material({ map: texture }) });
+  add_wall_plane(scene, { size: [1.08, 2.2], position: on_calle_12(8.14, 1.25, 0.02), material: standard_material({ map: texture }) });
 }
 
 function add_esika_shop(scene) {
@@ -107,7 +109,7 @@ function add_riviera_sign(scene) {
     context.fillStyle = '#d1281f'; context.beginPath(); context.arc(90, 140, 70, 0, 7); context.fill();
   });
   const material = new THREE.MeshStandardMaterial({ map: texture, emissive: 0x333300 });
-  add_wall_plane(scene, { size: [3.0, 0.86], position: on_calle_12(8.45, 4.2, 0.08), material });
+  add_wall_plane(scene, { size: [2.6, 0.86], position: on_calle_12(7.4, 3.62, 0.08), material });
 }
 
 function add_street_plate(scene) {
@@ -120,13 +122,13 @@ function add_street_plate(scene) {
     context.fillText('Carrera   7', 24, 105);
     context.fillText('Calle     12', 24, 165);
   });
-  add_wall_plane(scene, { size: [0.75, 0.35], position: on_calle_12(1.45, 4.05, 0.04), material: standard_material({ map: texture }) });
+  add_wall_plane(scene, { size: [0.6, 0.31], position: on_calle_12(1.28, 3.6, 0.04), material: standard_material({ map: texture }) });
 }
 
 function add_one_way_signs(scene) {
   const arrow_material = standard_material({ map: arrow_texture() });
   const black = standard_material({ color: 0x111111 });
-  add_wall_plane(scene, { size: [0.9, 0.3], position: on_calle_12(5.35, 3.85, 0.04), material: arrow_material });
+  add_wall_plane(scene, { size: [0.74, 0.25], position: on_calle_12(4.64, 3.4, 0.04), material: arrow_material });
   add_box(scene, { size: [0.1, 2.8, 0.1], position: [1.0, 1.4, 0.8], material: standard_material({ color: 0xcfcfcf }) });
   add_box(scene, { size: [1.4, 0.45, 0.03], position: [1.0, 2.9, 0.8], material: [black, black, black, black, arrow_material, arrow_material] });
 }
@@ -141,12 +143,20 @@ function arrow_texture() {
   });
 }
 
+// The faces are flat circles so the text stays upright; a cylinder cap would turn it sideways.
 function add_round_sign(scene, { position, rotation_y }) {
-  const face = standard_material({ map: round_sign_texture() });
-  const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.12, 32), [standard_material({ color: 0x222222 }), face, face]);
-  disc.rotation.x = Math.PI / 2;
+  const radius = 0.27;
+  const face_material = standard_material({ map: round_sign_texture() });
+  const rim = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.08, 32, 1, true), standard_material({ color: 0x222222 }));
+  rim.rotation.x = Math.PI / 2;
   const holder = new THREE.Group();
-  holder.add(disc);
+  holder.add(rim);
+  [0.041, -0.041].forEach((offset, index) => {
+    const face = new THREE.Mesh(new THREE.CircleGeometry(radius, 32), face_material);
+    face.position.z = offset;
+    face.rotation.y = index * Math.PI;
+    holder.add(face);
+  });
   holder.rotation.y = rotation_y;
   holder.position.set(...position);
   scene.add(holder);

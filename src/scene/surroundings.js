@@ -19,7 +19,7 @@ function add_neighbor_blocks(scene) {
   const blocks = [
     [14, 7, 18, -length_a - 7.5, -9, 0xcfc4b3], [12, 12, 16, -8, -building.carrera_7_facade_length - 9, 0xb5634a],
     [16, 6, 14, -10, far_side_a, 0xd9d2c4], [10, 9, 14, -28, far_side_a, 0xb86b52],
-    [14, 5, 14, far_side_b, 6, 0xe0d6c4], [14, 14, 18, far_side_b, -16, 0xc9c1b2],
+    [14, 14, 18, far_side_b, -16, 0xc9c1b2],
   ];
   blocks.forEach(([width, height, depth, x, z, color]) =>
     add_box(scene, { size: [width, height, depth], position: [x, height / 2, z], material: standard_material({ color }) }));
