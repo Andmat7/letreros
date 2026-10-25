@@ -24,10 +24,15 @@ class PhotoBundleBuilder:
         "esquina_cerca": "images/photos/esquina_cerca.jpg",
         "esquina_calle_12": "images/photos/esquina_calle_12.jpg",
         "esquina_diagonal": "images/photos/esquina_diagonal.jpg",
-        "bancolombia_retiros": "images/signs/bancolombia_retiros.webp",
-        "nequi": "images/signs/nequi.png",
-        "mano": "images/signs/mano.webp",
-        "tarjeta": "images/signs/tarjeta.webp",
+        "propuesta_01": "images/signs/propuestas/propuesta_01_borrador_nequi_icono_y_mano.webp",
+        "propuesta_02": "images/signs/propuestas/propuesta_02_cuatro_bloques_iconos_servicios.webp",
+        "propuesta_03": "images/signs/propuestas/propuesta_03_tarjeta_bancolombia_ondas.webp",
+        "propuesta_04": "images/signs/propuestas/propuesta_04_flecha_morada_volteando_esquina.webp",
+        "propuesta_05": "images/signs/propuestas/propuesta_05_flecha_roja_volteando_esquina.webp",
+        "bancolombia_retiros": "images/signs/anteriores/bancolombia_retiros.webp",
+        "nequi": "images/signs/anteriores/nequi.png",
+        "mano": "images/signs/anteriores/mano.webp",
+        "tarjeta": "images/signs/anteriores/tarjeta.webp",
     }
     # PNG keeps the transparent background around the hand.
     transparent_keys = {"mano"}
