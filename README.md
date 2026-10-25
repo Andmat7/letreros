@@ -18,7 +18,7 @@ Run both builds again after changing anything in `images/`. The second one lists
 
 ## What it is
 
-An approximate 3D model of the La Riviera corner (Carrera 7 con Calle 12) with two blank proposed signs (corner column and corner seen from Calle 12). The scene can be rotated and zoomed, signs can be dragged along the walls, and camera icons mark where each photo was taken. A 1.70 m figure gives scale.
+An approximate 3D model of the La Riviera corner (Carrera 7 con Calle 12) with two removable boards (corner column and corner seen from Calle 12), whose design can be swapped in the panel. The scene can be rotated and zoomed, signs can be dragged along the walls, and camera icons mark where each photo was taken. A 1.70 m figure gives scale.
 
 Choosing a photo moves the camera to where it was taken, with the same lens, and lays the photo over the view: the F key hides or shows it, "Foto" sets its transparency, "Lente" the field of view, and "Copiar cámara" copies the adjusted camera as a line for `src/data/photo_viewpoints.js`.
 
@@ -33,3 +33,7 @@ The 📏 Medir button measures between two clicked points; points stick to nearb
 - `src/components/` – side panel and image viewer web components.
 - `src/generated/photo_bundle.js` – built by `tools/build_photo_bundle.py`; do not edit by hand.
 - `images/` – original photos and sign artwork.
+
+## Trying designs on the boards
+
+The panel's "Probar diseños" section lets you pick a design for each board (blank, Nequi, hand, Bancolombia, debit card), whether it fits whole or fills the board and cropped, and a 90° turn for wide designs on a tall board. Each design keeps its own ratio and sits on a white board; the choice is remembered in the browser. Add designs in `src/data/sign_artwork.js` (the image must be in `tools/build_photo_bundle.py`).

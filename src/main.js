@@ -1,4 +1,5 @@
 import { overview_views, photo_viewpoints } from './data/photo_viewpoints.js';
+import { artwork_fits, sign_artwork } from './data/sign_artwork.js';
 import { photo_bundle } from './generated/photo_bundle.js';
 import { create_stage } from './stage.js';
 import { build_building } from './scene/building.js';
@@ -11,7 +12,8 @@ import { create_measuring_tape, set_measuring } from './interaction/measuring_ta
 import { create_photo_comparison } from './interaction/photo_comparison.js';
 import { build_photo_markers, set_markers_visible } from './interaction/photo_markers.js';
 import { attach_pointer_controller } from './interaction/pointer_controller.js';
-import { build_wall_signs, reset_signs } from './interaction/wall_signs.js';
+import { build_wall_signs, reset_signs, save_artwork, set_sign_artwork } from './interaction/wall_signs.js';
+import './components/artwork_picker/artwork_picker.js';
 import './components/image_viewer.js';
 import './components/measure_readout.js';
 import './components/photo_overlay/photo_overlay.js';
@@ -22,6 +24,7 @@ const panel = document.querySelector('site-panel');
 const viewer = document.querySelector('image-viewer');
 const readout = document.querySelector('measure-readout');
 const overlay = document.querySelector('photo-overlay');
+const picker = document.querySelector('artwork-picker');
 build_world(stage.scene);
 const signs = build_wall_signs(stage.scene);
 const markers = build_photo_markers(stage.scene);
@@ -48,8 +51,24 @@ function connect_panel() {
   panel.addEventListener('panel-select', ({ detail }) => detail.kind === 'photo'
     ? show_photo(photo_viewpoints.find(viewpoint => viewpoint.key === detail.key))
     : show_sign(signs.find(sign => sign.entry.key === detail.key)));
+  picker.set_options({
+    boards: signs.map(sign => ({ key: sign.entry.key, title: sign.entry.title, artwork: sign.artwork })),
+    artworks: sign_artwork.map(({ key, title }) => ({ key, title: key ? `${title} (${photo_ratio(key)})` : title })),
+    fits: artwork_fits,
+  });
+  picker.addEventListener('artwork-change', ({ detail }) => change_artwork(detail));
   panel.addEventListener('panel-command', ({ detail }) => run_command(detail.command));
   viewer.addEventListener('viewer-close', () => panel.set_active(''));
+}
+
+function photo_ratio(key) {
+  const { width, height } = photo_bundle[key];
+  return `ancho/alto ${(width / height).toFixed(2)}`;
+}
+
+async function change_artwork({ board_key, ...artwork }) {
+  await set_sign_artwork(signs.find(sign => sign.entry.key === board_key), artwork);
+  save_artwork(signs);
 }
 
 function run_command(command) {

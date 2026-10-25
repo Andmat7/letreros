@@ -9,6 +9,8 @@ const template = /* html */ `
     <div class="list" data-list="photo"></div>
     <h2>Letreros</h2>
     <div class="list" data-list="sign"></div>
+    <h2>Probar diseños</h2>
+    <slot name="artwork"></slot>
     <div class="commands">
       <button class="command" data-command="home">Vista general</button>
       <button class="command" data-command="top">Desde arriba</button>
