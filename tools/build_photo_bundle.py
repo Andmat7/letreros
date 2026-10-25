@@ -30,6 +30,7 @@ class PhotoBundleBuilder:
         "propuesta_04": "images/signs/propuestas/propuesta_04_flecha_morada_volteando_esquina.webp",
         "propuesta_05": "images/signs/propuestas/propuesta_05_flecha_roja_volteando_esquina.webp",
         "propuesta_06": "images/signs/propuestas/propuesta_06_angosta_flecha_roja_volteando_esquina.webp",
+        "propuesta_07": "images/signs/propuestas/propuesta_07_angosta_bancolombia_oscuro_flecha_roja.webp",
         "bancolombia_retiros": "images/signs/anteriores/bancolombia_retiros.webp",
         "nequi": "images/signs/anteriores/nequi.png",
         "mano": "images/signs/anteriores/mano.webp",

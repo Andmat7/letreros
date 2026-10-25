@@ -7,6 +7,7 @@ export const sign_artwork = [
   { key: 'propuesta_04', title: 'Propuesta 4 – flecha morada «Volteando la esquina»' },
   { key: 'propuesta_05', title: 'Propuesta 5 – flecha roja «Volteando la esquina»' },
   { key: 'propuesta_06', title: 'Propuesta 6 – angosta (columna), flecha roja' },
+  { key: 'propuesta_07', title: 'Propuesta 7 – angosta (columna), Bancolombia oscuro' },
   { key: 'nequi', title: 'Nequi – app' },
   { key: 'mano', title: 'Nequi – celular en la mano' },
   { key: 'bancolombia_retiros', title: 'Bancolombia – Retiros y consignaciones' },
