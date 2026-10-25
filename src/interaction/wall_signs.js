@@ -1,22 +1,20 @@
 import * as THREE from 'three';
 import { building } from '../data/building_measurements.js';
 import { sign_catalog } from '../data/sign_catalog.js';
-import { photo_bundle } from '../generated/photo_bundle.js';
 
-const storage_key = 'letreros-positions-v3';
+const storage_key = 'letreros-positions-v9';
 const wall_offset = 0.06;
 const sidewalk_margin = 0.4;
-const texture_loader = new THREE.TextureLoader();
 
 const walls = {
   calle_12: {
     plane: new THREE.Plane(new THREE.Vector3(0, 0, 1), -wall_offset), normal: new THREE.Vector3(0, 0, 1), rotation_y: 0,
-    nearest: 0.2, farthest: building.calle_12_facade_length - 0.5, top: building.total_height,
+    nearest: 0, farthest: building.calle_12_facade_length - 0.5, top: building.total_height,
     to_position: (distance, height) => new THREE.Vector3(-distance, height, wall_offset), to_distance: point => -point.x,
   },
   carrera_7: {
     plane: new THREE.Plane(new THREE.Vector3(1, 0, 0), -wall_offset), normal: new THREE.Vector3(1, 0, 0), rotation_y: Math.PI / 2,
-    nearest: building.corner_pier_depth + 0.2, farthest: building.carrera_7_facade_length - 0.5, top: building.ground_floor_height,
+    nearest: 0, farthest: building.carrera_7_facade_length - 0.5, top: building.ground_floor_height,
     to_position: (distance, height) => new THREE.Vector3(wall_offset, height, -distance), to_distance: point => -point.z,
   },
 };
@@ -50,11 +48,9 @@ function load_placements() {
 }
 
 function create_wall_sign(scene, entry, saved_placement) {
-  const image = photo_bundle[entry.key];
-  const size = [entry.width, entry.width * image.height / image.width];
+  const size = [entry.width, entry.height];
   const group = new THREE.Group();
-  const hit_meshes = [create_face(entry, image, size)];
-  if (entry.has_backing) hit_meshes.push(create_backing(size));
+  const hit_meshes = [create_face(size), create_backing(size)];
   group.add(...hit_meshes);
   group.rotation.y = walls[entry.wall].rotation_y;
   scene.add(group);
@@ -64,12 +60,8 @@ function create_wall_sign(scene, entry, saved_placement) {
   return sign;
 }
 
-function create_face(entry, image, size) {
-  const texture = texture_loader.load(image.source);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
-  const material = new THREE.MeshStandardMaterial({ map: texture, transparent: !entry.has_backing, roughness: 0.6 });
-  const face = new THREE.Mesh(new THREE.PlaneGeometry(...size), material);
+function create_face(size) {
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(...size), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 }));
   face.position.z = 0.03;
   return face;
 }

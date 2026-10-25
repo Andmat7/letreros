@@ -18,7 +18,7 @@ Run both builds again after changing anything in `images/`. The second one lists
 
 ## What it is
 
-An approximate 3D model of the La Riviera corner (Carrera 7 con Calle 12) with proposed sign placements (Bancolombia, Nequi). The scene can be rotated and zoomed, signs can be dragged along the walls, and camera icons mark where each photo was taken. A 1.70 m figure gives scale.
+An approximate 3D model of the La Riviera corner (Carrera 7 con Calle 12) with two blank proposed signs (corner column and corner seen from Calle 12). The scene can be rotated and zoomed, signs can be dragged along the walls, and camera icons mark where each photo was taken. A 1.70 m figure gives scale.
 
 Choosing a photo moves the camera to where it was taken, with the same lens, and lays the photo over the view: the F key hides or shows it, "Foto" sets its transparency, "Lente" the field of view, and "Copiar cámara" copies the adjusted camera as a line for `src/data/photo_viewpoints.js`.
 

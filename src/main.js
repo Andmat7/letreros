@@ -43,7 +43,7 @@ function build_world(scene) {
 function connect_panel() {
   panel.set_items([
     ...photo_viewpoints.map(viewpoint => ({ kind: 'photo', key: viewpoint.key, title: viewpoint.title, subtitle: 'Ver desde donde se tomó', image: photo_bundle[viewpoint.key].source })),
-    ...signs.map(sign => ({ kind: 'sign', key: sign.entry.key, title: sign.entry.title, subtitle: sign.entry.wall === 'calle_12' ? 'Fachada Calle 12' : 'Soportal Carrera 7', image: photo_bundle[sign.entry.key].source })),
+    ...signs.map(sign => ({ kind: 'sign', key: sign.entry.key, title: sign.entry.title, subtitle: sign.entry.wall === 'calle_12' ? 'Fachada Calle 12' : 'Soportal Carrera 7', image: photo_bundle[sign.entry.reference_photo].source })),
   ]);
   panel.addEventListener('panel-select', ({ detail }) => detail.kind === 'photo'
     ? show_photo(photo_viewpoints.find(viewpoint => viewpoint.key === detail.key))
@@ -83,7 +83,7 @@ function show_sign(sign) {
   const center = sign.group.position;
   const camera_position = center.clone().addScaledVector(sign.wall.normal, 4.5);
   flight.fly_to({ camera_position: [camera_position.x, center.y + 0.6, camera_position.z], look_at: center.toArray() });
-  viewer.show({ title: sign.entry.title, image: photo_bundle[sign.entry.key].source });
+  viewer.show({ title: sign.entry.title, image: photo_bundle[sign.entry.reference_photo].source });
   panel.set_active(sign.entry.key);
 }
 
