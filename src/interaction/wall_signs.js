@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { building } from '../data/building_measurements.js';
+import { sign_artwork } from '../data/sign_artwork.js';
 import { sign_catalog } from '../data/sign_catalog.js';
 import { create_board_canvas, load_artwork_image, paint_board } from './sign_artwork_canvas.js';
 
@@ -26,8 +27,13 @@ export function build_wall_signs(scene) {
   const saved_placements = load_stored(storage_key);
   const saved_artwork = load_stored(artwork_storage_key);
   const signs = sign_catalog.map(entry => create_wall_sign(scene, entry, saved_placements[entry.key]));
-  signs.forEach(sign => set_sign_artwork(sign, saved_artwork[sign.entry.key] || blank_artwork));
+  signs.forEach(sign => set_sign_artwork(sign, known_artwork(saved_artwork[sign.entry.key])));
   return signs;
+}
+
+// A design removed from the catalog may still be saved in the browser.
+function known_artwork(artwork) {
+  return sign_artwork.some(({ key }) => key === artwork?.key) ? artwork : blank_artwork;
 }
 
 // Paints the design on the board; the caller changes one of key, fit or rotated at a time.

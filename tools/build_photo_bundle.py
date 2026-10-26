@@ -24,17 +24,15 @@ class PhotoBundleBuilder:
         "esquina_cerca": "images/photos/esquina_cerca.jpg",
         "esquina_calle_12": "images/photos/esquina_calle_12.jpg",
         "esquina_diagonal": "images/photos/esquina_diagonal.jpg",
-        "propuesta_01": "images/signs/propuestas/propuesta_01_borrador_nequi_icono_y_mano.webp",
-        "propuesta_02": "images/signs/propuestas/propuesta_02_cuatro_bloques_iconos_servicios.webp",
-        "propuesta_03": "images/signs/propuestas/propuesta_03_tarjeta_bancolombia_ondas.webp",
-        "propuesta_04": "images/signs/propuestas/propuesta_04_flecha_morada_volteando_esquina.webp",
-        "propuesta_05": "images/signs/propuestas/propuesta_05_flecha_roja_volteando_esquina.webp",
-        "propuesta_06": "images/signs/propuestas/propuesta_06_angosta_flecha_roja_volteando_esquina.webp",
-        "propuesta_07": "images/signs/propuestas/propuesta_07_angosta_bancolombia_oscuro_flecha_roja.webp",
+        "esquina_bancolombia": "images/signs/propuestas/esquina_bancolombia_oscuro.webp",
+        "esquina_cuatro_servicios": "images/signs/propuestas/esquina_cuatro_servicios.webp",
+        "columna_cuatro_servicios": "images/signs/propuestas/columna_cuatro_servicios.webp",
         "bancolombia_retiros": "images/signs/anteriores/bancolombia_retiros.webp",
         "nequi": "images/signs/anteriores/nequi.png",
         "mano": "images/signs/anteriores/mano.webp",
         "tarjeta": "images/signs/anteriores/tarjeta.webp",
+        "logo_nequi": "images/signs/anteriores/logo_nequi.avif",
+        "facturas_servicios_publicos": "images/signs/anteriores/facturas_servicios_publicos.avif",
     }
     # PNG keeps the transparent background around the hand.
     transparent_keys = {"mano"}

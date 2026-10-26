@@ -16,6 +16,7 @@ const template = /* html */ `
       <button class="command" data-command="top">Desde arriba</button>
       <button class="command" data-command="reset">Reiniciar letreros</button>
       <button class="command" data-command="measure">📏 Medir</button>
+      <button class="command" data-command="markers">📷 Iconos de fotos</button>
     </div>
     <p class="hint">Al elegir una foto, se pone encima del modelo desde el mismo punto: compáralas con la tecla F.<br>
       Arrastra para girar · rueda o pellizco para acercar · clic derecho para desplazar.<br>

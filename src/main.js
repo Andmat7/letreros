@@ -25,6 +25,7 @@ const viewer = document.querySelector('image-viewer');
 const readout = document.querySelector('measure-readout');
 const overlay = document.querySelector('photo-overlay');
 const picker = document.querySelector('artwork-picker');
+let markers_hidden = true;
 build_world(stage.scene);
 const signs = build_wall_signs(stage.scene);
 const markers = build_photo_markers(stage.scene);
@@ -33,6 +34,7 @@ const flight = create_camera_flight(stage.camera, stage.controls);
 const comparison = create_photo_comparison({ stage, flight, overlay }, end_photo);
 attach_pointer_controller(stage, { signs, markers, tape }, { on_photo: show_photo, on_sign: show_sign });
 connect_panel();
+set_markers_visible(markers, !markers_hidden);
 start(overview_views.home);
 
 function build_world(scene) {
@@ -74,6 +76,7 @@ async function change_artwork({ board_key, ...artwork }) {
 function run_command(command) {
   if (command === 'reset') return reset_signs(signs);
   if (command === 'measure') return toggle_measuring();
+  if (command === 'markers') return toggle_markers();
   comparison.close();
   flight.fly_to(overview_views[command]);
 }
@@ -81,6 +84,12 @@ function run_command(command) {
 function toggle_measuring() {
   set_measuring(tape, !tape.active);
   panel.set_pressed('measure', tape.active);
+}
+
+function toggle_markers() {
+  markers_hidden = !markers_hidden;
+  set_markers_visible(markers, !markers_hidden);
+  panel.set_pressed('markers', !markers_hidden);
 }
 
 // The panel folds away so it does not cover the photo laid over the view.
@@ -93,7 +102,7 @@ function show_photo(viewpoint) {
 }
 
 function end_photo() {
-  set_markers_visible(markers, true);
+  set_markers_visible(markers, !markers_hidden);
   panel.set_active('');
 }
 
@@ -104,6 +113,8 @@ function show_sign(sign) {
   flight.fly_to({ camera_position: [camera_position.x, center.y + 0.6, camera_position.z], look_at: center.toArray() });
   viewer.show({ title: sign.entry.title, image: photo_bundle[sign.entry.reference_photo].source });
   panel.set_active(sign.entry.key);
+  panel.classList.remove('collapsed');
+  picker.highlight_board(sign.entry.key);
 }
 
 function start(view) {

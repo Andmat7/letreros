@@ -18,9 +18,15 @@ export class ArtworkPicker extends HTMLElement {
     this.shadowRoot.replaceChildren(...boards.map(board => this.#create_board(board, artworks, fits)));
   }
 
+  highlight_board(board_key) {
+    this.shadowRoot.querySelectorAll('.board').forEach(element => element.classList.toggle('selected', element.dataset.key === board_key));
+    this.shadowRoot.querySelector('.board.selected')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
   #create_board({ key, title, artwork }, artworks, fits) {
     const element = document.createElement('div');
     element.className = 'board';
+    element.dataset.key = key;
     element.innerHTML = board_template;
     element.querySelector('.board_title').textContent = title;
     this.#fill_select(element.querySelector('[data-field="key"]'), artworks, artwork.key);
