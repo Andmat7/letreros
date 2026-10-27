@@ -32,8 +32,12 @@ The 📏 Medir button measures between two clicked points; points stick to nearb
 - `src/interaction/` – sign dragging, photo markers, camera flights.
 - `src/components/` – side panel and image viewer web components.
 - `src/generated/photo_bundle.js` – built by `tools/build_photo_bundle.py`; do not edit by hand.
-- `images/` – original photos and sign artwork: `signs/propuestas/` has the full proposals (named by their width x height ratio), `signs/partes/` the loose pieces to build them.
+- `images/` – original photos and sign artwork: `signs/propuestas/` has the full proposals (named by their width x height ratio), `signs/partes/` the loose pieces to build them. `signs/partes/bancolombia_oscuro_1x4_6/` is that proposal cut into `fondos/` (bands without elements), `fotos/` (phones with hands, card and invoices cut out along their edges), `logos/` and `textos/`, made by `.venv/Scripts/python tools/cut_sign_parts.py`.
 
 ## Trying designs on the boards
 
 The panel's "Probar diseños" section lets you pick a design for each board (blank, the proposals and the loose pieces), whether it fits whole or fills the board and cropped, and a 90° turn for wide designs on a tall board. Each design keeps its own ratio and sits on a white board; the choice is remembered in the browser. Add designs in `src/data/sign_artwork.js` (the image must be in `tools/build_photo_bundle.py`).
+
+## Arranging the cut pieces
+
+With the dev server running, open http://localhost:8000/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_oscuro_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, reorder them, write a note per piece and press "Copiar instrucciones" to paste the layout into the chat.
