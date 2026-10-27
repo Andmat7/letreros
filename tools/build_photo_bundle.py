@@ -24,18 +24,13 @@ class PhotoBundleBuilder:
         "esquina_cerca": "images/photos/esquina_cerca.jpg",
         "esquina_calle_12": "images/photos/esquina_calle_12.jpg",
         "esquina_diagonal": "images/photos/esquina_diagonal.jpg",
-        "esquina_bancolombia": "images/signs/propuestas/esquina_bancolombia_oscuro.webp",
-        "esquina_cuatro_servicios": "images/signs/propuestas/esquina_cuatro_servicios.webp",
-        "columna_cuatro_servicios": "images/signs/propuestas/columna_cuatro_servicios.webp",
-        "bancolombia_retiros": "images/signs/anteriores/bancolombia_retiros.webp",
-        "nequi": "images/signs/anteriores/nequi.png",
-        "mano": "images/signs/anteriores/mano.webp",
-        "tarjeta": "images/signs/anteriores/tarjeta.webp",
-        "logo_nequi": "images/signs/anteriores/logo_nequi.avif",
-        "facturas_servicios_publicos": "images/signs/anteriores/facturas_servicios_publicos.avif",
+        "bancolombia_oscuro_1x4_6": "images/signs/propuestas/bancolombia_oscuro_1x4_6.webp",
+        "cuatro_servicios_1x2_3": "images/signs/propuestas/cuatro_servicios_1x2_3.webp",
+        "cuatro_servicios_1x3_3": "images/signs/propuestas/cuatro_servicios_1x3_3.webp",
+        "logo_nequi": "images/signs/partes/logo_nequi.avif",
+        "facturas_servicios_publicos": "images/signs/partes/facturas_servicios_publicos.avif",
     }
-    # PNG keeps the transparent background around the hand.
-    transparent_keys = {"mano"}
+    transparent_keys: set[str] = set()
 
     def __init__(self, project_root: Path):
         self.project_root = project_root
