@@ -9,6 +9,7 @@ layout_editor_styles.replaceSync(/* css */ `
   .stage img.in_section { outline: 4px dashed #00a8ff; }
   .stage img.selected { outline: 6px solid #00a8ff; }
   .stage img.locked { cursor: default; }
+  .stage .handle { position: absolute; z-index: 10000; background: #00a8ff; border: 2px solid #fff; cursor: nwse-resize; box-sizing: border-box; }
   .stage img.reference { opacity: 0.45; pointer-events: none; outline: 4px dashed #f0f; }
   .panel { display: flex; flex-direction: column; gap: 10px; padding: 12px; overflow: auto; background: #fff; border-left: 1px solid #ccc; }
   .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }

@@ -15,17 +15,17 @@ const bands = [
   ['06_flecha_inferior', 4082],
 ];
 const pieces = [
-  ['textos', 'texto_recarga', 30, 565],
+  ['textos', 'texto_recarga', 40, 553],
   ['textos', 'texto_corresponsal', 112, 2654],
   ['textos', 'texto_pago_servicios', 123, 3214],
-  ['logos', 'logo_nequi', 60, 790],
+  ['logos', 'logo_nequi', 60, 707],
   ['logos', 'logo_bancolombia', 85, 2464],
   ['logos', 'iconos_servicios', 325, 2923],
   ['logos', 'logo_davivienda', 49, 3685],
   ['logos', 'logo_daviplata', 190, 3976],
   ['fotos', 'facturas', 672, 2878],
   ['fotos', 'tarjeta_bancolombia', 235, 2040],
-  ['fotos', 'celular_nequi', 190, 1176],
+  ['fotos', 'celular_nequi', 150, 996],
   ['fotos', 'celular_davivienda', 605, 3520],
 ];
 

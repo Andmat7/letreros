@@ -38,6 +38,8 @@ export class LayoutEditor extends HTMLElement {
   #zoom = 0.3;
   static viewport_padding = 32;
   #images = new Map();
+  #handle = null;
+  static scale_step = 1.05;
 
   connectedCallback() {
     this.attachShadow({ mode: 'open' });
@@ -55,6 +57,7 @@ export class LayoutEditor extends HTMLElement {
     stage.style.height = `${sign_size.height}px`;
     for (const part of parts_catalog) stage.append(this.#create_image(part));
     stage.append(this.#create_reference());
+    stage.append(this.#create_handle());
   }
 
   #create_image(part) {
@@ -62,8 +65,17 @@ export class LayoutEditor extends HTMLElement {
     image.src = part.source;
     image.draggable = false;
     image.addEventListener('pointerdown', (event) => this.#start_drag(event, part));
+    image.addEventListener('wheel', (event) => this.#scale_with_wheel(event, part), { passive: false });
     this.#images.set(part.name, image);
     return image;
+  }
+
+  // The corner square that scales the selected piece when dragged.
+  #create_handle() {
+    this.#handle = document.createElement('div');
+    this.#handle.className = 'handle';
+    this.#handle.addEventListener('pointerdown', (event) => this.#start_resize(event));
+    return this.#handle;
   }
 
   // The original image includes the black frame, so it sits above the sign by the frame height.
@@ -103,7 +115,7 @@ export class LayoutEditor extends HTMLElement {
 
   #start_drag(event, part) {
     this.#select(part.name);
-    if (part.is_background && !this.#element('.move_backgrounds').checked) return;
+    if (this.#is_locked(part)) return;
     const placement = this.#layout[part.name];
     const origin = { pointer_x: event.clientX, pointer_y: event.clientY, x: placement.x, y: placement.y };
     const move = (moved) => {
@@ -122,13 +134,53 @@ export class LayoutEditor extends HTMLElement {
     event.preventDefault();
   }
 
+  #start_resize(event) {
+    const placement = this.#layout[this.#selected_name];
+    const natural_width = this.#images.get(this.#selected_name).naturalWidth;
+    const stage = this.#element('.stage');
+    const move = (moved) => {
+      const pointer_x = (moved.clientX - stage.getBoundingClientRect().left) / this.#zoom;
+      placement.scale = Math.max(0.05, Math.round(((pointer_x - placement.x) / natural_width) * 100) / 100);
+      this.#refresh_stage();
+      this.#fill_fields();
+    };
+    const stop = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', stop);
+      save_layout(this.#layout);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', stop);
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  // The wheel scales only the selected piece; anywhere else it keeps scrolling the page.
+  #scale_with_wheel(event, part) {
+    if (part.name !== this.#selected_name || this.#is_locked(part)) return;
+    const factor = event.deltaY < 0 ? LayoutEditor.scale_step : 1 / LayoutEditor.scale_step;
+    this.#edit_selected({ scale: Math.round(this.#layout[part.name].scale * factor * 100) / 100 });
+    event.preventDefault();
+  }
+
+  #is_locked(part) {
+    return part.is_background && !this.#element('.move_backgrounds').checked;
+  }
+
   #nudge(event) {
+    if (event.key === '+' || event.key === '-') return this.#scale_with_key(event);
     const steps = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
     if (!steps || !this.#selected_name) return;
     const distance = event.shiftKey ? 10 : 1;
     const placement = this.#layout[this.#selected_name];
     this.#edit_selected({ x: placement.x + steps[0] * distance, y: placement.y + steps[1] * distance });
     event.preventDefault();
+  }
+
+  #scale_with_key(event) {
+    if (!this.#selected_name) return;
+    const factor = event.key === '+' ? LayoutEditor.scale_step : 1 / LayoutEditor.scale_step;
+    this.#edit_selected({ scale: Math.round(this.#layout[this.#selected_name].scale * factor * 100) / 100 });
   }
 
   #select(name) {
@@ -166,7 +218,20 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.stage').style.transform = `scale(${this.#zoom})`;
     const can_move_backgrounds = this.#element('.move_backgrounds').checked;
     for (const part of parts_catalog) this.#place_image(part, can_move_backgrounds);
+    this.#place_handle();
     this.#images.get('reference').style.display = this.#element('.show_reference').checked ? 'block' : 'none';
+  }
+
+  #place_handle() {
+    const part = parts_catalog.find((candidate) => candidate.name === this.#selected_name);
+    this.#handle.style.display = part && !this.#is_locked(part) ? 'block' : 'none';
+    if (!part) return;
+    const placement = this.#layout[part.name];
+    const image = this.#images.get(part.name);
+    const size = 28 / this.#zoom;
+    this.#handle.style.width = this.#handle.style.height = `${size}px`;
+    this.#handle.style.left = `${placement.x + image.naturalWidth * placement.scale - size / 2}px`;
+    this.#handle.style.top = `${placement.y + image.naturalHeight * placement.scale - size / 2}px`;
   }
 
   #place_image(part, can_move_backgrounds) {

@@ -21,19 +21,21 @@ BAND_NAMES = ["flecha_superior", "nequi", "bancolombia", "servicios_publicos", "
 REBUILT_BANDS = [1, 2, 3, 4]
 # Bands replaced by new art (the originals are kept in fuentes/); cutting must not bring the old one back.
 REPLACED_BANDS = {"flecha_superior", "flecha_inferior"}
+# New art for a whole section: pasted over its band before cutting, so its pieces are cut from the new art.
+NEW_SECTION_ART = {1: "fuentes/02_nequi_nueva.webp"}
 
 # name: (folder, left, top, right, bottom, how it is cut)
 PARTS = {
-    "celular_nequi": ("fotos", 190, 1176, 773, 2017, "grabcut"),
+    "celular_nequi": ("fotos", 150, 996, 960, 2017, "grabcut"),
     "tarjeta_bancolombia": ("fotos", 235, 2040, 750, 2470, "grabcut"),
     "facturas": ("fotos", 672, 2878, 960, 3380, "grabcut"),
     "celular_davivienda": ("fotos", 605, 3520, 960, 3950, "grabcut_sin_amarillo"),
-    "logo_nequi": ("logos", 60, 790, 905, 1058, "grabcut"),
+    "logo_nequi": ("logos", 60, 707, 900, 980, "grabcut"),
     "logo_bancolombia": ("logos", 85, 2464, 892, 2621, "key"),
     "iconos_servicios": ("logos", 325, 2923, 616, 3208, "key"),
     "logo_davivienda": ("logos", 49, 3685, 587, 3943, "opaque"),
     "logo_daviplata": ("logos", 190, 3976, 780, 4122, "key"),
-    "texto_recarga": ("textos", 30, 565, 930, 665, "key"),
+    "texto_recarga": ("textos", 40, 553, 930, 665, "key"),
     "texto_corresponsal": ("textos", 112, 2654, 862, 2834, "key"),
     "texto_pago_servicios": ("textos", 123, 3214, 847, 3606, "key"),
 }
@@ -46,8 +48,16 @@ SURE_BACKGROUND_DISTANCE, PROBABLE_FOREGROUND_DISTANCE, SURE_FOREGROUND_DISTANCE
 
 class SignPartCutter:
     def __init__(self, project_root: Path):
-        self.source = np.asarray(Image.open(project_root / SOURCE).convert("RGB"))
         self.output = project_root / OUTPUT
+        self.source = self._source_with_new_art(project_root)
+
+    def _source_with_new_art(self, project_root: Path) -> np.ndarray:
+        source = Image.open(project_root / SOURCE).convert("RGB")
+        for index, art_path in NEW_SECTION_ART.items():
+            top, bottom = self._band_rows(index)
+            art = Image.open(self.output / art_path).convert("RGB")
+            source.paste(art.resize((source.width, bottom - top), Image.LANCZOS), (0, top))
+        return np.asarray(source)
 
     def cut_all(self) -> None:
         backgrounds = self._rebuild_backgrounds()
