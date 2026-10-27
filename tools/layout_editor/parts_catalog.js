@@ -29,7 +29,20 @@ const pieces = [
   ['fotos', 'celular_davivienda', 605, 3520],
 ];
 
+// Sections of the sign from top to bottom; each lists the pieces that belong to it.
+export const sections = [
+  { title: '1. flecha superior', pieces: ['01_flecha_superior'] },
+  { title: '2. nequi', pieces: ['02_nequi', 'texto_recarga', 'logo_nequi', 'celular_nequi'] },
+  { title: '3. bancolombia', pieces: ['03_bancolombia', 'tarjeta_bancolombia', 'logo_bancolombia', 'texto_corresponsal'] },
+  { title: '4. servicios', pieces: ['iconos_servicios', 'facturas'] },
+  { title: '5. servicios_publicos', pieces: ['04_servicios_publicos', 'texto_pago_servicios'] },
+  { title: '6. davivienda', pieces: ['05_davivienda', 'logo_davivienda', 'logo_daviplata', 'celular_davivienda'] },
+  { title: '7. flecha inferior', pieces: ['06_flecha_inferior'] },
+];
+
+const section_of = Object.fromEntries(sections.flatMap((section) => section.pieces.map((name) => [name, section.title])));
+
 export const parts_catalog = [
   ...bands.map(([name, y]) => ({ name, source: `${base_folder}/fondos/${name}.webp`, x: 0, y, is_background: true })),
   ...pieces.map(([folder, name, x, y]) => ({ name, source: `${base_folder}/${folder}/${name}.webp`, x, y: y - sign_top, is_background: false })),
-];
+].map((part) => ({ ...part, section: section_of[part.name] }));

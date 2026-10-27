@@ -1,16 +1,18 @@
 import { layout_editor_styles } from './layout_editor.css.js';
-import { parts_catalog, sign_size, original_image } from './parts_catalog.js';
+import { parts_catalog, sections, sign_size, original_image } from './parts_catalog.js';
+import { render_section_blob } from './section_image.js';
 import { load_layout, save_layout, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
 
 const template = /* html */ `
   <div class="viewport"><div class="sizer"><div class="stage"></div></div></div>
   <aside class="panel">
     <div class="row">
-      <label>Zoom <input class="zoom" type="range" min="0.1" max="1.5" step="0.05"></label>
+      <label>Zoom <input class="zoom" type="range" min="0.1" max="1.5" step="0.01"></label>
       <label><input class="show_reference" type="checkbox"> Original encima</label>
       <label><input class="move_backgrounds" type="checkbox"> Mover fondos</label>
     </div>
     <ul class="list"></ul>
+    <div class="row"><button class="copy_section primary">Copiar sección como imagen</button><span class="section_name">Ninguna sección elegida</span></div>
     <div class="selected_controls">
       <strong class="selected_name">Ninguna pieza elegida</strong>
       <div class="fields">
@@ -32,7 +34,9 @@ const template = /* html */ `
 export class LayoutEditor extends HTMLElement {
   #layout = load_layout();
   #selected_name = null;
+  #selected_section = null;
   #zoom = 0.3;
+  static viewport_padding = 32;
   #images = new Map();
 
   connectedCallback() {
@@ -40,6 +44,7 @@ export class LayoutEditor extends HTMLElement {
     this.shadowRoot.adoptedStyleSheets = [layout_editor_styles];
     this.shadowRoot.innerHTML = template;
     this.#build_stage();
+    this.#zoom = this.#zoom_to_fit_screen();
     this.#bind_controls();
     this.#refresh();
   }
@@ -71,6 +76,12 @@ export class LayoutEditor extends HTMLElement {
     return reference;
   }
 
+  // The whole sign fits the screen height until the person zooms in.
+  #zoom_to_fit_screen() {
+    const available_height = this.#element('.viewport').clientHeight - LayoutEditor.viewport_padding;
+    return Math.min(1.5, Math.max(0.1, Math.floor((available_height / sign_size.height) * 100) / 100));
+  }
+
   #bind_controls() {
     this.#element('.zoom').value = this.#zoom;
     this.#element('.zoom').addEventListener('input', (event) => { this.#zoom = Number(event.target.value); this.#refresh(); });
@@ -83,6 +94,7 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.to_front').addEventListener('click', () => this.#edit_selected({ order: this.#extreme_order(Math.max) + 1 }));
     this.#element('.to_back').addEventListener('click', () => this.#edit_selected({ order: this.#extreme_order(Math.min) - 1 }));
     this.#element('.copy').addEventListener('click', () => this.#copy_instructions());
+    this.#element('.copy_section').addEventListener('click', () => this.#copy_section());
     this.#element('.reset').addEventListener('click', () => { this.#layout = original_layout(); this.#changed(); });
     this.#element('.load').addEventListener('click', () => this.#load_pasted());
     this.addEventListener('keydown', (event) => this.#nudge(event));
@@ -121,6 +133,7 @@ export class LayoutEditor extends HTMLElement {
 
   #select(name) {
     this.#selected_name = name;
+    this.#selected_section = parts_catalog.find((part) => part.name === name).section;
     this.#refresh();
     this.focus();
   }
@@ -165,12 +178,32 @@ export class LayoutEditor extends HTMLElement {
     image.style.transform = `scale(${placement.scale})`;
     image.style.display = placement.visible ? 'block' : 'none';
     image.classList.toggle('selected', part.name === this.#selected_name);
+    image.classList.toggle('in_section', part.section === this.#selected_section);
     image.classList.toggle('locked', part.is_background && !can_move_backgrounds);
   }
 
   #refresh_list() {
-    const list = this.#element('.list');
-    list.replaceChildren(...ordered_names(this.#layout).reverse().map((name) => this.#create_list_item(name)));
+    const items = sections.flatMap((section) => [this.#create_section_header(section), ...this.#section_names(section).map((name) => this.#create_list_item(name))]);
+    this.#element('.list').replaceChildren(...items);
+    this.#element('.section_name').textContent = this.#selected_section ?? 'Ninguna sección elegida';
+  }
+
+  #section_names(section) {
+    return ordered_names(this.#layout).filter((name) => section.pieces.includes(name)).reverse();
+  }
+
+  #create_section_header(section) {
+    const header = document.createElement('li');
+    header.className = section.title === this.#selected_section ? 'section_header selected' : 'section_header';
+    header.textContent = section.title;
+    header.addEventListener('click', () => this.#select_section(section));
+    return header;
+  }
+
+  #select_section(section) {
+    this.#selected_section = section.title;
+    this.#selected_name = null;
+    this.#refresh();
   }
 
   #create_list_item(name) {
@@ -206,6 +239,18 @@ export class LayoutEditor extends HTMLElement {
     } catch (clipboard_error) {
       this.#element('.import').value = describe_layout(this.#layout);
       this.#say('No pude copiar solo: el texto quedó en el cuadro de abajo, cópialo a mano.');
+    }
+  }
+
+  async #copy_section() {
+    if (!this.#selected_section) return this.#say('Elige una sección primero.');
+    const parts = parts_catalog.filter((part) => part.section === this.#selected_section);
+    try {
+      const blob = await render_section_blob(parts, this.#layout, this.#images);
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      this.#say(`Sección "${this.#selected_section}" copiada como imagen.`);
+    } catch (copy_error) {
+      this.#say(`No se pudo copiar la imagen: ${copy_error.message}`);
     }
   }
 

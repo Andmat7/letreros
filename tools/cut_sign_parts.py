@@ -19,6 +19,8 @@ BAND_ENDS = [430, 2017, 2878, 3649, 4142, SIGN_BOTTOM]
 BAND_NAMES = ["flecha_superior", "nequi", "bancolombia", "servicios_publicos", "davivienda", "flecha_inferior"]
 # Bands whose background is rebuilt row by row; the two white ones are kept whole.
 REBUILT_BANDS = [1, 2, 3, 4]
+# Bands replaced by new art (the originals are kept in fuentes/); cutting must not bring the old one back.
+REPLACED_BANDS = {"flecha_superior", "flecha_inferior"}
 
 # name: (folder, left, top, right, bottom, how it is cut)
 PARTS = {
@@ -134,6 +136,8 @@ class SignPartCutter:
         (self.output / "fondos").mkdir(parents=True, exist_ok=True)
         starts = [SIGN_TOP, *BAND_ENDS[:-1]]
         for number, name in enumerate(BAND_NAMES, start=1):
+            if name in REPLACED_BANDS:
+                continue
             band = backgrounds[starts[number - 1]:BAND_ENDS[number - 1]]
             Image.fromarray(band).save(self.output / "fondos" / f"{number:02d}_{name}.webp", lossless=True)
 
