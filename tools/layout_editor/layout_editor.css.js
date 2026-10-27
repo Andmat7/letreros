@@ -9,6 +9,7 @@ layout_editor_styles.replaceSync(/* css */ `
   .stage img.in_section { outline: 4px dashed #00a8ff; }
   .stage img.selected { outline: 6px solid #00a8ff; }
   .stage img.locked { cursor: default; }
+  .stage .divider { position: absolute; left: 0; right: 0; z-index: 9500; cursor: ns-resize; background: linear-gradient(transparent 45%, #ff3d71 45%, #ff3d71 55%, transparent 55%); }
   .stage .handle { position: absolute; z-index: 10000; background: #00a8ff; border: 2px solid #fff; cursor: nwse-resize; box-sizing: border-box; }
   .stage img.reference { opacity: 0.45; pointer-events: none; outline: 4px dashed #f0f; }
   .panel { display: flex; flex-direction: column; gap: 10px; padding: 12px; overflow: auto; background: #fff; border-left: 1px solid #ccc; }
@@ -19,6 +20,8 @@ layout_editor_styles.replaceSync(/* css */ `
   ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   li { display: flex; gap: 6px; align-items: center; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
   li.section_header { margin-top: 8px; font-weight: 700; background: #eef0f5; }
+  li.section_header label { display: flex; gap: 4px; align-items: center; font-weight: 400; font-size: 12px; }
+  li.section_header input { width: 64px; }
   li.selected { background: #dff0ff; }
   li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }

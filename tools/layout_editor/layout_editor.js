@@ -1,7 +1,9 @@
 import { layout_editor_styles } from './layout_editor.css.js';
 import { parts_catalog, sections, sign_size, original_image } from './parts_catalog.js';
 import { render_section_blob } from './section_image.js';
-import { load_layout, save_layout, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
+import { move_border, set_section_height, section_tops } from './section_space.js';
+import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
+import { original_section_heights } from './parts_catalog.js';
 
 const template = /* html */ `
   <div class="viewport"><div class="sizer"><div class="stage"></div></div></div>
@@ -33,6 +35,8 @@ const template = /* html */ `
 // Drag the cut pieces of the sign into place, write notes, and copy the result as instructions.
 export class LayoutEditor extends HTMLElement {
   #layout = load_layout();
+  #heights = load_section_heights();
+  #dividers = [];
   #selected_name = null;
   #selected_section = null;
   #zoom = 0.3;
@@ -58,6 +62,16 @@ export class LayoutEditor extends HTMLElement {
     for (const part of parts_catalog) stage.append(this.#create_image(part));
     stage.append(this.#create_reference());
     stage.append(this.#create_handle());
+    for (let index = 1; index < sections.length; index++) stage.append(this.#create_divider(index));
+  }
+
+  // The line between two sections; dragging it hands height from one section to the other.
+  #create_divider(index) {
+    const divider = document.createElement('div');
+    divider.className = 'divider';
+    divider.addEventListener('pointerdown', (event) => this.#start_divider_drag(event, index));
+    this.#dividers[index] = divider;
+    return divider;
   }
 
   #create_image(part) {
@@ -107,7 +121,11 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.to_back').addEventListener('click', () => this.#edit_selected({ order: this.#extreme_order(Math.min) - 1 }));
     this.#element('.copy').addEventListener('click', () => this.#copy_instructions());
     this.#element('.copy_section').addEventListener('click', () => this.#copy_section());
-    this.#element('.reset').addEventListener('click', () => { this.#layout = original_layout(); this.#changed(); });
+    this.#element('.reset').addEventListener('click', () => {
+      this.#layout = original_layout();
+      this.#heights = [...original_section_heights];
+      this.#changed();
+    });
     this.#element('.load').addEventListener('click', () => this.#load_pasted());
     this.addEventListener('keydown', (event) => this.#nudge(event));
     this.tabIndex = 0;
@@ -127,7 +145,24 @@ export class LayoutEditor extends HTMLElement {
     const stop = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', stop);
-      save_layout(this.#layout);
+      this.#save();
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', stop);
+    event.preventDefault();
+  }
+
+  #start_divider_drag(event, index) {
+    const stage = this.#element('.stage');
+    const move = (moved) => {
+      const pointer_y = (moved.clientY - stage.getBoundingClientRect().top) / this.#zoom;
+      move_border(sections, this.#heights, this.#layout, (name) => this.#natural_size(name), index, pointer_y);
+      this.#refresh();
+    };
+    const stop = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', stop);
+      this.#save();
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', stop);
@@ -147,7 +182,7 @@ export class LayoutEditor extends HTMLElement {
     const stop = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', stop);
-      save_layout(this.#layout);
+      this.#save();
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', stop);
@@ -201,8 +236,13 @@ export class LayoutEditor extends HTMLElement {
   }
 
   #changed() {
-    save_layout(this.#layout);
+    this.#save();
     this.#refresh();
+  }
+
+  #save() {
+    save_layout(this.#layout);
+    save_section_heights(this.#heights);
   }
 
   #refresh() {
@@ -219,7 +259,17 @@ export class LayoutEditor extends HTMLElement {
     const can_move_backgrounds = this.#element('.move_backgrounds').checked;
     for (const part of parts_catalog) this.#place_image(part, can_move_backgrounds);
     this.#place_handle();
+    this.#place_dividers();
     this.#images.get('reference').style.display = this.#element('.show_reference').checked ? 'block' : 'none';
+  }
+
+  #place_dividers() {
+    const tops = section_tops(this.#heights);
+    this.#dividers.forEach((divider, index) => {
+      divider.style.top = `${tops[index]}px`;
+      divider.style.height = `${24 / this.#zoom}px`;
+      divider.style.marginTop = `${-12 / this.#zoom}px`;
+    });
   }
 
   #place_handle() {
@@ -240,7 +290,7 @@ export class LayoutEditor extends HTMLElement {
     image.style.left = `${placement.x}px`;
     image.style.top = `${placement.y}px`;
     image.style.zIndex = placement.order;
-    image.style.transform = `scale(${placement.scale})`;
+    image.style.transform = `scale(${placement.scale}, ${placement.scale * placement.stretch})`;
     image.style.display = placement.visible ? 'block' : 'none';
     image.classList.toggle('selected', part.name === this.#selected_name);
     image.classList.toggle('in_section', part.section === this.#selected_section);
@@ -253,6 +303,11 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.section_name').textContent = this.#selected_section ?? 'Ninguna sección elegida';
   }
 
+  #natural_size(name) {
+    const image = this.#images.get(name);
+    return { width: image.naturalWidth, height: image.naturalHeight };
+  }
+
   #section_names(section) {
     return ordered_names(this.#layout).filter((name) => section.pieces.includes(name)).reverse();
   }
@@ -260,9 +315,19 @@ export class LayoutEditor extends HTMLElement {
   #create_section_header(section) {
     const header = document.createElement('li');
     header.className = section.title === this.#selected_section ? 'section_header selected' : 'section_header';
-    header.textContent = section.title;
+    header.innerHTML = /* html */ `<span></span><label>alto <input class="section_height" type="number" step="10"></label>`;
+    header.querySelector('span').textContent = section.title;
+    const height_field = header.querySelector('.section_height');
+    height_field.value = this.#heights[sections.indexOf(section)];
+    height_field.addEventListener('click', (event) => event.stopPropagation());
+    height_field.addEventListener('change', () => this.#set_height(section, Number(height_field.value)));
     header.addEventListener('click', () => this.#select_section(section));
     return header;
+  }
+
+  #set_height(section, requested_height) {
+    set_section_height(sections, this.#heights, this.#layout, (name) => this.#natural_size(name), sections.indexOf(section), requested_height);
+    this.#changed();
   }
 
   #select_section(section) {
@@ -299,10 +364,10 @@ export class LayoutEditor extends HTMLElement {
 
   async #copy_instructions() {
     try {
-      await navigator.clipboard.writeText(describe_layout(this.#layout));
+      await navigator.clipboard.writeText(describe_layout(this.#layout, this.#heights));
       this.#say('Copiado. Pégalo en el chat.');
     } catch (clipboard_error) {
-      this.#element('.import').value = describe_layout(this.#layout);
+      this.#element('.import').value = describe_layout(this.#layout, this.#heights);
       this.#say('No pude copiar solo: el texto quedó en el cuadro de abajo, cópialo a mano.');
     }
   }
@@ -321,7 +386,7 @@ export class LayoutEditor extends HTMLElement {
 
   #load_pasted() {
     try {
-      this.#layout = parse_layout(this.#element('.import').value);
+      ({ layout: this.#layout, heights: this.#heights } = parse_layout(this.#element('.import').value));
       this.#changed();
       this.#say('Layout cargado.');
     } catch (parse_error) {

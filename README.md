@@ -40,4 +40,4 @@ The panel's "Probar diseños" section lets you pick a design for each board (bla
 
 ## Arranging the cut pieces
 
-With the dev server running, open http://localhost:8000/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_oscuro_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, reorder them, write a note per piece and press "Copiar instrucciones" to paste the layout into the chat.
+With the dev server running, open http://localhost:8000/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_oscuro_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, reorder them, write a note per piece, set how tall each section is (the number next to its name, or drag the pink line between two sections; the space moves from one section to its neighbour) and press "Copiar instrucciones" to paste the layout into the chat.
