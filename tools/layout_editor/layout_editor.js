@@ -1,19 +1,15 @@
 import { layout_editor_styles } from './layout_editor.css.js';
-import { parts_catalog, sections, sign_size, original_image } from './parts_catalog.js';
+import { active_sign_key, original_image, original_section_heights, parts_catalog, sections, sign_size } from './active_sign.js';
 import { render_section_blob } from './section_image.js';
 import { move_border, set_section_height, section_tops } from './section_space.js';
 import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
-import { original_section_heights } from './parts_catalog.js';
-import { describe_signs, describe_size, board_pixels } from './physical_size.js';
+import { describe_signs, describe_size } from './physical_size.js';
 import { sign_catalog } from '../../src/data/sign_catalog.js';
 
-// Only the column board has cut pieces; the other board is shown whole, with its artwork when it has one.
-const layout_board_key = 'columna_esquina';
-const board_images = { esquina_calle_12: '../../images/signs/propuestas/esquina_calle_12_nueva_0x6_1x4.webp' };
 const sign_options = sign_catalog.map(({ key, title }) => `<option value="${key}">${title}</option>`).join('');
 
 const template = /* html */ `
-  <div class="viewport"><div class="sizer"><div class="stage"></div><div class="board_view"></div></div></div>
+  <div class="viewport"><div class="sizer"><div class="stage"></div></div></div>
   <aside class="panel">
     <div class="row">
       <label>Zoom <input class="zoom" type="range" min="0.1" max="1.5" step="0.01"></label>
@@ -50,7 +46,6 @@ export class LayoutEditor extends HTMLElement {
   #selected_name = null;
   #selected_section = null;
   #zoom = 0.3;
-  #board_key = layout_board_key;
   static viewport_padding = 32;
   #images = new Map();
   #handle = null;
@@ -116,29 +111,14 @@ export class LayoutEditor extends HTMLElement {
   // The whole board fits the window, both its width and its height, until the person zooms in.
   #zoom_to_fit_screen() {
     const viewport = this.#element('.viewport');
-    const pixels = this.#current_pixels();
-    const fit_width = (viewport.clientWidth - LayoutEditor.viewport_padding) / pixels.width;
-    const fit_height = (viewport.clientHeight - LayoutEditor.viewport_padding) / pixels.height;
+    const fit_width = (viewport.clientWidth - LayoutEditor.viewport_padding) / sign_size.width;
+    const fit_height = (viewport.clientHeight - LayoutEditor.viewport_padding) / sign_size.height;
     return Math.min(1.5, Math.max(0.1, Math.floor(Math.min(fit_width, fit_height) * 100) / 100));
   }
 
-  #current_board() {
-    return sign_catalog.find(({ key }) => key === this.#board_key);
-  }
-
-  #current_pixels() {
-    return board_pixels(this.#current_board());
-  }
-
-  #choose_sign(key) {
-    this.#board_key = key;
-    this.#zoom = this.#zoom_to_fit_screen();
-    this.#element('.zoom').value = this.#zoom;
-    this.#refresh();
-  }
-
   #bind_controls() {
-    this.#element('.sign_choice').addEventListener('change', (event) => this.#choose_sign(event.target.value));
+    this.#element('.sign_choice').value = active_sign_key;
+    this.#element('.sign_choice').addEventListener('change', (event) => { window.location.search = `?sign=${event.target.value}`; });
     this.#element('.zoom').value = this.#zoom;
     this.#element('.zoom').addEventListener('input', (event) => { this.#zoom = Number(event.target.value); this.#refresh(); });
     this.#element('.show_reference').addEventListener('change', () => this.#refresh());
@@ -293,17 +273,9 @@ export class LayoutEditor extends HTMLElement {
 
   #refresh_stage() {
     const sizer = this.#element('.sizer');
-    const pixels = this.#current_pixels();
-    const is_layout = this.#board_key === layout_board_key;
-    sizer.style.width = `${pixels.width * this.#zoom}px`;
-    sizer.style.height = `${pixels.height * this.#zoom}px`;
-    this.#element('.stage').style.display = is_layout ? 'block' : 'none';
+    sizer.style.width = `${sign_size.width * this.#zoom}px`;
+    sizer.style.height = `${sign_size.height * this.#zoom}px`;
     this.#element('.stage').style.transform = `scale(${this.#zoom})`;
-    const board_view = this.#element('.board_view');
-    board_view.style.display = is_layout ? 'none' : 'block';
-    board_view.style.width = `${pixels.width * this.#zoom}px`;
-    board_view.style.height = `${pixels.height * this.#zoom}px`;
-    board_view.style.backgroundImage = board_images[this.#board_key] ? `url("${board_images[this.#board_key]}")` : 'none';
     const can_move_backgrounds = this.#element('.move_backgrounds').checked;
     for (const part of parts_catalog) this.#place_image(part, can_move_backgrounds);
     this.#place_handle();
