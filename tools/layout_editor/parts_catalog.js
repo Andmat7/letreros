@@ -1,17 +1,19 @@
 // Every cut piece with the place it has in the proposal (pixels of the 960 x 4379 sign).
-const base_folder = '../../images/signs/partes/bancolombia_nueva_1x4_6';
+const bancolombia_folder = '../../images/signs/partes/bancolombia_nueva_1x4_6';
+const daviplata_folder = '../../images/signs/partes/daviplata_nueva_1x0_5';
 
 export const sign_size = { width: 960, height: 4379 };
 export const original_image = '../../images/signs/propuestas/bancolombia_nueva_1x4_6.webp';
 
-// Positions are pixels of the sign, the same boxes tools/cut_new_sign_parts.py cuts. Pieces are listed from back to front.
+// Positions are pixels of the sign, the same boxes the cut scripts in tools/ use. Pieces are listed from back to front.
+// The Davivienda band and its pieces come from the Daviplata art, which is as tall as that band.
 const bands = [
-  ['01_flecha_superior', 0],
-  ['02_nequi', 370],
-  ['03_bancolombia', 1610],
-  ['04_servicios', 2419],
-  ['05_davivienda', 3587],
-  ['06_flecha_inferior', 4080],
+  ['01_flecha_superior', 0, bancolombia_folder],
+  ['02_nequi', 370, bancolombia_folder],
+  ['03_bancolombia', 1610, bancolombia_folder],
+  ['04_servicios', 2419, bancolombia_folder],
+  ['05_davivienda', 3587, daviplata_folder],
+  ['06_flecha_inferior', 4080, bancolombia_folder],
 ];
 const pieces = [
   ['logos', 'destellos_izquierda', 145, 875],
@@ -21,12 +23,14 @@ const pieces = [
   ['textos', 'texto_pago_servicios', 60, 2465],
   ['logos', 'logo_nequi', 125, 560],
   ['logos', 'logo_bancolombia', 50, 2005],
-  ['logos', 'logo_davivienda', 50, 3625],
-  ['logos', 'logo_daviplata', 190, 3895],
   ['fotos', 'facturas', 14, 2705],
   ['fotos', 'tarjeta_bancolombia', 240, 1625],
   ['fotos', 'celular_nequi', 150, 795],
-  ['fotos', 'celular_davivienda', 600, 3460],
+];
+const davivienda_pieces = [
+  ['logos', 'logo_davivienda', 125, 3627],
+  ['logos', 'logo_daviplata', 100, 3852],
+  ['fotos', 'celular_davivienda', 655, 3587],
 ];
 
 // Sections from top to bottom. Each owns one background band that defines its slot of the sign; the flecha bands
@@ -43,8 +47,9 @@ export const sections = [
 const section_of = Object.fromEntries(sections.flatMap((section) => section.pieces.map((name) => [name, section.title])));
 
 export const parts_catalog = [
-  ...bands.map(([name, y]) => ({ name, source: `${base_folder}/fondos/${name}.webp`, x: 0, y, is_background: true })),
-  ...pieces.map(([folder, name, x, y]) => ({ name, source: `${base_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
+  ...bands.map(([name, y, folder]) => ({ name, source: `${folder}/fondos/${name}.webp`, x: 0, y, is_background: true })),
+  ...pieces.map(([folder, name, x, y]) => ({ name, source: `${bancolombia_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
+  ...davivienda_pieces.map(([folder, name, x, y]) => ({ name, source: `${daviplata_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
 ].map((part) => ({ ...part, section: section_of[part.name] }));
 
 // Height of every section slot in the original proposal, from top to bottom.
