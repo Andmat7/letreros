@@ -1,9 +1,9 @@
-// Draws the visible pieces of one section, back to front, into a PNG cropped to the area they cover.
-export function render_section_blob(parts, layout, images) {
+// Draws the visible pieces, back to front, into a PNG. Without `fixed_bounds` it is cropped to the area they cover.
+export function render_section_blob(parts, layout, images, fixed_bounds = null) {
   const placed = parts.filter((part) => layout[part.name].visible).sort((first, second) => layout[first.name].order - layout[second.name].order);
   if (!placed.length) throw new Error('The section has no visible pieces');
   const rectangles = placed.map((part) => rectangle_of(layout[part.name], images.get(part.name)));
-  const bounds = union_of(rectangles);
+  const bounds = fixed_bounds ?? union_of(rectangles);
   const canvas = new OffscreenCanvas(Math.ceil(bounds.right - bounds.left), Math.ceil(bounds.bottom - bounds.top));
   const context = canvas.getContext('2d');
   placed.forEach((part, index) => {

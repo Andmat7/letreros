@@ -3,7 +3,8 @@
 Photos (phones with hands, card, invoices) are cut out along their real edges with GrabCut; logos and
 texts are keyed against the band color; bands are rebuilt without them. The Nequi section has its own
 art (fuentes/), so its pieces come from there and the Nequi band takes the art's proportion; the
-Bancolombia band absorbs the height difference.
+Bancolombia band absorbs the height difference. The Bancolombia pieces come from art that already has a
+transparent background, so they are only cropped.
 """
 from pathlib import Path
 
@@ -28,14 +29,11 @@ SIGN_WIDTH = 960
 
 # name: (folder, left, top, right, bottom, how it is cut)
 PARTS = {
-    "tarjeta_bancolombia": ("fotos", 235, 2040, 750, 2470, "grabcut"),
     "facturas": ("fotos", 672, 2878, 960, 3380, "grabcut"),
     "celular_davivienda": ("fotos", 605, 3520, 960, 3950, "grabcut_sin_amarillo"),
-    "logo_bancolombia": ("logos", 85, 2464, 892, 2621, "key"),
     "iconos_servicios": ("logos", 325, 2923, 616, 3208, "key"),
     "logo_davivienda": ("logos", 49, 3685, 587, 3943, "opaque"),
     "logo_daviplata": ("logos", 190, 3976, 780, 4122, "key"),
-    "texto_corresponsal": ("textos", 112, 2654, 862, 2834, "key"),
     "texto_pago_servicios": ("textos", 123, 3214, 847, 3606, "key"),
 }
 # Pieces of the Nequi art, boxes in pixels of the art scaled to the sign width.
@@ -45,6 +43,13 @@ NEQUI_PARTS = {
     "destellos_izquierda": ("logos", 145, 505, 250, 612, "key"),
     "destellos_derecha": ("logos", 625, 555, 725, 695, "key"),
     "celular_nequi": ("fotos", 150, 425, 960, 1241, "grabcut"),
+}
+# Pieces of art that already has a transparent background (fuentes/); boxes are in pixels of that art.
+BANCOLOMBIA_ART = "fuentes/03_bancolombia_nueva.webp"
+BANCOLOMBIA_PARTS = {
+    "tarjeta_bancolombia": ("fotos", 215, 40, 785, 490),
+    "logo_bancolombia": ("logos", 75, 490, 962, 675),
+    "texto_corresponsal": ("textos", 78, 672, 950, 862),
 }
 KEY_THRESHOLD = 40
 # The sign sits inside a black frame; the clean color of each row is sampled just inside it.
@@ -68,6 +73,7 @@ class SignPartCutter:
         art_background = self._clean_rows(self.nequi_art)
         self._cut_parts(PARTS, self.source, backgrounds)
         self._cut_parts(NEQUI_PARTS, self.nequi_art, art_background)
+        self._cut_transparent_art(BANCOLOMBIA_ART, BANCOLOMBIA_PARTS)
         self._save_bands(backgrounds, art_background)
 
     def _cut_parts(self, parts: dict, image: np.ndarray, backgrounds: np.ndarray) -> None:
@@ -75,6 +81,12 @@ class SignPartCutter:
             box = (left, top, right, bottom)
             crop = image[top:bottom, left:right]
             self._save(folder, name, crop, self._alpha(crop, box, method, backgrounds))
+
+    def _cut_transparent_art(self, art_path: str, parts: dict) -> None:
+        art = np.asarray(Image.open(self.output / art_path).convert("RGBA"))
+        for name, (folder, left, top, right, bottom) in parts.items():
+            region = art[top:bottom, left:right]
+            self._save(folder, name, region[..., :3], region[..., 3])
 
     def _rebuild_backgrounds(self) -> np.ndarray:
         backgrounds = self.source.copy()

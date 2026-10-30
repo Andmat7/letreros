@@ -22,6 +22,12 @@ layout_editor_styles.replaceSync(/* css */ `
   li.section_header { margin-top: 8px; font-weight: 700; background: #eef0f5; }
   li.section_header label { display: flex; gap: 4px; align-items: center; font-weight: 400; font-size: 12px; }
   li.section_header input { width: 64px; }
+  li.section_header { flex-wrap: wrap; }
+  li.section_header button { padding: 2px 8px; font-size: 12px; }
+  li.deleted { opacity: 0.55; }
+  li.deleted span { text-decoration: line-through; }
+  :host(.clean) .stage .divider, :host(.clean) .stage .handle, :host(.clean) .stage img.reference { display: none !important; }
+  :host(.clean) .stage img { outline: none !important; cursor: default; }
   li.selected { background: #dff0ff; }
   li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
