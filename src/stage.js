@@ -9,6 +9,8 @@ export function create_stage(canvas) {
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
+  // The default zoom jumps several meters per wheel tick or trackpad gesture; a gentler speed keeps it controllable.
+  controls.zoomSpeed = 0.35;
   controls.maxPolarAngle = Math.PI / 2 - 0.03;
   controls.minDistance = 1;
   controls.maxDistance = 90;

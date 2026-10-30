@@ -5,8 +5,9 @@ import { sign_catalog } from '../data/sign_catalog.js';
 import { create_board_canvas, load_artwork_image, paint_board } from './sign_artwork_canvas.js';
 
 const storage_key = 'letreros-positions-v9';
-const artwork_storage_key = 'letreros-artwork-v1';
+const artwork_storage_key = 'letreros-artwork-v2';
 const blank_artwork = { key: '', fit: 'contain', rotated: false };
+const default_artwork = { key: 'bancolombia_nueva_1x4_6', fit: 'contain', rotated: false };
 const wall_offset = 0.06;
 const sidewalk_margin = 0.4;
 
@@ -27,7 +28,7 @@ export function build_wall_signs(scene) {
   const saved_placements = load_stored(storage_key);
   const saved_artwork = load_stored(artwork_storage_key);
   const signs = sign_catalog.map(entry => create_wall_sign(scene, entry, saved_placements[entry.key]));
-  signs.forEach(sign => set_sign_artwork(sign, known_artwork(saved_artwork[sign.entry.key])));
+  signs.forEach(sign => set_sign_artwork(sign, known_artwork(saved_artwork[sign.entry.key] ?? default_artwork)));
   return signs;
 }
 
@@ -93,7 +94,9 @@ function create_wall_sign(scene, entry, saved_placement) {
 function create_face(size, texture) {
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 8;
-  const face = new THREE.Mesh(new THREE.PlaneGeometry(...size), new THREE.MeshStandardMaterial({ map: texture, roughness: 0.6 }));
+  // The artwork emits its own light, like a lightbox, so it stays readable in the shade of the facade.
+  const material = new THREE.MeshStandardMaterial({ map: texture, emissiveMap: texture, emissive: 0xffffff, emissiveIntensity: 0.45, roughness: 0.6 });
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(...size), material);
   face.position.z = 0.03;
   return face;
 }

@@ -8,6 +8,7 @@ import { build_streets } from './scene/street.js';
 import { build_surroundings } from './scene/surroundings.js';
 import { build_windows } from './scene/windows.js';
 import { create_camera_flight } from './interaction/camera_flight.js';
+import { zoom_camera } from './interaction/camera_zoom.js';
 import { create_measuring_tape, set_measuring } from './interaction/measuring_tape.js';
 import { create_photo_comparison } from './interaction/photo_comparison.js';
 import { build_photo_markers, set_markers_visible } from './interaction/photo_markers.js';
@@ -18,6 +19,7 @@ import './components/image_viewer.js';
 import './components/measure_readout.js';
 import './components/photo_overlay/photo_overlay.js';
 import './components/site_panel.js';
+import './components/zoom_control.js';
 
 const stage = create_stage(document.getElementById('scene'));
 const panel = document.querySelector('site-panel');
@@ -34,6 +36,7 @@ const flight = create_camera_flight(stage.camera, stage.controls);
 const comparison = create_photo_comparison({ stage, flight, overlay }, end_photo);
 attach_pointer_controller(stage, { signs, markers, tape }, { on_photo: show_photo, on_sign: show_sign });
 connect_panel();
+document.querySelector('zoom-control').addEventListener('zoom-step', ({ detail }) => zoom_camera(stage, detail.direction));
 set_markers_visible(markers, !markers_hidden);
 start(overview_views.home);
 
