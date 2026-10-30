@@ -5,6 +5,7 @@ layout_editor_styles.replaceSync(/* css */ `
   .viewport { overflow: auto; background: #cfd0d6; padding: 16px; }
   .sizer { margin: 0 auto; }
   .stage { position: relative; background: #fff; transform-origin: top left; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3); }
+  .board_view { background: #fff center / 100% 100% no-repeat; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3); }
   .stage img { position: absolute; transform-origin: top left; user-select: none; -webkit-user-drag: none; cursor: grab; }
   .stage img.in_section { outline: 4px dashed #00a8ff; }
   .stage img.selected { outline: 6px solid #00a8ff; }

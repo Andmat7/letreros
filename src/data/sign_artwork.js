@@ -2,6 +2,7 @@
 export const sign_artwork = [
   { key: '', title: 'Blanco' },
   { key: 'bancolombia_nueva_1x4_6', title: 'Esquina Bancolombia – nueva, con flechas blancas' },
+  { key: 'esquina_calle_12_nueva_0x6_1x4', title: 'Esquina Calle 12 – nueva (0.60 × 1.40 m)' },
   { key: 'bancolombia_oscuro_1x4_6', title: 'Esquina Bancolombia – columna, fondo oscuro y flecha roja' },
   { key: 'cuatro_servicios_1x2_3', title: 'Esquina – Nequi, Bancolombia, servicios públicos y Davivienda' },
   { key: 'cuatro_servicios_1x3_3', title: 'Columna – Nequi, Bancolombia y servicios públicos' },

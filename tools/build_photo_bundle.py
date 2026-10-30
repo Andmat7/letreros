@@ -28,6 +28,7 @@ class PhotoBundleBuilder:
         "bancolombia_oscuro_1x4_6": "images/signs/propuestas/bancolombia_oscuro_1x4_6.webp",
         "cuatro_servicios_1x2_3": "images/signs/propuestas/cuatro_servicios_1x2_3.webp",
         "cuatro_servicios_1x3_3": "images/signs/propuestas/cuatro_servicios_1x3_3.webp",
+        "esquina_calle_12_nueva_0x6_1x4": "images/signs/propuestas/esquina_calle_12_nueva_0x6_1x4.webp",
         "logo_nequi": "images/signs/partes/logo_nequi.avif",
         "facturas_servicios_publicos": "images/signs/partes/facturas_servicios_publicos.avif",
     }

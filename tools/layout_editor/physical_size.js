@@ -11,8 +11,15 @@ export function describe_size(height_in_pixels) {
   return `${format_centimeters(width)} × ${format_centimeters(height)} cm`;
 }
 
-export function describe_board() {
-  return `tablero ${column_board.width * 100} × ${column_board.height * 100} cm`;
+// The full layout is the column sign; the corner sign from Calle 12 is listed by its catalog title.
+export function describe_signs() {
+  const corner_sign = sign_catalog.find(({ key }) => key === 'esquina_calle_12');
+  return [`Letrero completo: ${describe_size(sign_size.height)}`, corner_sign.title];
+}
+
+// Pixels of the editor canvas that cover a board, at the same scale as the layout.
+export function board_pixels(board) {
+  return { width: (board.width * 100) / centimeters_per_pixel, height: (board.height * 100) / centimeters_per_pixel };
 }
 
 function format_centimeters(value) {

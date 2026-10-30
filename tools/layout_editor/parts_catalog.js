@@ -1,8 +1,13 @@
-// Every cut piece with the place it has in the proposal (pixels of the 960 x 4379 sign).
+import { sign_catalog } from '../../src/data/sign_catalog.js';
+
+// Every cut piece with the place it has in the proposal (pixels of the sign, 960 px wide).
 const bancolombia_folder = '../../images/signs/partes/bancolombia_nueva_1x4_6';
 const daviplata_folder = '../../images/signs/partes/daviplata_nueva_1x0_5';
 
-export const sign_size = { width: 960, height: 4379 };
+// The printed board is 0.30 × 1.40 m, so the sign keeps that proportion; the extra height goes to the bottom band.
+const column_board = sign_catalog.find(({ key }) => key === 'columna_esquina');
+const sign_width = 960;
+export const sign_size = { width: sign_width, height: Math.round((sign_width * column_board.height) / column_board.width) };
 export const original_image = '../../images/signs/propuestas/bancolombia_nueva_1x4_6.webp';
 
 // Positions are pixels of the sign, the same boxes the cut scripts in tools/ use. Pieces are listed from back to front.
