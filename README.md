@@ -32,7 +32,7 @@ The 📏 Medir button measures between two clicked points; points stick to nearb
 - `src/interaction/` – sign dragging, photo markers, camera flights.
 - `src/components/` – side panel and image viewer web components.
 - `src/generated/photo_bundle.js` – built by `tools/build_photo_bundle.py`; do not edit by hand.
-- `images/` – original photos and sign artwork: `signs/propuestas/` has the full proposals (named by their width x height ratio), `signs/partes/` the loose pieces to build them. `signs/partes/bancolombia_oscuro_1x4_6/` is that proposal cut into `fondos/` (bands without elements), `fotos/` (phones with hands, card and invoices cut out along their edges), `logos/` and `textos/`, made by `.venv/Scripts/python tools/cut_sign_parts.py`.
+- `images/` – original photos and sign artwork: `signs/propuestas/` has the full proposals (named by their width x height ratio), `signs/partes/` the loose pieces to build them. `signs/partes/bancolombia_oscuro_1x4_6/` is that proposal cut into `fondos/` (bands without elements), `fotos/` (phones with hands, card and invoices cut out along their edges), `logos/` and `textos/`, made by `.venv/Scripts/python tools/cut_sign_parts.py`. `signs/partes/bancolombia_nueva_1x4_6/` is the newer proposal (white arrow bands) cut the same way by `cd tools && ../.venv/Scripts/python cut_new_sign_parts.py`; both boards show it by default.
 
 ## Trying designs on the boards
 
@@ -40,4 +40,4 @@ The panel's "Probar diseños" section lets you pick a design for each board (bla
 
 ## Arranging the cut pieces
 
-With the dev server running, open http://localhost:8000/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_oscuro_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, reorder them, write a note per piece, set how tall each section is (the number next to its name, or drag the pink line between two sections; the space moves from one section to its neighbour) and each section has "Copiar imagen" (copies it as a PNG), "Eliminar imagen" (or the Delete key) takes the chosen image out of the sign and of every copy until you restore it, "Copiar imagen completa" copies the whole sign, "Vista final" hides every control mark, and "Copiar instrucciones" pastes the layout into the chat.
+With the dev server running, open http://localhost:8000/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_nueva_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, reorder them, write a note per piece, set how tall each section is (the number next to its name, or drag the pink line between two sections; the space moves from one section to its neighbour) and each section has "Copiar imagen" (copies it as a PNG), "Eliminar imagen" (or the Delete key) takes the chosen image out of the sign and of every copy until you restore it, "Copiar imagen completa" copies the whole sign, "Vista final" hides every control mark, and "Copiar instrucciones" pastes the layout into the chat.

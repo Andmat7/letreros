@@ -1,6 +1,6 @@
 import { parts_catalog, original_section_heights, sections, sign_size } from './parts_catalog.js';
 
-const storage_key = 'layout_editor:bancolombia_oscuro_1x4_6';
+const storage_key = 'layout_editor:bancolombia_nueva_1x4_6';
 const heights_key = `${storage_key}:section_heights`;
 
 export function original_layout() {
@@ -45,7 +45,7 @@ export function parse_layout(text) {
 
 // The text a person pastes back into the conversation: a readable list and the exact JSON.
 export function describe_layout(layout, heights) {
-  const header = `Layout of bancolombia_oscuro_1x4_6 (canvas ${sign_size.width}x${sign_size.height} px, origin top-left, back to front):`;
+  const header = `Layout of bancolombia_nueva_1x4_6 (canvas ${sign_size.width}x${sign_size.height} px, origin top-left, back to front):`;
   const section_lines = sections.map((section, index) => `- ${section.title}: height=${heights[index]}`);
   const piece_lines = ordered_names(layout).map((name) => describe_piece(name, layout[name]));
   const data = JSON.stringify({ section_heights: heights, layout }, null, 1);

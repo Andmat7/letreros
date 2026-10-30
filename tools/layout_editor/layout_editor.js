@@ -4,6 +4,7 @@ import { render_section_blob } from './section_image.js';
 import { move_border, set_section_height, section_tops } from './section_space.js';
 import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
 import { original_section_heights } from './parts_catalog.js';
+import { describe_board, describe_size } from './physical_size.js';
 
 const template = /* html */ `
   <div class="viewport"><div class="sizer"><div class="stage"></div></div></div>
@@ -14,6 +15,7 @@ const template = /* html */ `
       <label><input class="move_backgrounds" type="checkbox"> Mover fondos</label>
       <label><input class="clean_view" type="checkbox"> Vista final</label>
     </div>
+    <div class="sign_size">Letrero completo: ${describe_size(sign_size.height)} (${describe_board()})</div>
     <ul class="list"></ul>
     <div class="row"><button class="copy_all primary">Copiar imagen completa</button></div>
     <div class="selected_controls">
@@ -324,8 +326,9 @@ export class LayoutEditor extends HTMLElement {
   #create_section_header(section) {
     const header = document.createElement('li');
     header.className = section.title === this.#selected_section ? 'section_header selected' : 'section_header';
-    header.innerHTML = /* html */ `<span></span><label>alto <input class="section_height" type="number" step="10"></label><button class="copy_image" title="Copiar esta sección como imagen">Copiar imagen</button>`;
+    header.innerHTML = /* html */ `<span></span><small class="section_size"></small><label>alto <input class="section_height" type="number" step="10"></label><button class="copy_image" title="Copiar esta sección como imagen">Copiar imagen</button>`;
     header.querySelector('span').textContent = section.title;
+    header.querySelector('.section_size').textContent = describe_size(this.#heights[sections.indexOf(section)]);
     this.#bind_header(header, section);
     return header;
   }

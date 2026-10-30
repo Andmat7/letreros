@@ -1,35 +1,32 @@
-// Every cut piece with the place it had in the original proposal (pixels of the 960 x 4382 sign).
-const base_folder = '../../images/signs/partes/bancolombia_oscuro_1x4_6';
+// Every cut piece with the place it has in the proposal (pixels of the 960 x 4379 sign).
+const base_folder = '../../images/signs/partes/bancolombia_nueva_1x4_6';
 
-export const sign_size = { width: 960, height: 4382 };
-export const original_image = '../../images/signs/propuestas/bancolombia_oscuro_1x4_6.webp';
+export const sign_size = { width: 960, height: 4379 };
+export const original_image = '../../images/signs/propuestas/bancolombia_nueva_1x4_6.webp';
 
-// Positions are pixels of the sign. Pieces are listed from back to front. The Nequi band follows its new art's
-// proportion (1241 px tall) and the Bancolombia band takes the rest, so its pieces are spread over the taller band.
+// Positions are pixels of the sign, the same boxes tools/cut_new_sign_parts.py cuts. Pieces are listed from back to front.
 const bands = [
   ['01_flecha_superior', 0],
   ['02_nequi', 370],
-  ['03_bancolombia', 1611],
-  ['04_servicios', 2818],
-  ['05_servicios_publicos', 3153],
-  ['06_davivienda', 3589],
-  ['07_flecha_inferior', 4082],
+  ['03_bancolombia', 1610],
+  ['04_servicios', 2419],
+  ['05_davivienda', 3587],
+  ['06_flecha_inferior', 4080],
 ];
 const pieces = [
   ['logos', 'destellos_izquierda', 145, 875],
   ['logos', 'destellos_derecha', 625, 925],
   ['textos', 'texto_recarga', 50, 430],
-  ['textos', 'texto_corresponsal', 44, 2480],
-  ['textos', 'texto_pago_servicios', 123, 3154],
+  ['textos', 'texto_corresponsal', 100, 2215],
+  ['textos', 'texto_pago_servicios', 60, 2465],
   ['logos', 'logo_nequi', 125, 560],
-  ['logos', 'logo_bancolombia', 36, 2230],
-  ['logos', 'iconos_servicios', 325, 2863],
-  ['logos', 'logo_davivienda', 49, 3625],
-  ['logos', 'logo_daviplata', 190, 3916],
-  ['fotos', 'facturas', 672, 2818],
-  ['fotos', 'tarjeta_bancolombia', 195, 1650],
+  ['logos', 'logo_bancolombia', 50, 2005],
+  ['logos', 'logo_davivienda', 50, 3625],
+  ['logos', 'logo_daviplata', 190, 3895],
+  ['fotos', 'facturas', 14, 2705],
+  ['fotos', 'tarjeta_bancolombia', 240, 1625],
   ['fotos', 'celular_nequi', 150, 795],
-  ['fotos', 'celular_davivienda', 605, 3460],
+  ['fotos', 'celular_davivienda', 600, 3460],
 ];
 
 // Sections from top to bottom. Each owns one background band that defines its slot of the sign; the flecha bands
@@ -38,10 +35,9 @@ export const sections = [
   { title: '1. flecha superior', background: '01_flecha_superior', stretch_background: false, pieces: ['01_flecha_superior'] },
   { title: '2. nequi', background: '02_nequi', stretch_background: true, pieces: ['02_nequi', 'texto_recarga', 'logo_nequi', 'destellos_izquierda', 'destellos_derecha', 'celular_nequi'] },
   { title: '3. bancolombia', background: '03_bancolombia', stretch_background: true, pieces: ['03_bancolombia', 'tarjeta_bancolombia', 'logo_bancolombia', 'texto_corresponsal'] },
-  { title: '4. servicios', background: '04_servicios', stretch_background: true, pieces: ['04_servicios', 'iconos_servicios', 'facturas'] },
-  { title: '5. servicios_publicos', background: '05_servicios_publicos', stretch_background: true, pieces: ['05_servicios_publicos', 'texto_pago_servicios'] },
-  { title: '6. davivienda', background: '06_davivienda', stretch_background: true, pieces: ['06_davivienda', 'logo_davivienda', 'logo_daviplata', 'celular_davivienda'] },
-  { title: '7. flecha inferior', background: '07_flecha_inferior', stretch_background: false, pieces: ['07_flecha_inferior'] },
+  { title: '4. servicios', background: '04_servicios', stretch_background: true, pieces: ['04_servicios', 'facturas', 'texto_pago_servicios'] },
+  { title: '5. davivienda', background: '05_davivienda', stretch_background: true, pieces: ['05_davivienda', 'logo_davivienda', 'logo_daviplata', 'celular_davivienda'] },
+  { title: '6. flecha inferior', background: '06_flecha_inferior', stretch_background: false, pieces: ['06_flecha_inferior'] },
 ];
 
 const section_of = Object.fromEntries(sections.flatMap((section) => section.pieces.map((name) => [name, section.title])));

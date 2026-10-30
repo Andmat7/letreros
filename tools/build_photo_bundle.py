@@ -24,6 +24,7 @@ class PhotoBundleBuilder:
         "esquina_cerca": "images/photos/esquina_cerca.jpg",
         "esquina_calle_12": "images/photos/esquina_calle_12.jpg",
         "esquina_diagonal": "images/photos/esquina_diagonal.jpg",
+        "bancolombia_nueva_1x4_6": "images/signs/propuestas/bancolombia_nueva_1x4_6.webp",
         "bancolombia_oscuro_1x4_6": "images/signs/propuestas/bancolombia_oscuro_1x4_6.webp",
         "cuatro_servicios_1x2_3": "images/signs/propuestas/cuatro_servicios_1x2_3.webp",
         "cuatro_servicios_1x3_3": "images/signs/propuestas/cuatro_servicios_1x3_3.webp",

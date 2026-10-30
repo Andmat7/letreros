@@ -17,10 +17,10 @@ SOURCE = "images/signs/propuestas/bancolombia_oscuro_1x4_6.webp"
 OUTPUT = "images/signs/partes/bancolombia_oscuro_1x4_6"
 SIGN_TOP, SIGN_BOTTOM = 60, 4442
 # Rows where each band ends (the last one is the sign bottom).
-BAND_ENDS = [430, 2017, 2878, 3213, 3649, 4142, SIGN_BOTTOM]
-BAND_NAMES = ["flecha_superior", "nequi", "bancolombia", "servicios", "servicios_publicos", "davivienda", "flecha_inferior"]
+BAND_ENDS = [430, 2017, 2878, 3649, 4142, SIGN_BOTTOM]
+BAND_NAMES = ["flecha_superior", "nequi", "bancolombia", "servicios", "davivienda", "flecha_inferior"]
 # Bands whose background is rebuilt row by row; the two white ones are kept whole.
-REBUILT_BANDS = [1, 2, 3, 4, 5]
+REBUILT_BANDS = [1, 2, 3, 4]
 # Bands replaced by new art (the originals are kept in fuentes/); cutting must not bring the old one back.
 REPLACED_BANDS = {"flecha_superior", "flecha_inferior"}
 NEQUI_ART = "fuentes/02_nequi_nueva.webp"

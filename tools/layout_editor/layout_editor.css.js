@@ -23,6 +23,8 @@ layout_editor_styles.replaceSync(/* css */ `
   li.section_header label { display: flex; gap: 4px; align-items: center; font-weight: 400; font-size: 12px; }
   li.section_header input { width: 64px; }
   li.section_header { flex-wrap: wrap; }
+  li.section_header .section_size { flex-basis: 100%; font-weight: 400; color: #5d6673; }
+  .sign_size { padding: 4px 8px; font-size: 12px; color: #5d6673; }
   li.section_header button { padding: 2px 8px; font-size: 12px; }
   li.deleted { opacity: 0.55; }
   li.deleted span { text-decoration: line-through; }
