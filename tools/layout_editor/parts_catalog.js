@@ -15,39 +15,47 @@ export const original_image = '../../images/signs/propuestas/bancolombia_nueva_1
 // The Davivienda band and its pieces come from the Daviplata art, which is as tall as that band.
 const bands = [
   ['01_flecha_superior', 0, bancolombia_folder],
-  ['02_nequi', 370, bancolombia_folder],
-  ['03_bancolombia', 1610, bancolombia_folder],
-  ['04_servicios', 2419, bancolombia_folder],
-  ['05_davivienda', 3587, daviplata_folder],
-  ['06_flecha_inferior', 4110, bancolombia_folder],
+  ['02_nequi', 400, bancolombia_folder],
+  ['03_bancolombia', 1480, bancolombia_folder],
+  ['04_servicios', 2350, bancolombia_folder],
+  ['05_davivienda', 3489, daviplata_folder],
+  ['06_flecha_inferior', 4157, bancolombia_folder],
 ];
 const pieces = [
-  ['logos', 'destellos_izquierda', 145, 875],
-  ['logos', 'destellos_derecha', 625, 925],
-  ['textos', 'texto_recarga', 50, 430],
-  ['textos', 'texto_corresponsal', 100, 2215],
-  ['textos', 'texto_pago_servicios', 60, 2465],
-  ['logos', 'logo_nequi', 125, 560],
-  ['logos', 'logo_bancolombia', 50, 2005],
-  ['fotos', 'facturas', 14, 2705],
-  ['fotos', 'tarjeta_bancolombia', 240, 1625],
-  ['fotos', 'celular_nequi', 150, 795],
+  ['logos', 'destellos_izquierda', 145, 841],
+  ['logos', 'destellos_derecha', 625, 892],
+  ['textos', 'texto_recarga', 50, 460],
+  ['textos', 'texto_corresponsal', 100, 2135],
+  ['textos', 'texto_pago_servicios', 60, 2395],
+  ['logos', 'logo_nequi', 125, 568],
+  ['logos', 'logo_bancolombia', 56, 1943],
+  ['fotos', 'facturas', 96, 2673],
+  ['fotos', 'tarjeta_bancolombia', 196, 1514],
+  ['fotos', 'celular_nequi', 225, 799],
 ];
 const davivienda_pieces = [
-  ['logos', 'logo_davivienda', 125, 3627],
-  ['logos', 'logo_daviplata', 100, 3852],
-  ['fotos', 'celular_davivienda', 655, 3587],
+  ['logos', 'logo_davivienda', 125, 3544],
+  ['logos', 'logo_daviplata', 100, 3827],
+  ['fotos', 'celular_davivienda', 574, 3496],
 ];
-// The arrow art, cut by tools/cut_esika_arrow_parts.py. The same pieces appear in the top and the bottom arrow.
-const arrow_pieces = [
+// The arrow art, cut by tools/cut_esika_arrow_parts.py. The same pieces appear in the top and the bottom arrow,
+// each at its own place in its section.
+const top_arrow_pieces = [
   ['flecha', 40, 18],
-  ['a_la_vuelta', 427, 44],
-  ['linea_roja', 427, 117],
-  ['en_la_tienda', 427, 138],
-  ['logo_esika', 427, 213],
+  ['a_la_vuelta', 427, 47],
+  ['linea_roja', 427, 126],
+  ['en_la_tienda', 427, 150],
+  ['logo_esika', 427, 231],
 ];
-const top_arrow_names = arrow_pieces.map(([file]) => `sup_${file}`);
-const bottom_arrow_names = arrow_pieces.map(([file]) => `inf_${file}`);
+const bottom_arrow_pieces = [
+  ['flecha', 40, 16],
+  ['a_la_vuelta', 427, 39],
+  ['linea_roja', 427, 103],
+  ['en_la_tienda', 427, 119],
+  ['logo_esika', 427, 185],
+];
+const top_arrow_names = top_arrow_pieces.map(([file]) => `sup_${file}`);
+const bottom_arrow_names = bottom_arrow_pieces.map(([file]) => `inf_${file}`);
 
 // Sections from top to bottom. Each owns one background band that defines its slot of the sign; the flecha bands
 // carry artwork, so they keep their proportions and are centered in their slot instead of being stretched.
@@ -66,8 +74,8 @@ export const parts_catalog = [
   ...bands.map(([name, y, folder]) => ({ name, source: `${folder}/fondos/${name}.webp`, x: 0, y, is_background: true })),
   ...pieces.map(([folder, name, x, y]) => ({ name, source: `${bancolombia_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
   ...davivienda_pieces.map(([folder, name, x, y]) => ({ name, source: `${daviplata_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
-  ...arrow_pieces.map(([file, x, y]) => ({ name: `sup_${file}`, source: `${arrow_folder}/${file}.webp`, x, y, is_background: false })),
-  ...arrow_pieces.map(([file, x, y]) => ({ name: `inf_${file}`, source: `${arrow_folder}/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
+  ...top_arrow_pieces.map(([file, x, y]) => ({ name: `sup_${file}`, source: `${arrow_folder}/${file}.webp`, x, y, is_background: false })),
+  ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `inf_${file}`, source: `${arrow_folder}/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
 ].map((part) => ({ ...part, section: section_of[part.name] }));
 
 // Height of every section slot in the original proposal, from top to bottom.
