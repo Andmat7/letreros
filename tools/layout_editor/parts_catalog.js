@@ -19,7 +19,7 @@ const bands = [
   ['03_bancolombia', 1610, bancolombia_folder],
   ['04_servicios', 2419, bancolombia_folder],
   ['05_davivienda', 3587, daviplata_folder],
-  ['06_flecha_inferior', 4080, bancolombia_folder],
+  ['06_flecha_inferior', 4110, bancolombia_folder],
 ];
 const pieces = [
   ['logos', 'destellos_izquierda', 145, 875],
@@ -40,11 +40,11 @@ const davivienda_pieces = [
 ];
 // The arrow art, cut by tools/cut_esika_arrow_parts.py. The same pieces appear in the top and the bottom arrow.
 const arrow_pieces = [
-  ['flecha', 83, 33],
-  ['a_la_vuelta', 459, 49],
-  ['linea_roja', 459, 114],
-  ['en_la_tienda', 459, 134],
-  ['logo_esika', 459, 209],
+  ['flecha', 40, 18],
+  ['a_la_vuelta', 427, 44],
+  ['linea_roja', 427, 117],
+  ['en_la_tienda', 427, 138],
+  ['logo_esika', 427, 213],
 ];
 const top_arrow_names = arrow_pieces.map(([file]) => `sup_${file}`);
 const bottom_arrow_names = arrow_pieces.map(([file]) => `inf_${file}`);
