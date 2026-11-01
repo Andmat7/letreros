@@ -29,6 +29,8 @@ class PhotoBundleBuilder:
         "cuatro_servicios_1x2_3": "images/signs/propuestas/cuatro_servicios_1x2_3.webp",
         "cuatro_servicios_1x3_3": "images/signs/propuestas/cuatro_servicios_1x3_3.webp",
         "esquina_calle_12_nueva_0x6_1x4": "images/signs/propuestas/esquina_calle_12_nueva_0x6_1x4.webp",
+        "columna_esquina_layout": "images/signs/propuestas/columna_esquina_layout.webp",
+        "esquina_calle_12_layout": "images/signs/propuestas/esquina_calle_12_layout.webp",
         "logo_nequi": "images/signs/partes/logo_nequi.avif",
         "facturas_servicios_publicos": "images/signs/partes/facturas_servicios_publicos.avif",
     }

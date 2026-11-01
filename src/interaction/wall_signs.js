@@ -7,7 +7,8 @@ import { create_board_canvas, load_artwork_image, paint_board } from './sign_art
 const storage_key = 'letreros-positions-v9';
 const artwork_storage_key = 'letreros-artwork-v2';
 const blank_artwork = { key: '', fit: 'contain', rotated: false };
-const default_artwork = { key: 'bancolombia_nueva_1x4_6', fit: 'contain', rotated: false };
+const default_artwork_keys = { columna_esquina: 'columna_esquina_layout', esquina_calle_12: 'esquina_calle_12_layout' };
+const fallback_artwork_key = 'bancolombia_nueva_1x4_6';
 const wall_offset = 0.06;
 const sidewalk_margin = 0.4;
 
@@ -28,8 +29,12 @@ export function build_wall_signs(scene) {
   const saved_placements = load_stored(storage_key);
   const saved_artwork = load_stored(artwork_storage_key);
   const signs = sign_catalog.map(entry => create_wall_sign(scene, entry, saved_placements[entry.key]));
-  signs.forEach(sign => set_sign_artwork(sign, known_artwork(saved_artwork[sign.entry.key] ?? default_artwork)));
+  signs.forEach(sign => set_sign_artwork(sign, known_artwork(saved_artwork[sign.entry.key] ?? default_artwork_for(sign.entry.key))));
   return signs;
+}
+
+function default_artwork_for(sign_key) {
+  return { key: default_artwork_keys[sign_key] ?? fallback_artwork_key, fit: 'contain', rotated: false };
 }
 
 // A design removed from the catalog may still be saved in the browser.

@@ -25,34 +25,34 @@ const pieces = [
   ['logos', 'destellos_izquierda', 145, 841],
   ['logos', 'destellos_derecha', 625, 892],
   ['textos', 'texto_recarga', 50, 460],
-  ['textos', 'texto_corresponsal', 100, 2135],
+  ['textos', 'texto_corresponsal', 94, 2135],
   ['textos', 'texto_pago_servicios', 60, 2395],
   ['logos', 'logo_nequi', 125, 568],
-  ['logos', 'logo_bancolombia', 56, 1943],
-  ['fotos', 'facturas', 96, 2673],
-  ['fotos', 'tarjeta_bancolombia', 196, 1514],
+  ['logos', 'logo_bancolombia', 57, 2093],
+  ['fotos', 'facturas', 72, 2680],
+  ['fotos', 'tarjeta_bancolombia', 153, 1551],
   ['fotos', 'celular_nequi', 225, 799],
 ];
 const davivienda_pieces = [
-  ['logos', 'logo_davivienda', 125, 3544],
-  ['logos', 'logo_daviplata', 100, 3827],
-  ['fotos', 'celular_davivienda', 574, 3496],
+  ['logos', 'logo_davivienda', 125, 3546],
+  ['logos', 'logo_daviplata', 100, 3836],
+  ['fotos', 'celular_davivienda', 574, 3497],
 ];
 // The arrow art, cut by tools/cut_esika_arrow_parts.py. The same pieces appear in the top and the bottom arrow,
 // each at its own place in its section.
 const top_arrow_pieces = [
-  ['flecha', 40, 18],
-  ['a_la_vuelta', 427, 47],
+  ['flecha', 9, 31],
+  ['a_la_vuelta', 403, 60],
   ['linea_roja', 427, 126],
   ['en_la_tienda', 427, 150],
-  ['logo_esika', 427, 231],
+  ['logo_esika', 415, 188],
 ];
 const bottom_arrow_pieces = [
-  ['flecha', 40, 16],
-  ['a_la_vuelta', 427, 39],
-  ['linea_roja', 427, 103],
-  ['en_la_tienda', 427, 119],
-  ['logo_esika', 427, 185],
+  ['flecha', 34, 47],
+  ['a_la_vuelta', 427, 70],
+  ['linea_roja', 421, 179],
+  ['en_la_tienda', 427, 144],
+  ['logo_esika', 427, 190],
 ];
 const top_arrow_names = top_arrow_pieces.map(([file]) => `sup_${file}`);
 const bottom_arrow_names = bottom_arrow_pieces.map(([file]) => `inf_${file}`);
@@ -67,6 +67,26 @@ export const sections = [
   { title: '5. davivienda', background: '05_davivienda', stretch_background: true, pieces: ['05_davivienda', 'logo_davivienda', 'logo_daviplata', 'celular_davivienda'] },
   { title: '6. flecha inferior', background: '06_flecha_inferior', stretch_background: false, pieces: ['06_flecha_inferior', ...bottom_arrow_names] },
 ];
+
+// Scale, stretch, hidden or deleted images and a moved background from the layout last saved in the editor.
+// Browsers that already saved a layout keep their own copy until it is reset.
+export const default_adjustments = {
+  '01_flecha_superior': { y: 15 },
+  '02_nequi': { stretch: 0.8709677419354839 },
+  '03_bancolombia': { stretch: 1.0754017305315204 },
+  '04_servicios': { stretch: 0.9751712328767124 },
+  '05_davivienda': { stretch: 1.3971486761710794 },
+  sup_a_la_vuelta: { scale: 1.1 },
+  sup_logo_esika: { scale: 1.01 },
+  logo_bancolombia: { scale: 0.92 },
+  facturas: { scale: 0.87 },
+  tarjeta_bancolombia: { scale: 1.3 },
+  celular_nequi: { scale: 0.84 },
+  celular_davivienda: { scale: 1.23 },
+  texto_corresponsal: { deleted: true },
+  sup_en_la_tienda: { visible: false },
+  inf_en_la_tienda: { visible: false },
+};
 
 const section_of = Object.fromEntries(sections.flatMap((section) => section.pieces.map((name) => [name, section.title])));
 

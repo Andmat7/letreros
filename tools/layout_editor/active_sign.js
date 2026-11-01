@@ -10,3 +10,4 @@ export const active_sign_key = is_corner ? corner_sign.corner_sign_key : 'column
 // The column layout was saved under its first name, so that name keeps its saved work.
 export const active_storage_name = is_corner ? corner_sign.corner_sign_key : 'bancolombia_nueva_1x4_6';
 export const { parts_catalog, sections, sign_size, original_image, original_section_heights } = active;
+export const default_adjustments = active.default_adjustments ?? {};

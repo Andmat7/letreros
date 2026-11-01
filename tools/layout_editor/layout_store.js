@@ -1,11 +1,11 @@
-import { active_sign_key, active_storage_name, original_section_heights, parts_catalog, sections, sign_size } from './active_sign.js';
+import { active_sign_key, active_storage_name, default_adjustments, original_section_heights, parts_catalog, sections, sign_size } from './active_sign.js';
 
 const storage_key = `layout_editor:${active_storage_name}`;
 const heights_key = `${storage_key}:section_heights`;
 
 export function original_layout() {
   return Object.fromEntries(parts_catalog.map((part, index) => [
-    part.name, { x: part.x, y: part.y, scale: 1, stretch: 1, visible: true, deleted: false, order: index, note: '' },
+    part.name, { x: part.x, y: part.y, scale: 1, stretch: 1, visible: true, deleted: false, order: index, note: '', ...default_adjustments[part.name] },
   ]));
 }
 
