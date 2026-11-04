@@ -6,6 +6,10 @@ export function render_section_blob(parts, layout, images, fixed_bounds = null) 
   const bounds = fixed_bounds ?? union_of(rectangles);
   const canvas = new OffscreenCanvas(Math.ceil(bounds.right - bounds.left), Math.ceil(bounds.bottom - bounds.top));
   const context = canvas.getContext('2d');
+  // The sign is printed on a white board, so where no piece covers it (like the hidden header band) it is white,
+  // as the editor shows it, not transparent.
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, canvas.width, canvas.height);
   placed.forEach((part, index) => {
     const { left, top, width, height } = rectangles[index];
     context.drawImage(images.get(part.name), left - bounds.left, top - bounds.top, width, height);

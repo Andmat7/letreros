@@ -1,4 +1,5 @@
-// The Calle 12 corner sign, cut into bands and pieces by tools/cut_corner_sign_parts.py.
+// The Calle 12 corner sign, cut into bands and pieces by tools/cut_corner_sign_parts.py; the services band and
+// its pieces come from new art cut by tools/cut_servicios_parts.py.
 export const corner_sign_key = 'esquina_calle_12';
 
 const sign_folder = '../../images/signs/partes/esquina_calle_12_nueva';
@@ -7,7 +8,7 @@ const bands = [
   ['01_cabecera', 0],
   ['02_nequi', 583],
   ['03_bancolombia', 1563],
-  ['04_servicios', 2263],
+  ['04_servicios_publicos', 2263],
   ['05_davivienda', 3525],
 ];
 const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. servicios', '5. davivienda'];
@@ -23,10 +24,11 @@ const pieces = [
   [2, 'fotos', 'tarjeta_bancolombia', 75, 1705],
   [2, 'logos', 'logo_bancolombia', 608, 1747],
   [2, 'textos', 'texto_corresponsal', 899, 2034],
-  [3, 'textos', 'texto_pago_servicios', 293, 2306],
-  [3, 'textos', 'texto_servicios_lista', 493, 2656],
-  [3, 'fotos', 'facturas', 229, 2763],
-  [3, 'logos', 'iconos_servicios', 286, 3349],
+  [3, 'textos', 'texto_paga_aqui', 250, 2270],
+  [3, 'textos', 'texto_luz_agua_gas', 435, 2552],
+  [3, 'fotos', 'facturas_servicios', 131, 2648],
+  [3, 'textos', 'texto_tambien_recargas', 427, 3266],
+  [3, 'logos', 'logos_operadores', 616, 3355],
   [4, 'logos', 'logo_davivienda', 178, 3584],
   [4, 'logos', 'logo_daviplata', 172, 3960],
   [4, 'fotos', 'celular_davivienda', 1256, 3512],
@@ -39,7 +41,6 @@ export const default_adjustments = {
   '01_cabecera': { visible: false },
   '02_nequi': { stretch: 1.0458911419423693 },
   '03_bancolombia': { stretch: 0.9459459459459459 },
-  '04_servicios': { stretch: 0.9944838455476753 },
   '05_davivienda': { stretch: 1.0042060988433228 },
   flecha_izquierda: { scale: 1.16 },
   en_la_tienda: { scale: 2 },
@@ -50,8 +51,6 @@ export const default_adjustments = {
   tarjeta_bancolombia: { scale: 1.44 },
   logo_bancolombia: { scale: 0.99 },
   texto_corresponsal: { scale: 0.7 },
-  facturas: { scale: 0.92 },
-  iconos_servicios: { deleted: true },
   logo_davivienda: { scale: 1.06 },
   celular_davivienda: { scale: 1.41 },
 };
