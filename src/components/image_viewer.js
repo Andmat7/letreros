@@ -1,8 +1,10 @@
+import { copy_image_to_clipboard } from './copy_image.js';
 import { image_viewer_styles } from './image_viewer.css.js';
 
 const template = /* html */ `
-  <div class="header"><span class="title"></span><button>Cerrar</button></div>
+  <div class="header"><span class="title"></span><span class="buttons"><button class="copy">Copiar foto</button><button class="close">Cerrar</button></span></div>
   <img alt="">
+  <div class="status"></div>
 `;
 
 // Emits "viewer-close" when the user closes it.
@@ -12,20 +14,32 @@ export class ImageViewer extends HTMLElement {
     root.adoptedStyleSheets = [image_viewer_styles];
     root.innerHTML = template;
     this.hidden = true;
-    root.querySelector('button').addEventListener('click', () => {
+    root.querySelector('.close').addEventListener('click', () => {
       this.hide();
       this.dispatchEvent(new CustomEvent('viewer-close'));
     });
+    root.querySelector('.copy').addEventListener('click', () => this.#copy_photo());
   }
 
   show({ title, image }) {
     this.shadowRoot.querySelector('.title').textContent = title;
     this.shadowRoot.querySelector('img').src = image;
+    this.shadowRoot.querySelector('.status').textContent = '';
     this.hidden = false;
   }
 
   hide() {
     this.hidden = true;
+  }
+
+  async #copy_photo() {
+    const status = this.shadowRoot.querySelector('.status');
+    try {
+      await copy_image_to_clipboard(this.shadowRoot.querySelector('img').src);
+      status.textContent = 'Foto copiada. Pégala donde quieras.';
+    } catch (copy_error) {
+      status.textContent = `No se pudo copiar la foto: ${copy_error.message}`;
+    }
   }
 }
 

@@ -9,6 +9,8 @@ image_viewer_styles.replaceSync(/* css */ `
   :host([hidden]) { display: none; }
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
   .title { font-size: 13px; font-weight: 600; }
+  .buttons { display: flex; gap: 6px; }
+  .status { margin-top: 6px; font-size: 12px; color: var(--muted); }
   img { display: block; width: 100%; max-height: 55vh; object-fit: contain; border-radius: 8px; background: #000; }
   button {
     border: 1px solid var(--line); background: var(--chip); color: inherit; border-radius: 8px;

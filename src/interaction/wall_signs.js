@@ -5,7 +5,7 @@ import { sign_catalog } from '../data/sign_catalog.js';
 import { create_board_canvas, load_artwork_image, paint_board } from './sign_artwork_canvas.js';
 
 const storage_key = 'letreros-positions-v9';
-const artwork_storage_key = 'letreros-artwork-v2';
+const artwork_storage_key = 'letreros-artwork-v3';
 const blank_artwork = { key: '', fit: 'contain', rotated: false };
 const default_artwork_keys = { columna_esquina: 'columna_esquina_layout', esquina_calle_12: 'esquina_calle_12_layout' };
 const fallback_artwork_key = 'bancolombia_nueva_1x4_6';

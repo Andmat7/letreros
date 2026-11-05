@@ -38,7 +38,7 @@ attach_pointer_controller(stage, { signs, markers, tape }, { on_photo: show_phot
 connect_panel();
 document.querySelector('zoom-control').addEventListener('zoom-step', ({ detail }) => zoom_camera(stage, detail.direction));
 set_markers_visible(markers, !markers_hidden);
-start(overview_views.home);
+start(sign_view(signs.find(sign => sign.entry.key === 'esquina_calle_12')));
 
 function build_world(scene) {
   build_streets(scene);
@@ -111,13 +111,17 @@ function end_photo() {
 
 function show_sign(sign) {
   comparison.close();
-  const center = sign.group.position;
-  const camera_position = center.clone().addScaledVector(sign.wall.normal, 4.5);
-  flight.fly_to({ camera_position: [camera_position.x, center.y + 0.6, camera_position.z], look_at: center.toArray() });
+  flight.fly_to(sign_view(sign));
   viewer.show({ title: sign.entry.title, image: photo_bundle[sign.entry.reference_photo].source });
   panel.set_active(sign.entry.key);
   panel.classList.remove('collapsed');
   picker.highlight_board(sign.entry.key);
+}
+
+function sign_view(sign) {
+  const center = sign.group.position;
+  const camera_position = center.clone().addScaledVector(sign.wall.normal, 4.5);
+  return { camera_position: [camera_position.x, center.y + 0.6, camera_position.z], look_at: center.toArray() };
 }
 
 function start(view) {

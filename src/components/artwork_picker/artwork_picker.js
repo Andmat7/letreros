@@ -2,6 +2,7 @@ import { artwork_picker_styles } from './artwork_picker.css.js';
 
 const board_template = /* html */ `
   <div class="board_title"></div>
+  <a class="edit_link" target="_blank" rel="noopener">Editar este letrero</a>
   <select data-field="key" aria-label="Diseño"></select>
   <select data-field="fit" aria-label="Ajuste"></select>
   <label><input type="checkbox" data-field="rotated"> Girar 90° (diseño horizontal en tablero vertical)</label>
@@ -29,6 +30,7 @@ export class ArtworkPicker extends HTMLElement {
     element.dataset.key = key;
     element.innerHTML = board_template;
     element.querySelector('.board_title').textContent = title;
+    element.querySelector('.edit_link').href = `tools/layout_editor/?sign=${key}`;
     this.#fill_select(element.querySelector('[data-field="key"]'), artworks, artwork.key);
     this.#fill_select(element.querySelector('[data-field="fit"]'), fits, artwork.fit);
     element.querySelector('[data-field="rotated"]').checked = artwork.rotated;
