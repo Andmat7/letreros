@@ -1,3 +1,4 @@
+import { copy_image_to_clipboard } from '../copy_image.js';
 import { photo_overlay_styles } from './photo_overlay.css.js';
 
 const svg_namespace = 'http://www.w3.org/2000/svg';
@@ -14,6 +15,7 @@ const template = /* html */ `
       <button data-action="toggle">Ocultar foto</button>
       <button data-action="edges">Ver bordes</button>
       <button data-action="copy">Copiar cámara</button>
+      <button data-action="copy_photo">Copiar foto</button>
       <button data-action="close">Cerrar</button>
     </div>
     <div class="hint">Tecla F: ocultar o mostrar. Tecla B: foto o bordes (verde: foto, magenta: modelo).
@@ -69,8 +71,18 @@ export class PhotoOverlay extends HTMLElement {
     root.querySelector('[data-action="toggle"]').addEventListener('click', () => this.#toggle_concealed());
     root.querySelector('[data-action="edges"]').addEventListener('click', () => this.#toggle_edges());
     root.querySelector('[data-action="copy"]').addEventListener('click', () => this.#emit('overlay-copy'));
+    root.querySelector('[data-action="copy_photo"]').addEventListener('click', () => this.#copy_photo());
     root.querySelector('[data-action="close"]').addEventListener('click', () => this.#emit('overlay-close'));
     root.querySelector('.layer').style.opacity = 0.5;
+  }
+
+  async #copy_photo() {
+    try {
+      await copy_image_to_clipboard(this.shadowRoot.querySelector('.photo').src);
+      this.set_status('Foto copiada. Pégala donde quieras.');
+    } catch (copy_error) {
+      this.set_status(`No se pudo copiar la foto: ${copy_error.message}`);
+    }
   }
 
   #connect_keys() {
