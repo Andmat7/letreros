@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { overview_views, photo_viewpoints } from './data/photo_viewpoints.js';
 import { artwork_fits, sign_artwork } from './data/sign_artwork.js';
 import { photo_bundle } from './generated/photo_bundle.js';
@@ -38,7 +39,9 @@ attach_pointer_controller(stage, { signs, markers, tape }, { on_photo: show_phot
 connect_panel();
 document.querySelector('zoom-control').addEventListener('zoom-step', ({ detail }) => zoom_camera(stage, detail.direction));
 set_markers_visible(markers, !markers_hidden);
-start(sign_view(signs.find(sign => sign.entry.key === 'esquina_calle_12')));
+start(both_signs_view());
+// On a phone the open panel would cover half of the boards.
+if (matchMedia('(max-width: 640px)').matches) panel.classList.add('collapsed');
 
 function build_world(scene) {
   build_streets(scene);
@@ -122,6 +125,18 @@ function sign_view(sign) {
   const center = sign.group.position;
   const camera_position = center.clone().addScaledVector(sign.wall.normal, 4.5);
   return { camera_position: [camera_position.x, center.y + 0.6, camera_position.z], look_at: center.toArray() };
+}
+
+// Looks at the corner along the diagonal so both boards fit, even on a narrow portrait screen.
+function both_signs_view() {
+  const center = new THREE.Vector3();
+  signs.forEach(sign => center.add(sign.group.position));
+  center.divideScalar(signs.length);
+  const half_width = Math.tan(THREE.MathUtils.degToRad(stage.camera.fov / 2)) * Math.min(1, stage.camera.aspect);
+  const distance = Math.max(5, 2.2 / half_width);
+  const diagonal = new THREE.Vector3(1, 0, 0.8).normalize();
+  const camera_position = center.clone().addScaledVector(diagonal, distance);
+  return { camera_position: [camera_position.x, center.y, camera_position.z], look_at: center.toArray() };
 }
 
 function start(view) {
