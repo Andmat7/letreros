@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { add_tape_point, grab_tape_point, move_tape_point, preview_tape_end } from './measuring_tape.js';
-import { move_sign, save_placements } from './wall_signs.js';
+import { add_tape_point, grab_tape_point, move_tape_point, preview_tape_end } from './measuring_tape.js?v=29bdb55891';
+import { move_sign, save_placements } from './wall_signs.js?v=29bdb55891';
 
 const click_tolerance = 5;
 

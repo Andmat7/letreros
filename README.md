@@ -16,6 +16,8 @@ Run both builds again after changing anything in `images/`. The second one lists
 - Online: https://andmat7.github.io/letreros/
 - Locally: `.venv/Scripts/python tools/dev_server.py`, then open http://localhost:8000 (ES modules do not load from `file://`; this server turns off browser caching so old modules never mix with new ones).
 
+- Before each commit run `python tools/stamp_versions.py`: it adds `?v=<hash>` to every module import so browsers skip GitHub Pages' 10-minute cache.
+
 ## What it is
 
 An approximate 3D model of the La Riviera corner (Carrera 7 con Calle 12) with two removable boards (corner column and corner seen from Calle 12), whose design can be swapped in the panel. The scene can be rotated and zoomed, signs can be dragged along the walls, and camera icons mark where each photo was taken. A 1.70 m figure gives scale.
