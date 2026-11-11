@@ -3,7 +3,7 @@ import { sign_catalog } from '../../src/data/sign_catalog.js';
 // Every cut piece with the place it has in the proposal (pixels of the sign, 960 px wide).
 const bancolombia_folder = '../../images/signs/partes/bancolombia_nueva_1x4_6';
 const daviplata_folder = '../../images/signs/partes/daviplata_nueva_1x0_5';
-const arrow_folder = '../../images/signs/partes/flecha_esika_vuelta';
+const header_folder = '../../images/signs/partes/encabezado_tienda_esika';
 
 // The printed board is 0.30 × 1.40 m, so the sign keeps that proportion; the extra height goes to the bottom band.
 const column_board = sign_catalog.find(({ key }) => key === 'columna_esquina');
@@ -38,21 +38,15 @@ const davivienda_pieces = [
   ['logos', 'logo_daviplata', 100, 3836],
   ['fotos', 'celular_davivienda', 574, 3497],
 ];
-// The arrow art, cut by tools/cut_esika_arrow_parts.py. The same pieces appear in the top and the bottom arrow,
-// each at its own place in its section.
+// The "en la tienda ÉSIKA, segundo local a la izquierda" header, drawn by tools/make_store_header_parts.py.
+// The same pieces appear in the top and the bottom arrow, each at its own place in its section.
 const top_arrow_pieces = [
-  ['flecha', 9, 31],
-  ['a_la_vuelta', 403, 60],
-  ['linea_roja', 427, 126],
-  ['en_la_tienda', 427, 150],
-  ['logo_esika', 415, 188],
+  ['flecha_columna', 132, 98],
+  ['texto_tienda_columna', 408, 36],
 ];
 const bottom_arrow_pieces = [
-  ['flecha', 34, 47],
-  ['a_la_vuelta', 427, 70],
-  ['linea_roja', 421, 179],
-  ['en_la_tienda', 427, 144],
-  ['logo_esika', 427, 190],
+  ['flecha_columna', 132, 83],
+  ['texto_tienda_columna', 408, 21],
 ];
 const top_arrow_names = top_arrow_pieces.map(([file]) => `sup_${file}`);
 const bottom_arrow_names = bottom_arrow_pieces.map(([file]) => `inf_${file}`);
@@ -76,16 +70,12 @@ export const default_adjustments = {
   '03_bancolombia': { stretch: 1.0754017305315204 },
   '04_servicios': { stretch: 0.9751712328767124 },
   '05_davivienda': { stretch: 1.3971486761710794 },
-  sup_a_la_vuelta: { scale: 1.1 },
-  sup_logo_esika: { scale: 1.01 },
   logo_bancolombia: { scale: 0.92 },
   facturas: { scale: 0.87 },
   tarjeta_bancolombia: { scale: 1.3 },
   celular_nequi: { scale: 0.84 },
   celular_davivienda: { scale: 1.23 },
   texto_corresponsal: { deleted: true },
-  sup_en_la_tienda: { visible: false },
-  inf_en_la_tienda: { visible: false },
 };
 
 const section_of = Object.fromEntries(sections.flatMap((section) => section.pieces.map((name) => [name, section.title])));
@@ -94,8 +84,8 @@ export const parts_catalog = [
   ...bands.map(([name, y, folder]) => ({ name, source: `${folder}/fondos/${name}.webp`, x: 0, y, is_background: true })),
   ...pieces.map(([folder, name, x, y]) => ({ name, source: `${bancolombia_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
   ...davivienda_pieces.map(([folder, name, x, y]) => ({ name, source: `${daviplata_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
-  ...top_arrow_pieces.map(([file, x, y]) => ({ name: `sup_${file}`, source: `${arrow_folder}/${file}.webp`, x, y, is_background: false })),
-  ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `inf_${file}`, source: `${arrow_folder}/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
+  ...top_arrow_pieces.map(([file, x, y]) => ({ name: `sup_${file}`, source: `${header_folder}/${file}.webp`, x, y, is_background: false })),
+  ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `inf_${file}`, source: `${header_folder}/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
 ].map((part) => ({ ...part, section: section_of[part.name] }));
 
 // Height of every section slot in the original proposal, from top to bottom.

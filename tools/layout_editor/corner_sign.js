@@ -3,6 +3,7 @@
 export const corner_sign_key = 'esquina_calle_12';
 
 const sign_folder = '../../images/signs/partes/esquina_calle_12_nueva';
+const header_folder = '../../images/signs/partes/encabezado_tienda_esika';
 // 3200 px per meter: the board is 2.00 m tall, 0.60 m wide.
 const sign_height = 6400;
 const bands = [
@@ -16,9 +17,8 @@ const bands = [
 const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. fotocopias', '5. servicios', '6. davivienda'];
 // Pieces as [section index, folder, name, x, y], in pixels of the sign, back to front.
 const pieces = [
-  [0, 'logos', 'flecha_izquierda', 134, 156],
-  [0, 'textos', 'en_la_tienda', 770, 62],
-  [0, 'logos', 'logo_esika', 746, 241],
+  [0, 'header', 'flecha_ancho', 90, 128],
+  [0, 'header', 'texto_tienda_ancho', 558, 128],
   [1, 'textos', 'texto_recarga', 228, 715],
   [1, 'logos', 'logo_nequi', 121, 1029],
   [1, 'textos', 'texto_hazlo_facil', 231, 1547],
@@ -49,9 +49,6 @@ export const default_adjustments = {
   '06_seccion_nueva': { stretch: 0.45 },
   '04_servicios_publicos': { stretch: 1.2678288431061806 },
   '05_davivienda': { stretch: 1.1756046267087277 },
-  flecha_izquierda: { scale: 1.16 },
-  en_la_tienda: { scale: 2 },
-  logo_esika: { scale: 2 },
   texto_recarga: { scale: 0.95 },
   logo_nequi: { scale: 0.94 },
   celular_nequi: { scale: 0.93 },
@@ -69,8 +66,10 @@ export const original_image = '../../images/signs/propuestas/esquina_calle_12_nu
 const band_parts = bands.map(([name, y], index) => ({
   name, source: `${sign_folder}/fondos/${name}.webp`, x: 0, y, is_background: true, section: band_titles[index],
 }));
+// The header pieces live in their own folder, shared with the column sign's art.
+const piece_source = (folder, name) => (folder === 'header' ? `${header_folder}/${name}.webp` : `${sign_folder}/${folder}/${name}.webp`);
 const piece_parts = pieces.map(([index, folder, name, x, y]) => ({
-  name, source: `${sign_folder}/${folder}/${name}.webp`, x, y, is_background: false, section: band_titles[index],
+  name, source: piece_source(folder, name), x, y, is_background: false, section: band_titles[index],
 }));
 export const parts_catalog = [...band_parts, ...piece_parts];
 

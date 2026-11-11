@@ -1,5 +1,5 @@
-import { copy_image_to_clipboard } from '../copy_image.js?v=59573343bd';
-import { photo_overlay_styles } from './photo_overlay.css.js?v=59573343bd';
+import { copy_image_to_clipboard } from '../copy_image.js?v=5517a9ba08';
+import { photo_overlay_styles } from './photo_overlay.css.js?v=5517a9ba08';
 
 const svg_namespace = 'http://www.w3.org/2000/svg';
 const template = /* html */ `
