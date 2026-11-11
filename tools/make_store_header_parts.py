@@ -1,23 +1,17 @@
 """Draws the "EN LA TIENDA ÉSIKA (SEGUNDO LOCAL A LA IZQUIERDA)" header of
 images/signs/propuestas/encabezado_tienda_esika_referencia.png at print resolution, as loose pieces and as one
-finished header per board. The column stands at the corner, so its header says "A LA VUELTA" and keeps the
-curved arrow of the earlier art. Run from the project root:
+finished header per board. The column stands at the corner, so its header says "A LA VUELTA" with a turning arrow.
+Arrows are drawn as a tip and a body (and a turn), each body centered on the tip. Run from the project root:
 .venv/Scripts/python tools/make_store_header_parts.py
 """
 from pathlib import Path
 
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = PROJECT_ROOT / "images/signs/partes/encabezado_tienda_esika"
 FONT_PATH = Path("C:/Windows/Fonts/bahnschrift.ttf")
 FONT_STYLE = b"Bold Condensed"
-CURVED_ARROW_SOURCE = PROJECT_ROOT / "images/signs/propuestas/flecha_esika_vuelta_nueva.webp"
-CURVED_ARROW_BOX = (84, 37, 812, 640)
-# Pixels this far from white count as ink; the ramp keeps the arrow edge smooth.
-INK_FLOOR = 12
-INK_STRENGTH = 4
 # Colors sampled from the reference image.
 STORE_RED = (190, 4, 4, 255)
 DIRECTION_BLUE = (4, 30, 78, 255)
@@ -27,7 +21,10 @@ WHITE = (255, 255, 255, 255)
 WIDE_HEADER = (1920, 583, 90)
 COLUMN_HEADER = (960, 400, 36)
 ARROW_GAP = 0.05
+# Joined arrow pieces overlap by this many pixels so no seam shows; the layout editor uses the same value.
 BODY_OVERLAP = 3
+# Shapes are drawn this many times larger and scaled down, for smooth edges.
+SUPERSAMPLE = 4
 LINE_GAP = 0.12
 
 
@@ -55,40 +52,25 @@ class StoreHeaderMaker:
         }
 
     # The arrow beside the stacked texts, as tall as its share of them, all centered in the header.
-    # Each text is its own piece, saved at its final size so the layout editor shows it at scale 1.
+    # Each piece is saved at its final size so the layout editor shows it at scale 1.
     def _make_header(self, folder, size, texts, arrow_style):
         width, height, margin = size
         make_arrow, arrow_share = arrow_style
         text = self._stack(list(texts.values()))
-        arrow_height = round(text.height * arrow_share)
-        natural_width = make_arrow(arrow_height).width + width * ARROW_GAP + text.width
+        arrow_width, arrow_height = self._bounds(make_arrow(round(text.height * arrow_share)))
+        natural_width = arrow_width + width * ARROW_GAP + text.width
         scale = min((width - 2 * margin) / natural_width, (height - 2 * margin) / max(text.height, arrow_height))
         arrow = make_arrow(round(text.height * scale * arrow_share))
         left = round((width - natural_width * scale) / 2)
         text_right, top = width - left, round((height - text.height * scale) / 2)
-        places = self._arrow_parts(arrow, left, (height - arrow.height) // 2)
+        arrow_top = (height - self._bounds(arrow)[1]) // 2
+        places = {name: (piece, left + x, arrow_top + y) for name, (piece, x, y) in arrow.items()}
         for name, (piece, piece_top) in self._scaled_lines(texts, scale).items():
             places[name] = (piece, text_right - round((text.width * scale + piece.width) / 2), top + piece_top)
         self._save_header(folder, size, places)
 
-    # The arrow as its tip and its straight body, so the editor can lengthen the body without bending the tip.
-    # The body overlaps the tip by a few pixels so no seam shows between them.
-    def _arrow_parts(self, arrow, left, top):
-        split = self._body_start(arrow)
-        tip = arrow.crop((0, 0, split + BODY_OVERLAP, arrow.height))
-        body = arrow.crop((split, 0, arrow.width, arrow.height))
-        return {"flecha_cuerpo": (body, left + split, top), "flecha_punta": (tip, left, top)}
-
-    # The first column from which every column looks like one near the end: where the straight body begins.
-    # The reference stays a few pixels inside the right edge, whose soft border differs from the body.
-    def _body_start(self, arrow):
-        alpha = np.asarray(arrow.getchannel("A")).astype(int)
-        reference = arrow.width - 6
-        matches = np.abs(alpha - alpha[:, reference:reference + 1]).max(axis=0) < 40
-        split = reference
-        while split > 0 and matches[split - 1]:
-            split -= 1
-        return split
+    def _bounds(self, pieces):
+        return (max(x + piece.width for piece, x, _ in pieces.values()), max(y + piece.height for piece, _, y in pieces.values()))
 
     # The texts shrunk by scale, with their tops as they stand in the stack.
     def _scaled_lines(self, texts, scale):
@@ -109,28 +91,44 @@ class StoreHeaderMaker:
             print(f"  at {x}, {y}")
         self._save(header, f"{folder}/encabezado")
 
-    # A left arrow: a triangular head and a shaft half its height, drawn 4x larger and scaled down for smooth edges.
+    # A left arrow: the triangular tip and a straight body under half as thick, centered on the tip.
     def _straight_arrow(self, height):
-        scale = 4
-        width = round(height * 1.2)
-        big_width, big_height = width * scale, height * scale
-        head_length = big_height * 0.5
-        shaft_top, shaft_bottom = big_height * 0.27, big_height * 0.73
-        canvas = Image.new("RGBA", (big_width, big_height), TRANSPARENT)
-        ImageDraw.Draw(canvas).polygon([
-            (0, big_height / 2), (head_length, 0), (head_length, shaft_top), (big_width, shaft_top),
-            (big_width, shaft_bottom), (head_length, shaft_bottom), (head_length, big_height),
-        ], fill=STORE_RED)
-        return canvas.resize((width, height), Image.LANCZOS)
+        thickness = round(height * 0.46)
+        tip = self._polygon((round(height * 0.5), height), [(0, 0.5), (1, 0), (1, 1)])
+        body = Image.new("RGBA", (round(height * 0.7), thickness), STORE_RED)
+        return {"flecha_cuerpo": (body, tip.width - BODY_OVERLAP, (height - thickness) // 2), "flecha_punta": (tip, 0, 0)}
 
-    # The turning arrow of the earlier art, keyed out of its white background and painted in the header red.
+    # The turning arrow: the tip points up, the turn hangs centered under it and the straight body leaves to the right.
     def _curved_arrow(self, height):
-        source = Image.open(CURVED_ARROW_SOURCE).convert("L").crop(CURVED_ARROW_BOX)
-        source = source.resize((round(source.width * height / source.height), height), Image.LANCZOS)
-        alpha = source.point(lambda value: max(0, min(255, (255 - value - INK_FLOOR) * INK_STRENGTH)))
-        arrow = Image.new("RGBA", source.size, STORE_RED)
-        arrow.putalpha(alpha)
-        return arrow
+        thickness = round(height / 3.6)
+        tip = self._polygon((round(thickness * 2.15), round(thickness * 1.4)), [(0.5, 0), (1, 1), (0, 1)])
+        turn = self._turn(thickness)
+        body = Image.new("RGBA", (round(thickness * 1.6), thickness), STORE_RED)
+        turn_left, turn_top = (tip.width - thickness) // 2, tip.height - BODY_OVERLAP
+        return {
+            "flecha_curva": (turn, turn_left, turn_top),
+            "flecha_cuerpo": (body, turn_left + turn.width - BODY_OVERLAP, turn_top + turn.height - thickness),
+            "flecha_punta": (tip, 0, 0),
+        }
+
+    # A short stem going down that bends a quarter turn to the right, as thick as the body.
+    def _turn(self, thickness):
+        stem, inner = round(thickness * 0.37), round(thickness * 0.75)
+        outer = inner + thickness
+        canvas = Image.new("RGBA", (outer * SUPERSAMPLE, (stem + outer) * SUPERSAMPLE), TRANSPARENT)
+        draw = ImageDraw.Draw(canvas)
+        draw.rectangle([0, 0, thickness * SUPERSAMPLE - 1, stem * SUPERSAMPLE], fill=STORE_RED)
+        for radius, color in ((outer, STORE_RED), (inner, TRANSPARENT)):
+            center_x, center_y, reach = outer * SUPERSAMPLE, stem * SUPERSAMPLE, radius * SUPERSAMPLE
+            draw.pieslice([center_x - reach, center_y - reach, center_x + reach, center_y + reach], 90, 180, fill=color)
+        return canvas.resize((outer, stem + outer), Image.LANCZOS)
+
+    # A red polygon whose corners are given as fractions of its size.
+    def _polygon(self, size, corners):
+        width, height = size
+        canvas = Image.new("RGBA", (width * SUPERSAMPLE, height * SUPERSAMPLE), TRANSPARENT)
+        ImageDraw.Draw(canvas).polygon([(x * width * SUPERSAMPLE, y * height * SUPERSAMPLE) for x, y in corners], fill=STORE_RED)
+        return canvas.resize(size, Image.LANCZOS)
 
     def _stack(self, lines):
         gap = round(lines[0].height * LINE_GAP)

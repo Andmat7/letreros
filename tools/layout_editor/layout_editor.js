@@ -1,6 +1,7 @@
 import { layout_editor_styles } from './layout_editor.css.js';
 import { active_sign_key, original_image, original_section_heights, parts_catalog, sections, sign_size } from './active_sign.js';
 import { render_section_blob } from './section_image.js';
+import { align_joints, joint_root } from './arrow_joints.js';
 import { move_border, set_section_height, section_tops } from './section_space.js';
 import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
 import { describe_signs, describe_size } from './physical_size.js';
@@ -85,6 +86,7 @@ export class LayoutEditor extends HTMLElement {
     const image = new Image();
     image.src = part.source;
     image.draggable = false;
+    image.addEventListener('load', () => this.#refresh_stage());
     image.addEventListener('pointerdown', (event) => this.#start_drag(event, part));
     image.addEventListener('wheel', (event) => this.#scale_with_wheel(event, part), { passive: false });
     this.#images.set(part.name, image);
@@ -148,7 +150,7 @@ export class LayoutEditor extends HTMLElement {
   #start_drag(event, part) {
     this.#select(part.name);
     if (this.#is_locked(part)) return;
-    const placement = this.#layout[part.name];
+    const placement = this.#layout[joint_root(parts_catalog, part.name)];
     const origin = { pointer_x: event.clientX, pointer_y: event.clientY, x: placement.x, y: placement.y };
     const move = (moved) => {
       placement.x = Math.round(origin.x + (moved.clientX - origin.pointer_x) / this.#zoom);
@@ -274,6 +276,7 @@ export class LayoutEditor extends HTMLElement {
   }
 
   #refresh_stage() {
+    align_joints(parts_catalog, this.#layout, (name) => this.#natural_size(name));
     const sizer = this.#element('.sizer');
     sizer.style.width = `${sign_size.width * this.#zoom}px`;
     sizer.style.height = `${sign_size.height * this.#zoom}px`;

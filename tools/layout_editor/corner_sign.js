@@ -18,10 +18,10 @@ const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. fotocopias
 // Pieces as [section index, folder, name, x, y], in pixels of the sign, back to front.
 const pieces = [
   // The arrow is a tip and a straight body, so "ancho" on the body lengthens it without bending the tip.
-  [0, 'header', 'flecha_cuerpo', 254, 128],
+  [0, 'header', 'flecha_cuerpo', 251, 216],
   [0, 'header', 'flecha_punta', 90, 128],
-  [0, 'header', 'texto_rojo', 560, 128],
-  [0, 'header', 'texto_azul', 558, 344],
+  [0, 'header', 'texto_rojo', 557, 128],
+  [0, 'header', 'texto_azul', 556, 344],
   [1, 'textos', 'texto_recarga', 228, 715],
   [1, 'logos', 'logo_nequi', 121, 1029],
   [1, 'textos', 'texto_hazlo_facil', 231, 1547],
@@ -71,8 +71,10 @@ const band_parts = bands.map(([name, y], index) => ({
 }));
 // The header pieces live in their own folder, shared with the column sign's art.
 const piece_source = (folder, name) => (folder === 'header' ? `${header_folder}/ancho/${name}.webp` : `${sign_folder}/${folder}/${name}.webp`);
+// The body stays centered on the tip; see arrow_joints.js.
+const joints = { flecha_cuerpo: { to: 'flecha_punta', anchor: 'right_middle' } };
 const piece_parts = pieces.map(([index, folder, name, x, y]) => ({
-  name, source: piece_source(folder, name), x, y, is_background: false, section: band_titles[index],
+  name, source: piece_source(folder, name), joint: joints[name], x, y, is_background: false, section: band_titles[index],
 }));
 export const parts_catalog = [...band_parts, ...piece_parts];
 

@@ -40,19 +40,27 @@ const davivienda_pieces = [
 ];
 // The "a la vuelta, en la tienda ÉSIKA, segundo local a la izquierda" header, drawn by tools/make_store_header_parts.py.
 // The same pieces appear in the top and the bottom arrow, each at its own place in its section. Each arrow is a
-// tip and a straight body, so "ancho" on the body lengthens the arrow without bending the tip.
+// tip, a turn and a straight body; "ancho" on the body lengthens the arrow without bending the tip.
 const top_arrow_pieces = [
-  ['flecha_cuerpo', 143, 109],
-  ['flecha_punta', 36, 109],
-  ['texto_rojo', 304, 140],
-  ['texto_azul', 305, 205],
+  ['flecha_curva', 66, 180],
+  ['flecha_cuerpo', 154, 238],
+  ['flecha_punta', 36, 110],
+  ['texto_rojo', 285, 138],
+  ['texto_azul', 286, 205],
 ];
 const bottom_arrow_pieces = [
-  ['flecha_cuerpo', 143, 94],
-  ['flecha_punta', 36, 94],
-  ['texto_rojo', 304, 125],
-  ['texto_azul', 305, 190],
+  ['flecha_curva', 66, 165],
+  ['flecha_cuerpo', 154, 223],
+  ['flecha_punta', 36, 95],
+  ['texto_rojo', 285, 123],
+  ['texto_azul', 286, 190],
 ];
+// The turn hangs centered under the tip (its stem is as thick as the body, 52 px) and the body leaves the turn.
+const arrow_joints = (prefix) => ({
+  [`${prefix}flecha_curva`]: { to: `${prefix}flecha_punta`, anchor: 'below_center', stem: 52 },
+  [`${prefix}flecha_cuerpo`]: { to: `${prefix}flecha_curva`, anchor: 'right_bottom' },
+});
+const joints = { ...arrow_joints('sup_'), ...arrow_joints('inf_') };
 const top_arrow_names = top_arrow_pieces.map(([file]) => `sup_${file}`);
 const bottom_arrow_names = bottom_arrow_pieces.map(([file]) => `inf_${file}`);
 
@@ -91,7 +99,7 @@ export const parts_catalog = [
   ...davivienda_pieces.map(([folder, name, x, y]) => ({ name, source: `${daviplata_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
   ...top_arrow_pieces.map(([file, x, y]) => ({ name: `sup_${file}`, source: `${header_folder}/columna/${file}.webp`, x, y, is_background: false })),
   ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `inf_${file}`, source: `${header_folder}/columna/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
-].map((part) => ({ ...part, section: section_of[part.name] }));
+].map((part) => ({ ...part, section: section_of[part.name], joint: joints[part.name] }));
 
 // Height of every section slot in the original proposal, from top to bottom.
 export const original_section_heights = bands.map(([, top], index) => (bands[index + 1]?.[1] ?? sign_size.height) - top);
