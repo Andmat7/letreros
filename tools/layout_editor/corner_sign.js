@@ -18,7 +18,8 @@ const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. fotocopias
 // Pieces as [section index, folder, name, x, y], in pixels of the sign, back to front.
 const pieces = [
   [0, 'header', 'flecha_ancho', 90, 128],
-  [0, 'header', 'texto_tienda_ancho', 558, 128],
+  [0, 'header', 'texto_tienda_ancho', 560, 128],
+  [0, 'header', 'texto_segundo_local_ancho', 558, 344],
   [1, 'textos', 'texto_recarga', 228, 715],
   [1, 'logos', 'logo_nequi', 121, 1029],
   [1, 'textos', 'texto_hazlo_facil', 231, 1547],

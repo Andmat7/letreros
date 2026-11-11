@@ -27,6 +27,7 @@ const template = /* html */ `
         <label>x<input class="field_x" type="number"></label>
         <label>y<input class="field_y" type="number"></label>
         <label>escala<input class="field_scale" type="number" step="0.05" min="0.1"></label>
+        <label title="Estira la imagen a lo ancho: 1 es su ancho normal, 1.2 un 20 % más ancha">ancho<input class="field_widen" type="number" step="0.05" min="0.1"></label>
       </div>
       <div class="row"><button class="to_front">Al frente</button><button class="to_back">Al fondo</button><button class="delete_piece">Eliminar imagen</button></div>
       <textarea class="note" placeholder="Instrucción para esta pieza (ej. más grande, tapar la parte baja…)"></textarea>
@@ -123,7 +124,7 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.zoom').addEventListener('input', (event) => { this.#zoom = Number(event.target.value); this.#refresh(); });
     this.#element('.show_reference').addEventListener('change', () => this.#refresh());
     this.#element('.move_backgrounds').addEventListener('change', () => this.#refresh());
-    for (const field of ['x', 'y', 'scale']) {
+    for (const field of ['x', 'y', 'scale', 'widen']) {
       this.#element(`.field_${field}`).addEventListener('input', (event) => this.#edit_selected({ [field]: Number(event.target.value) }));
     }
     this.#element('.note').addEventListener('input', (event) => this.#edit_selected({ note: event.target.value }));
@@ -188,7 +189,7 @@ export class LayoutEditor extends HTMLElement {
     const stage = this.#element('.stage');
     const move = (moved) => {
       const pointer_x = (moved.clientX - stage.getBoundingClientRect().left) / this.#zoom;
-      placement.scale = Math.max(0.05, Math.round(((pointer_x - placement.x) / natural_width) * 100) / 100);
+      placement.scale = Math.max(0.05, Math.round(((pointer_x - placement.x) / (natural_width * placement.widen)) * 100) / 100);
       this.#refresh_stage();
       this.#fill_fields();
     };
@@ -301,7 +302,7 @@ export class LayoutEditor extends HTMLElement {
     const image = this.#images.get(part.name);
     const size = 28 / this.#zoom;
     this.#handle.style.width = this.#handle.style.height = `${size}px`;
-    this.#handle.style.left = `${placement.x + image.naturalWidth * placement.scale - size / 2}px`;
+    this.#handle.style.left = `${placement.x + image.naturalWidth * placement.scale * placement.widen - size / 2}px`;
     this.#handle.style.top = `${placement.y + image.naturalHeight * placement.scale - size / 2}px`;
   }
 
@@ -311,7 +312,7 @@ export class LayoutEditor extends HTMLElement {
     image.style.left = `${placement.x}px`;
     image.style.top = `${placement.y}px`;
     image.style.zIndex = placement.order;
-    image.style.transform = `scale(${placement.scale}, ${placement.scale * placement.stretch})`;
+    image.style.transform = `scale(${placement.scale * placement.widen}, ${placement.scale * placement.stretch})`;
     image.style.display = placement.visible && !placement.deleted ? 'block' : 'none';
     image.classList.toggle('selected', part.name === this.#selected_name);
     image.classList.toggle('in_section', part.section === this.#selected_section);
@@ -393,6 +394,7 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.field_x').value = placement.x;
     this.#element('.field_y').value = placement.y;
     this.#element('.field_scale').value = placement.scale;
+    this.#element('.field_widen').value = placement.widen;
     if (this.shadowRoot.activeElement !== this.#element('.note')) this.#element('.note').value = placement.note;
   }
 

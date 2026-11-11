@@ -5,7 +5,7 @@ const heights_key = `${storage_key}:section_heights`;
 
 export function original_layout() {
   return Object.fromEntries(parts_catalog.map((part, index) => [
-    part.name, { x: part.x, y: part.y, scale: 1, stretch: 1, visible: true, deleted: false, order: index, note: '', ...default_adjustments[part.name] },
+    part.name, { x: part.x, y: part.y, scale: 1, stretch: 1, widen: 1, visible: true, deleted: false, order: index, note: '', ...default_adjustments[part.name] },
   ]));
 }
 
@@ -59,8 +59,9 @@ export function ordered_names(layout) {
 function describe_piece(name, placement) {
   const state = placement.deleted ? ' [deleted]' : placement.visible ? '' : ' [hidden]';
   const stretch = placement.stretch === 1 ? '' : ` stretch=${placement.stretch.toFixed(2)}`;
+  const widen = placement.widen === 1 ? '' : ` widen=${placement.widen.toFixed(2)}`;
   const note = placement.note ? ` -> ${placement.note}` : '';
-  return `- ${name}: x=${Math.round(placement.x)} y=${Math.round(placement.y)} scale=${placement.scale.toFixed(2)}${stretch}${state}${note}`;
+  return `- ${name}: x=${Math.round(placement.x)} y=${Math.round(placement.y)} scale=${placement.scale.toFixed(2)}${stretch}${widen}${state}${note}`;
 }
 
 function merge_with_original(saved) {

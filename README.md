@@ -42,7 +42,7 @@ The panel's "Probar diseños" section lets you pick a design for each board (bla
 
 ## Arranging the cut pieces
 
-With the dev server running, open http://localhost:8020/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_nueva_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, reorder them, write a note per piece, set how tall each section is (the number next to its name, or drag the pink line between two sections; the space moves from one section to its neighbour) and each section has "Copiar imagen" (copies it as a PNG), "Eliminar imagen" (or the Delete key) takes the chosen image out of the sign and of every copy until you restore it, "Copiar imagen completa" copies the whole sign, "Vista final" hides every control mark, and "Copiar instrucciones" pastes the layout into the chat.
+With the dev server running, open http://localhost:8020/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_nueva_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, make them wider or narrower ("ancho": 1 is the normal width), reorder them, write a note per piece, set how tall each section is (the number next to its name, or drag the pink line between two sections; the space moves from one section to its neighbour) and each section has "Copiar imagen" (copies it as a PNG), "Eliminar imagen" (or the Delete key) takes the chosen image out of the sign and of every copy until you restore it, "Copiar imagen completa" copies the whole sign, "Vista final" hides every control mark, and "Copiar instrucciones" pastes the layout into the chat.
 
 ### From the editor to the 3D page and the print PDF
 

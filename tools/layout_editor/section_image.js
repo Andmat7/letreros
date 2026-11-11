@@ -18,7 +18,7 @@ export function render_section_blob(parts, layout, images, fixed_bounds = null) 
 }
 
 function rectangle_of(placement, image) {
-  const width = image.naturalWidth * placement.scale;
+  const width = image.naturalWidth * placement.scale * placement.widen;
   const height = image.naturalHeight * placement.scale * placement.stretch;
   return { left: placement.x, top: placement.y, width, height, right: placement.x + width, bottom: placement.y + height };
 }

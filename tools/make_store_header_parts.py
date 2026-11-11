@@ -40,36 +40,53 @@ class StoreHeaderMaker:
     # Both lines span the same width, as in the reference image.
     def _wide_text(self):
         width = 1600
-        return self._stack([
-            self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
-            self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, DIRECTION_BLUE),
-        ])
+        return {
+            "texto_tienda_ancho": self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
+            "texto_segundo_local_ancho": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, DIRECTION_BLUE),
+        }
 
-    # The column is narrow, so the direction takes two lines.
+    # The column is narrow, so each sentence takes two lines.
     def _column_text(self):
         width = 600
         blue_size = self._size_for_width("A LA IZQUIERDA)", width)
-        return self._stack([
-            self._fitted_line("A LA VUELTA", width, STORE_RED),
-            self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
-            self._line("(SEGUNDO LOCAL", blue_size, DIRECTION_BLUE),
-            self._line("A LA IZQUIERDA)", blue_size, DIRECTION_BLUE),
-        ])
+        return {
+            "texto_tienda_columna": self._stack([
+                self._fitted_line("A LA VUELTA", width, STORE_RED),
+                self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
+            ]),
+            "texto_segundo_local_columna": self._stack([
+                self._line("(SEGUNDO LOCAL", blue_size, DIRECTION_BLUE),
+                self._line("A LA IZQUIERDA)", blue_size, DIRECTION_BLUE),
+            ]),
+        }
 
-    # Arrow and text side by side, the arrow as tall as its share of the text, both centered in the header.
-    # The pieces are saved at their final size, so the layout editor shows them at scale 1.
-    def _make_header(self, suffix, size, text, arrow_style):
+    # The arrow beside the stacked texts, as tall as its share of them, all centered in the header.
+    # Each text is its own piece, saved at its final size so the layout editor shows it at scale 1.
+    def _make_header(self, suffix, size, texts, arrow_style):
         width, height, margin = size
         make_arrow, arrow_share = arrow_style
+        text = self._stack(list(texts.values()))
         natural_width = make_arrow(round(text.height * arrow_share)).width + width * ARROW_GAP + text.width
         scale = min((width - 2 * margin) / natural_width, (height - 2 * margin) / text.height)
-        text = text.resize((round(text.width * scale), round(text.height * scale)), Image.LANCZOS)
-        arrow = make_arrow(round(text.height * arrow_share))
+        arrow = make_arrow(round(text.height * scale * arrow_share))
         left = round((width - natural_width * scale) / 2)
-        top = (height - text.height) // 2
-        places = {f"flecha_{suffix}": (arrow, left, top + (text.height - arrow.height) // 2),
-                  f"texto_tienda_{suffix}": (text, width - left - text.width, top)}
-        header = Image.new("RGBA", (width, height), WHITE)
+        text_right, top = width - left, round((height - text.height * scale) / 2)
+        places = {f"flecha_{suffix}": (arrow, left, top + (round(text.height * scale) - arrow.height) // 2)}
+        for name, (piece, piece_top) in self._scaled_lines(texts, scale).items():
+            places[name] = (piece, text_right - round((text.width * scale + piece.width) / 2), top + piece_top)
+        self._save_header(suffix, size, places)
+
+    # The texts shrunk by scale, with their tops as they stand in the stack.
+    def _scaled_lines(self, texts, scale):
+        scaled, top = {}, 0
+        gap = round(next(iter(texts.values())).height * LINE_GAP)
+        for name, piece in texts.items():
+            scaled[name] = (piece.resize((round(piece.width * scale), round(piece.height * scale)), Image.LANCZOS), round(top * scale))
+            top += piece.height + gap
+        return scaled
+
+    def _save_header(self, suffix, size, places):
+        header = Image.new("RGBA", size[:2], WHITE)
         for name, (piece, x, y) in places.items():
             header.alpha_composite(piece, (x, y))
             self._save(piece, name)

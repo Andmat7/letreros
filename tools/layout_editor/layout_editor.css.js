@@ -32,7 +32,7 @@ layout_editor_styles.replaceSync(/* css */ `
   :host(.clean) .stage img { outline: none !important; cursor: default; }
   li.selected { background: #dff0ff; }
   li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .fields { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .fields label { display: flex; flex-direction: column; font-size: 12px; gap: 2px; }
   input[type=number] { width: 100%; box-sizing: border-box; }
   textarea { width: 100%; box-sizing: border-box; min-height: 60px; }
