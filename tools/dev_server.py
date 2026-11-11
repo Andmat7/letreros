@@ -11,6 +11,8 @@ from urllib.parse import parse_qs, urlparse
 from layout_publisher import LayoutPublisher
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# A fixed port of its own, so it never clashes with the dev servers of other local projects.
+PORT = 8020
 
 
 class NoCacheRequestHandler(SimpleHTTPRequestHandler):
@@ -36,7 +38,7 @@ class NoCacheRequestHandler(SimpleHTTPRequestHandler):
 
 
 class DevServer:
-    def __init__(self, project_root: Path, port: int = 8000):
+    def __init__(self, project_root: Path, port: int = PORT):
         handler = partial(NoCacheRequestHandler, directory=str(project_root))
         self.server = ThreadingHTTPServer(("localhost", port), handler)
 
@@ -46,5 +48,5 @@ class DevServer:
 
 
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
+    port = int(sys.argv[1]) if len(sys.argv) > 1 else PORT
     DevServer(PROJECT_ROOT, port).serve()

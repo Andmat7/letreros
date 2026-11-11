@@ -423,7 +423,7 @@ export class LayoutEditor extends HTMLElement {
       const response = await fetch(`/publish_layout?sign=${active_sign_key}`, { method: 'POST', body: await this.#render_full_sign() });
       const reply = await response.text();
       if (!response.ok) throw new Error(reply);
-      this.#say(`Guardado. Recarga http://localhost:8000/ para verlo en 3D. PDF: ${reply}`);
+      this.#say(`Guardado. Recarga ${window.location.origin}/ para verlo en 3D. PDF: ${reply}`);
     } catch (publish_error) {
       this.#say(`No se pudo guardar (¿está corriendo tools/dev_server.py?): ${publish_error.message}`);
     }

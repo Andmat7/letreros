@@ -1,5 +1,5 @@
 """Takes the full sign image the layout editor sends and makes it the board's finished layout: saved in
-images/signs/propuestas/, shown on the 3D board at http://localhost:8000/ and written as the print PDF.
+images/signs/propuestas/, shown on the 3D board at http://localhost:8020/ and written as the print PDF.
 """
 import io
 from pathlib import Path

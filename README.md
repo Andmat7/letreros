@@ -14,7 +14,7 @@ Run both builds again after changing anything in `images/`. The second one lists
 ## View
 
 - Online: https://andmat7.github.io/letreros/
-- Locally: `.venv/Scripts/python tools/dev_server.py`, then open http://localhost:8000 (ES modules do not load from `file://`; this server turns off browser caching so old modules never mix with new ones).
+- Locally: `.venv/Scripts/python tools/dev_server.py`, then open http://localhost:8020 (ES modules do not load from `file://`; this server turns off browser caching so old modules never mix with new ones).
 
 - Before each commit run `python tools/stamp_versions.py`: it adds `?v=<hash>` to every module import so browsers skip GitHub Pages' 10-minute cache.
 
@@ -42,10 +42,10 @@ The panel's "Probar diseños" section lets you pick a design for each board (bla
 
 ## Arranging the cut pieces
 
-With the dev server running, open http://localhost:8000/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_nueva_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, reorder them, write a note per piece, set how tall each section is (the number next to its name, or drag the pink line between two sections; the space moves from one section to its neighbour) and each section has "Copiar imagen" (copies it as a PNG), "Eliminar imagen" (or the Delete key) takes the chosen image out of the sign and of every copy until you restore it, "Copiar imagen completa" copies the whole sign, "Vista final" hides every control mark, and "Copiar instrucciones" pastes the layout into the chat.
+With the dev server running, open http://localhost:8020/tools/layout_editor/ to drag the pieces of `signs/partes/bancolombia_nueva_1x4_6/` (arrow keys nudge 1 px, Shift 10 px), scale them, reorder them, write a note per piece, set how tall each section is (the number next to its name, or drag the pink line between two sections; the space moves from one section to its neighbour) and each section has "Copiar imagen" (copies it as a PNG), "Eliminar imagen" (or the Delete key) takes the chosen image out of the sign and of every copy until you restore it, "Copiar imagen completa" copies the whole sign, "Vista final" hides every control mark, and "Copiar instrucciones" pastes the layout into the chat.
 
 ### From the editor to the 3D page and the print PDF
 
-1. Arrange each sign in the editor: http://localhost:8000/tools/layout_editor/?sign=columna_esquina and http://localhost:8000/tools/layout_editor/?sign=esquina_calle_12.
+1. Arrange each sign in the editor: http://localhost:8020/tools/layout_editor/?sign=columna_esquina and http://localhost:8020/tools/layout_editor/?sign=esquina_calle_12.
 2. Press "Guardar en 3D y PDF". The dev server saves the sign as `images/signs/propuestas/<sign>_layout.webp`, rebuilds `src/generated/photo_bundle.js` and writes `impresion/<sign>_<width>x<height>_cm.pdf`, sized from the image at 3200 px per meter (0.30 × 1.40 m and 0.60 × 2.00 m).
-3. Reload http://localhost:8000/ to see it on the 3D board. `.venv/Scripts/python tools/make_print_pdfs.py` writes both PDFs again from the saved layouts.
+3. Reload http://localhost:8020/ to see it on the 3D board. `.venv/Scripts/python tools/make_print_pdfs.py` writes both PDFs again from the saved layouts.
