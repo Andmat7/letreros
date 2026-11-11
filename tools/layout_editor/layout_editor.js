@@ -20,7 +20,7 @@ const template = /* html */ `
     <div class="row"><label>Letrero <select class="sign_choice">${sign_options}</select></label></div>
     <div class="sign_size">${describe_signs().map((line) => `<div>${line}</div>`).join('')}</div>
     <ul class="list"></ul>
-    <div class="row"><button class="copy_all primary">Copiar imagen completa</button></div>
+    <div class="row"><button class="copy_all primary">Copiar imagen completa</button><button class="publish primary" title="Guarda el letrero en el proyecto: se ve en la página 3D y genera el PDF de impresión">Guardar en 3D y PDF</button></div>
     <div class="selected_controls">
       <strong class="selected_name">Ninguna pieza elegida</strong>
       <div class="fields">
@@ -133,6 +133,7 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.copy').addEventListener('click', () => this.#copy_instructions());
     this.#element('.clean_view').addEventListener('change', (event) => this.classList.toggle('clean', event.target.checked));
     this.#element('.copy_all').addEventListener('click', () => this.#copy_all());
+    this.#element('.publish').addEventListener('click', () => this.#publish());
     this.#element('.reset').addEventListener('click', () => {
       this.#layout = original_layout();
       this.#heights = [...original_section_heights];
@@ -407,19 +408,37 @@ export class LayoutEditor extends HTMLElement {
 
   async #copy_section(section) {
     const parts = parts_catalog.filter((part) => part.section === section.title && !this.#layout[part.name].deleted);
-    await this.#copy_image(parts, null, `Sección "${section.title}"`);
+    await this.#copy_image(() => render_section_blob(parts, this.#layout, this.#images), `Sección "${section.title}"`);
+  }
+
+  async #copy_all() {
+    await this.#copy_image(() => this.#render_full_sign(), 'Imagen completa');
+  }
+
+  // The dev server (tools/dev_server.py) saves the sign as the board's finished layout, rebuilds the 3D page's
+  // images and writes the print PDF at the board's real size.
+  async #publish() {
+    this.#say('Guardando…');
+    try {
+      const response = await fetch(`/publish_layout?sign=${active_sign_key}`, { method: 'POST', body: await this.#render_full_sign() });
+      const reply = await response.text();
+      if (!response.ok) throw new Error(reply);
+      this.#say(`Guardado. Recarga http://localhost:8000/ para verlo en 3D. PDF: ${reply}`);
+    } catch (publish_error) {
+      this.#say(`No se pudo guardar (¿está corriendo tools/dev_server.py?): ${publish_error.message}`);
+    }
   }
 
   // The whole sign at its real size, without deleted images; whatever sticks out of the canvas is cut off.
-  async #copy_all() {
+  #render_full_sign() {
     const bounds = { left: 0, top: 0, right: sign_size.width, bottom: sign_size.height };
     const parts = parts_catalog.filter((part) => !this.#layout[part.name].deleted);
-    await this.#copy_image(parts, bounds, 'Imagen completa');
+    return render_section_blob(parts, this.#layout, this.#images, bounds);
   }
 
-  async #copy_image(parts, bounds, label) {
+  async #copy_image(render, label) {
     try {
-      const blob = await render_section_blob(parts, this.#layout, this.#images, bounds);
+      const blob = await render();
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       this.#say(`${label} copiada como imagen.`);
     } catch (copy_error) {

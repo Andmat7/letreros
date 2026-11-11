@@ -38,15 +38,15 @@ const davivienda_pieces = [
   ['logos', 'logo_daviplata', 100, 3836],
   ['fotos', 'celular_davivienda', 574, 3497],
 ];
-// The "en la tienda ÉSIKA, segundo local a la izquierda" header, drawn by tools/make_store_header_parts.py.
+// The "a la vuelta, en la tienda ÉSIKA, segundo local a la izquierda" header, drawn by tools/make_store_header_parts.py.
 // The same pieces appear in the top and the bottom arrow, each at its own place in its section.
 const top_arrow_pieces = [
-  ['flecha_columna', 132, 98],
-  ['texto_tienda_columna', 408, 36],
+  ['flecha_columna', 69, 60],
+  ['texto_tienda_columna', 441, 36],
 ];
 const bottom_arrow_pieces = [
-  ['flecha_columna', 132, 83],
-  ['texto_tienda_columna', 408, 21],
+  ['flecha_columna', 90, 45],
+  ['texto_tienda_columna', 482, 15],
 ];
 const top_arrow_names = top_arrow_pieces.map(([file]) => `sup_${file}`);
 const bottom_arrow_names = bottom_arrow_pieces.map(([file]) => `inf_${file}`);
@@ -76,6 +76,9 @@ export const default_adjustments = {
   celular_nequi: { scale: 0.84 },
   celular_davivienda: { scale: 1.23 },
   texto_corresponsal: { deleted: true },
+  // The bottom slot is shorter than the top one, so its header is a little smaller.
+  inf_flecha_columna: { scale: 0.9 },
+  inf_texto_tienda_columna: { scale: 0.9 },
 };
 
 const section_of = Object.fromEntries(sections.flatMap((section) => section.pieces.map((name) => [name, section.title])));

@@ -9,20 +9,27 @@ from pathlib import Path
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SIGNS = [
-    ("columna_esquina_layout", "columna_esquina_30x140_cm", 30, 140),
-    ("esquina_calle_12_layout", "esquina_calle_12_60x140_cm", 60, 140),
-]
+# Both layout editors draw the boards at 3200 px per meter, so the pixels give the printed size.
+PIXELS_PER_CENTIMETER = 32
 POINTS_PER_CENTIMETER = 72 / 2.54
+SIGN_KEYS = ["columna_esquina", "esquina_calle_12"]
 
 
 class PrintPdfWriter:
     def write_all(self) -> None:
-        for artwork_name, pdf_name, width_cm, height_cm in SIGNS:
-            image = self._load_flattened(PROJECT_ROOT / "images/signs/propuestas" / f"{artwork_name}.webp")
-            target = PROJECT_ROOT / "impresion" / f"{pdf_name}.pdf"
-            target.write_bytes(self._build_pdf(image, width_cm * POINTS_PER_CENTIMETER, height_cm * POINTS_PER_CENTIMETER))
-            print(f"{target.name}: {image.width}x{image.height} px, {target.stat().st_size / 1e6:.1f} MB")
+        for sign_key in SIGN_KEYS:
+            self.write(sign_key)
+
+    # Writes impresion/<sign>_<width>x<height>_cm.pdf from the finished layout, replacing older sizes of it.
+    def write(self, sign_key: str) -> Path:
+        image = self._load_flattened(PROJECT_ROOT / "images/signs/propuestas" / f"{sign_key}_layout.webp")
+        width_cm, height_cm = (round(side / PIXELS_PER_CENTIMETER) for side in image.size)
+        for old_pdf in (PROJECT_ROOT / "impresion").glob(f"{sign_key}_*x*_cm.pdf"):
+            old_pdf.unlink()
+        target = PROJECT_ROOT / "impresion" / f"{sign_key}_{width_cm}x{height_cm}_cm.pdf"
+        target.write_bytes(self._build_pdf(image, width_cm * POINTS_PER_CENTIMETER, height_cm * POINTS_PER_CENTIMETER))
+        print(f"{target.name}: {image.width}x{image.height} px, {target.stat().st_size / 1e6:.1f} MB")
+        return target
 
     def _load_flattened(self, path: Path) -> Image.Image:
         image = Image.open(path).convert("RGBA")

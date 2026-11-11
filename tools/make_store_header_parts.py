@@ -1,5 +1,7 @@
-"""Draws the "EN LA TIENDA ÉSIKA (SEGUNDO LOCAL A LA IZQUIERDA)" header from images/signs/propuestas/encabezado_tienda_esika_referencia.png at print resolution,
-as loose pieces and as one finished header per board. Run from the project root:
+"""Draws the "EN LA TIENDA ÉSIKA (SEGUNDO LOCAL A LA IZQUIERDA)" header of
+images/signs/propuestas/encabezado_tienda_esika_referencia.png at print resolution, as loose pieces and as one
+finished header per board. The column stands at the corner, so its header says "A LA VUELTA" and keeps the
+curved arrow of the earlier art. Run from the project root:
 .venv/Scripts/python tools/make_store_header_parts.py
 """
 from pathlib import Path
@@ -10,6 +12,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = PROJECT_ROOT / "images/signs/partes/encabezado_tienda_esika"
 FONT_PATH = Path("C:/Windows/Fonts/bahnschrift.ttf")
 FONT_STYLE = b"Bold Condensed"
+CURVED_ARROW_SOURCE = PROJECT_ROOT / "images/signs/propuestas/flecha_esika_vuelta_nueva.webp"
+CURVED_ARROW_BOX = (84, 37, 812, 640)
+# Pixels this far from white count as ink; the ramp keeps the arrow edge smooth.
+INK_FLOOR = 12
+INK_STRENGTH = 4
 # Colors sampled from the reference image.
 STORE_RED = (190, 4, 4, 255)
 DIRECTION_BLUE = (4, 30, 78, 255)
@@ -27,8 +34,8 @@ class StoreHeaderMaker:
         if not FONT_PATH.exists():
             raise FileNotFoundError(f"Font not found: {FONT_PATH}")
         OUTPUT.mkdir(parents=True, exist_ok=True)
-        self._make_header("ancho", WIDE_HEADER, self._wide_text(), 1.0)
-        self._make_header("columna", COLUMN_HEADER, self._column_text(), 0.62)
+        self._make_header("ancho", WIDE_HEADER, self._wide_text(), (self._straight_arrow, 1.0))
+        self._make_header("columna", COLUMN_HEADER, self._column_text(), (self._curved_arrow, 0.85))
 
     # Both lines span the same width, as in the reference image.
     def _wide_text(self):
@@ -38,26 +45,26 @@ class StoreHeaderMaker:
             self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, DIRECTION_BLUE),
         ])
 
-    # The column is narrow, so each sentence takes two lines.
+    # The column is narrow, so the direction takes two lines.
     def _column_text(self):
         width = 600
-        red_size = self._size_for_width("EN LA TIENDA", width)
         blue_size = self._size_for_width("A LA IZQUIERDA)", width)
         return self._stack([
-            self._line("EN LA TIENDA", red_size, STORE_RED),
-            self._line("ÉSIKA", red_size, STORE_RED),
+            self._fitted_line("A LA VUELTA", width, STORE_RED),
+            self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
             self._line("(SEGUNDO LOCAL", blue_size, DIRECTION_BLUE),
             self._line("A LA IZQUIERDA)", blue_size, DIRECTION_BLUE),
         ])
 
-    # Arrow and text side by side, the arrow as tall as arrow_share of the text, both centered in the header.
+    # Arrow and text side by side, the arrow as tall as its share of the text, both centered in the header.
     # The pieces are saved at their final size, so the layout editor shows them at scale 1.
-    def _make_header(self, suffix, size, text, arrow_share):
+    def _make_header(self, suffix, size, text, arrow_style):
         width, height, margin = size
-        natural_width = self._arrow_width(text.height * arrow_share) + width * ARROW_GAP + text.width
+        make_arrow, arrow_share = arrow_style
+        natural_width = make_arrow(round(text.height * arrow_share)).width + width * ARROW_GAP + text.width
         scale = min((width - 2 * margin) / natural_width, (height - 2 * margin) / text.height)
         text = text.resize((round(text.width * scale), round(text.height * scale)), Image.LANCZOS)
-        arrow = self._arrow(round(text.height * arrow_share))
+        arrow = make_arrow(round(text.height * arrow_share))
         left = round((width - natural_width * scale) / 2)
         top = (height - text.height) // 2
         places = {f"flecha_{suffix}": (arrow, left, top + (text.height - arrow.height) // 2),
@@ -70,9 +77,9 @@ class StoreHeaderMaker:
         self._save(header, f"encabezado_{suffix}")
 
     # A left arrow: a triangular head and a shaft half its height, drawn 4x larger and scaled down for smooth edges.
-    def _arrow(self, height):
+    def _straight_arrow(self, height):
         scale = 4
-        width = round(self._arrow_width(height))
+        width = round(height * 1.2)
         big_width, big_height = width * scale, height * scale
         head_length = big_height * 0.5
         shaft_top, shaft_bottom = big_height * 0.27, big_height * 0.73
@@ -83,8 +90,14 @@ class StoreHeaderMaker:
         ], fill=STORE_RED)
         return canvas.resize((width, height), Image.LANCZOS)
 
-    def _arrow_width(self, height):
-        return height * 1.2
+    # The turning arrow of the earlier art, keyed out of its white background and painted in the header red.
+    def _curved_arrow(self, height):
+        source = Image.open(CURVED_ARROW_SOURCE).convert("L").crop(CURVED_ARROW_BOX)
+        source = source.resize((round(source.width * height / source.height), height), Image.LANCZOS)
+        alpha = source.point(lambda value: max(0, min(255, (255 - value - INK_FLOOR) * INK_STRENGTH)))
+        arrow = Image.new("RGBA", source.size, STORE_RED)
+        arrow.putalpha(alpha)
+        return arrow
 
     def _stack(self, lines):
         gap = round(lines[0].height * LINE_GAP)
