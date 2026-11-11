@@ -6,6 +6,7 @@ curved arrow of the earlier art. Run from the project root:
 """
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -26,6 +27,7 @@ WHITE = (255, 255, 255, 255)
 WIDE_HEADER = (1920, 583, 90)
 COLUMN_HEADER = (960, 400, 36)
 ARROW_GAP = 0.05
+BODY_OVERLAP = 3
 LINE_GAP = 0.12
 
 
@@ -33,48 +35,60 @@ class StoreHeaderMaker:
     def make_all(self):
         if not FONT_PATH.exists():
             raise FileNotFoundError(f"Font not found: {FONT_PATH}")
-        OUTPUT.mkdir(parents=True, exist_ok=True)
         self._make_header("ancho", WIDE_HEADER, self._wide_text(), (self._straight_arrow, 1.0))
-        self._make_header("columna", COLUMN_HEADER, self._column_text(), (self._curved_arrow, 0.85))
+        self._make_header("columna", COLUMN_HEADER, self._column_text(), (self._curved_arrow, 1.5))
 
     # Both lines span the same width, as in the reference image.
     def _wide_text(self):
         width = 1600
         return {
-            "texto_tienda_ancho": self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
-            "texto_segundo_local_ancho": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, DIRECTION_BLUE),
+            "texto_rojo": self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
+            "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, DIRECTION_BLUE),
         }
 
-    # The column is narrow, so each sentence takes two lines.
+    # One line per sentence here too; the column is narrow, so the arrow is taller than the two lines.
     def _column_text(self):
         width = 600
-        blue_size = self._size_for_width("A LA IZQUIERDA)", width)
         return {
-            "texto_tienda_columna": self._stack([
-                self._fitted_line("A LA VUELTA", width, STORE_RED),
-                self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
-            ]),
-            "texto_segundo_local_columna": self._stack([
-                self._line("(SEGUNDO LOCAL", blue_size, DIRECTION_BLUE),
-                self._line("A LA IZQUIERDA)", blue_size, DIRECTION_BLUE),
-            ]),
+            "texto_rojo": self._fitted_line("A LA VUELTA EN LA TIENDA ÉSIKA", width, STORE_RED),
+            "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, DIRECTION_BLUE),
         }
 
     # The arrow beside the stacked texts, as tall as its share of them, all centered in the header.
     # Each text is its own piece, saved at its final size so the layout editor shows it at scale 1.
-    def _make_header(self, suffix, size, texts, arrow_style):
+    def _make_header(self, folder, size, texts, arrow_style):
         width, height, margin = size
         make_arrow, arrow_share = arrow_style
         text = self._stack(list(texts.values()))
-        natural_width = make_arrow(round(text.height * arrow_share)).width + width * ARROW_GAP + text.width
-        scale = min((width - 2 * margin) / natural_width, (height - 2 * margin) / text.height)
+        arrow_height = round(text.height * arrow_share)
+        natural_width = make_arrow(arrow_height).width + width * ARROW_GAP + text.width
+        scale = min((width - 2 * margin) / natural_width, (height - 2 * margin) / max(text.height, arrow_height))
         arrow = make_arrow(round(text.height * scale * arrow_share))
         left = round((width - natural_width * scale) / 2)
         text_right, top = width - left, round((height - text.height * scale) / 2)
-        places = {f"flecha_{suffix}": (arrow, left, top + (round(text.height * scale) - arrow.height) // 2)}
+        places = self._arrow_parts(arrow, left, (height - arrow.height) // 2)
         for name, (piece, piece_top) in self._scaled_lines(texts, scale).items():
             places[name] = (piece, text_right - round((text.width * scale + piece.width) / 2), top + piece_top)
-        self._save_header(suffix, size, places)
+        self._save_header(folder, size, places)
+
+    # The arrow as its tip and its straight body, so the editor can lengthen the body without bending the tip.
+    # The body overlaps the tip by a few pixels so no seam shows between them.
+    def _arrow_parts(self, arrow, left, top):
+        split = self._body_start(arrow)
+        tip = arrow.crop((0, 0, split + BODY_OVERLAP, arrow.height))
+        body = arrow.crop((split, 0, arrow.width, arrow.height))
+        return {"flecha_cuerpo": (body, left + split, top), "flecha_punta": (tip, left, top)}
+
+    # The first column from which every column looks like one near the end: where the straight body begins.
+    # The reference stays a few pixels inside the right edge, whose soft border differs from the body.
+    def _body_start(self, arrow):
+        alpha = np.asarray(arrow.getchannel("A")).astype(int)
+        reference = arrow.width - 6
+        matches = np.abs(alpha - alpha[:, reference:reference + 1]).max(axis=0) < 40
+        split = reference
+        while split > 0 and matches[split - 1]:
+            split -= 1
+        return split
 
     # The texts shrunk by scale, with their tops as they stand in the stack.
     def _scaled_lines(self, texts, scale):
@@ -85,13 +99,15 @@ class StoreHeaderMaker:
             top += piece.height + gap
         return scaled
 
-    def _save_header(self, suffix, size, places):
+    # Each board gets its own folder, with the pieces under the names the layout editor shows.
+    def _save_header(self, folder, size, places):
+        (OUTPUT / folder).mkdir(parents=True, exist_ok=True)
         header = Image.new("RGBA", size[:2], WHITE)
         for name, (piece, x, y) in places.items():
             header.alpha_composite(piece, (x, y))
-            self._save(piece, name)
+            self._save(piece, f"{folder}/{name}")
             print(f"  at {x}, {y}")
-        self._save(header, f"encabezado_{suffix}")
+        self._save(header, f"{folder}/encabezado")
 
     # A left arrow: a triangular head and a shaft half its height, drawn 4x larger and scaled down for smooth edges.
     def _straight_arrow(self, height):

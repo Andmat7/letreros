@@ -17,9 +17,11 @@ const bands = [
 const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. fotocopias', '5. servicios', '6. davivienda'];
 // Pieces as [section index, folder, name, x, y], in pixels of the sign, back to front.
 const pieces = [
-  [0, 'header', 'flecha_ancho', 90, 128],
-  [0, 'header', 'texto_tienda_ancho', 560, 128],
-  [0, 'header', 'texto_segundo_local_ancho', 558, 344],
+  // The arrow is a tip and a straight body, so "ancho" on the body lengthens it without bending the tip.
+  [0, 'header', 'flecha_cuerpo', 254, 128],
+  [0, 'header', 'flecha_punta', 90, 128],
+  [0, 'header', 'texto_rojo', 560, 128],
+  [0, 'header', 'texto_azul', 558, 344],
   [1, 'textos', 'texto_recarga', 228, 715],
   [1, 'logos', 'logo_nequi', 121, 1029],
   [1, 'textos', 'texto_hazlo_facil', 231, 1547],
@@ -68,7 +70,7 @@ const band_parts = bands.map(([name, y], index) => ({
   name, source: `${sign_folder}/fondos/${name}.webp`, x: 0, y, is_background: true, section: band_titles[index],
 }));
 // The header pieces live in their own folder, shared with the column sign's art.
-const piece_source = (folder, name) => (folder === 'header' ? `${header_folder}/${name}.webp` : `${sign_folder}/${folder}/${name}.webp`);
+const piece_source = (folder, name) => (folder === 'header' ? `${header_folder}/ancho/${name}.webp` : `${sign_folder}/${folder}/${name}.webp`);
 const piece_parts = pieces.map(([index, folder, name, x, y]) => ({
   name, source: piece_source(folder, name), x, y, is_background: false, section: band_titles[index],
 }));

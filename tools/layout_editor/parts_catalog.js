@@ -39,16 +39,19 @@ const davivienda_pieces = [
   ['fotos', 'celular_davivienda', 574, 3497],
 ];
 // The "a la vuelta, en la tienda ÉSIKA, segundo local a la izquierda" header, drawn by tools/make_store_header_parts.py.
-// The same pieces appear in the top and the bottom arrow, each at its own place in its section.
+// The same pieces appear in the top and the bottom arrow, each at its own place in its section. Each arrow is a
+// tip and a straight body, so "ancho" on the body lengthens the arrow without bending the tip.
 const top_arrow_pieces = [
-  ['flecha_columna', 76, 60],
-  ['texto_tienda_columna', 456, 36],
-  ['texto_segundo_local_columna', 446, 203],
+  ['flecha_cuerpo', 143, 109],
+  ['flecha_punta', 36, 109],
+  ['texto_rojo', 304, 140],
+  ['texto_azul', 305, 205],
 ];
 const bottom_arrow_pieces = [
-  ['flecha_columna', 90, 45],
-  ['texto_tienda_columna', 502, 15],
-  ['texto_segundo_local_columna', 493, 165],
+  ['flecha_cuerpo', 143, 94],
+  ['flecha_punta', 36, 94],
+  ['texto_rojo', 304, 125],
+  ['texto_azul', 305, 190],
 ];
 const top_arrow_names = top_arrow_pieces.map(([file]) => `sup_${file}`);
 const bottom_arrow_names = bottom_arrow_pieces.map(([file]) => `inf_${file}`);
@@ -78,10 +81,6 @@ export const default_adjustments = {
   celular_nequi: { scale: 0.84 },
   celular_davivienda: { scale: 1.23 },
   texto_corresponsal: { deleted: true },
-  // The bottom slot is shorter than the top one, so its header is a little smaller.
-  inf_flecha_columna: { scale: 0.9 },
-  inf_texto_tienda_columna: { scale: 0.9 },
-  inf_texto_segundo_local_columna: { scale: 0.9 },
 };
 
 const section_of = Object.fromEntries(sections.flatMap((section) => section.pieces.map((name) => [name, section.title])));
@@ -90,8 +89,8 @@ export const parts_catalog = [
   ...bands.map(([name, y, folder]) => ({ name, source: `${folder}/fondos/${name}.webp`, x: 0, y, is_background: true })),
   ...pieces.map(([folder, name, x, y]) => ({ name, source: `${bancolombia_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
   ...davivienda_pieces.map(([folder, name, x, y]) => ({ name, source: `${daviplata_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
-  ...top_arrow_pieces.map(([file, x, y]) => ({ name: `sup_${file}`, source: `${header_folder}/${file}.webp`, x, y, is_background: false })),
-  ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `inf_${file}`, source: `${header_folder}/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
+  ...top_arrow_pieces.map(([file, x, y]) => ({ name: `sup_${file}`, source: `${header_folder}/columna/${file}.webp`, x, y, is_background: false })),
+  ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `inf_${file}`, source: `${header_folder}/columna/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
 ].map((part) => ({ ...part, section: section_of[part.name] }));
 
 // Height of every section slot in the original proposal, from top to bottom.
