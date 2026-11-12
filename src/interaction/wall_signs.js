@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { building } from '../data/building_measurements.js?v=2f0e365084';
-import { sign_artwork } from '../data/sign_artwork.js?v=2f0e365084';
-import { sign_catalog } from '../data/sign_catalog.js?v=2f0e365084';
-import { create_board_canvas, load_artwork_image, paint_board } from './sign_artwork_canvas.js?v=2f0e365084';
+import { building } from '../data/building_measurements.js?v=a5e454d95f';
+import { sign_artwork } from '../data/sign_artwork.js?v=a5e454d95f';
+import { sign_catalog } from '../data/sign_catalog.js?v=a5e454d95f';
+import { create_board_canvas, load_artwork_image, paint_board } from './sign_artwork_canvas.js?v=a5e454d95f';
 
 const storage_key = 'letreros-positions-v9';
 const artwork_storage_key = 'letreros-artwork-v3';

@@ -8,16 +8,17 @@ const header_folder = '../../images/signs/partes/encabezado_tienda_esika';
 // (tools/make_plain_bands.py) and the carrier logos, as [source under its folder, name, x, y], back to front.
 const calle_12_folder = '../../images/signs/partes/esquina_calle_12_nueva';
 const calle_12_texts = `${calle_12_folder}/textos`;
-const services_pieces = [
+// The top-ups strip closes the Davivienda section, under DaviPlata.
+const shared_pieces = [
   ['textos/texto_paga_tus', 'texto_paga_tus', 58, 2385],
-  ['fondos_lisos/panel_recargas_columna', 'panel_recargas_columna', 0, 3099],
-  ['textos/texto_recargas_operadores', 'texto_recargas_operadores', 253, 3115],
-  ['logos/logo_claro', 'logo_claro', 76, 3275],
-  ['logos/logo_tigo_circulo', 'logo_tigo', 295, 3275],
-  ['logos/logo_movistar', 'logo_movistar', 515, 3277],
-  ['logos/logo_wom_circulo', 'logo_wom', 735, 3275],
+  ['fondos_lisos/panel_recargas_columna', 'panel_recargas_columna', 0, 3767],
+  ['textos/texto_recargas_operadores', 'texto_recargas_operadores', 253, 3783],
+  ['logos/logo_claro', 'logo_claro', 76, 3943],
+  ['logos/logo_tigo_circulo', 'logo_tigo', 295, 3943],
+  ['logos/logo_movistar', 'logo_movistar', 515, 3945],
+  ['logos/logo_wom_circulo', 'logo_wom', 735, 3943],
 ];
-const services_names = services_pieces.map(([, name]) => name);
+const top_ups_names = shared_pieces.slice(1).map(([, name]) => name);
 
 // The printed board is 0.30 × 1.40 m, so the sign keeps that proportion; the extra height goes to the bottom band.
 const column_board = sign_catalog.find(({ key }) => key === 'carrera_7');
@@ -32,7 +33,7 @@ const bands = [
   ['02_nequi', 400, bancolombia_folder],
   ['03_bancolombia', 1480, bancolombia_folder],
   ['04_servicios', 2350, bancolombia_folder],
-  ['05_davivienda', 3489, daviplata_folder],
+  ['05_davivienda', 3099, daviplata_folder],
   ['06_flecha_inferior', 4157, header_folder],
 ];
 const pieces = [
@@ -46,9 +47,9 @@ const pieces = [
   ['fotos', 'celular_nequi', 225, 799],
 ];
 const davivienda_pieces = [
-  ['logos', 'logo_davivienda', 125, 3546],
-  ['logos', 'logo_daviplata', 100, 3836],
-  ['fotos', 'celular_davivienda', 574, 3497],
+  ['logos', 'logo_davivienda', 125, 3156],
+  ['logos', 'logo_daviplata', 100, 3446],
+  ['fotos', 'celular_davivienda', 574, 3107],
 ];
 // The "a la vuelta, en la tienda ÉSIKA, segundo local a la izquierda" header, drawn by tools/make_store_header_parts.py.
 // The same pieces appear in the top and the bottom arrow, each at its own place in its section. Each arrow is a
@@ -90,8 +91,8 @@ export const sections = [
   { title: '1. flecha superior', background: '01_flecha_superior', stretch_background: true, pieces: ['01_flecha_superior', ...top_arrow_names] },
   { title: '2. nequi', background: '02_nequi', stretch_background: true, pieces: ['02_nequi', 'texto_recarga', 'logo_nequi', 'destellos_izquierda', 'destellos_derecha', 'celular_nequi'] },
   { title: '3. bancolombia', background: '03_bancolombia', stretch_background: true, pieces: ['03_bancolombia', 'tarjeta_bancolombia', 'logo_bancolombia', 'texto_retiros_consignaciones'] },
-  { title: '4. servicios', background: '04_servicios', stretch_background: true, pieces: ['04_servicios', 'facturas', ...services_names] },
-  { title: '5. davivienda', background: '05_davivienda', stretch_background: true, pieces: ['05_davivienda', 'logo_davivienda', 'logo_daviplata', 'celular_davivienda'] },
+  { title: '4. servicios', background: '04_servicios', stretch_background: true, pieces: ['04_servicios', 'facturas', 'texto_paga_tus'] },
+  { title: '5. davivienda', background: '05_davivienda', stretch_background: true, pieces: ['05_davivienda', 'logo_davivienda', 'logo_daviplata', 'celular_davivienda', ...top_ups_names] },
   { title: '6. flecha inferior', background: '06_flecha_inferior', stretch_background: true, pieces: ['06_flecha_inferior', ...bottom_arrow_names] },
 ];
 
@@ -101,8 +102,8 @@ export const default_adjustments = {
   '06_flecha_inferior': { stretch: 323 / 400 },
   '02_nequi': { stretch: 0.8709677419354839 },
   '03_bancolombia': { stretch: 1.0754017305315204 },
-  '04_servicios': { stretch: 0.9751712328767124 },
-  '05_davivienda': { stretch: 1.3971486761710794 },
+  '04_servicios': { stretch: 0.6413 },
+  '05_davivienda': { stretch: 2.2134 },
   logo_bancolombia: { scale: 0.85 },
   facturas: { scale: 0.62 },
   texto_paga_tus: { scale: 0.6 },
@@ -126,7 +127,7 @@ export const parts_catalog = [
   ...bands.map(([name, y, folder]) => ({ name, source: band_source(name, folder), x: 0, y, is_background: true })),
   ...pieces.map(([folder, name, x, y]) => ({ name, source: `${bancolombia_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
   { name: 'texto_retiros_consignaciones', source: `${calle_12_texts}/texto_retiros_consignaciones.webp`, x: 83, y: 2070, is_background: false },
-  ...services_pieces.map(([file, name, x, y]) => ({ name, source: `${calle_12_folder}/${file}.webp`, x, y, is_background: false })),
+  ...shared_pieces.map(([file, name, x, y]) => ({ name, source: `${calle_12_folder}/${file}.webp`, x, y, is_background: false })),
   ...davivienda_pieces.map(([folder, name, x, y]) => ({ name, source: `${daviplata_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
   ...top_arrow_pieces.map(([file, x, y]) => ({ name: `${top_prefix}${file}`, source: `${header_folder}/columna/${file}.webp`, x, y, is_background: false })),
   ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `${bottom_prefix}${file}`, source: `${header_folder}/columna/${file}.webp`, x, y: y + bands[5][1], is_background: false })),

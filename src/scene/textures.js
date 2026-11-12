@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { building } from '../data/building_measurements.js?v=2f0e365084';
+import { building } from '../data/building_measurements.js?v=a5e454d95f';
 
 const tile_pixels = 256;
 const course_pixels = 16;
