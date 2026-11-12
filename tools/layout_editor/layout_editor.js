@@ -60,7 +60,10 @@ export class LayoutEditor extends HTMLElement {
   static viewport_padding = 32;
   #images = new Map();
   #handle = null;
+  #publish_timer = null;
+  #publishing = Promise.resolve();
   static scale_step = 1.05;
+  static publish_delay = 1200;
 
   connectedCallback() {
     this.attachShadow({ mode: 'open' });
@@ -70,6 +73,7 @@ export class LayoutEditor extends HTMLElement {
     this.#zoom = this.#zoom_to_fit_screen();
     this.#bind_controls();
     this.#refresh();
+    this.#publish_when_loaded();
   }
 
   #build_stage() {
@@ -364,6 +368,7 @@ export class LayoutEditor extends HTMLElement {
   #save() {
     save_layout(this.#layout);
     save_section_heights(this.#heights);
+    this.#schedule_publish();
   }
 
   #refresh() {
@@ -562,15 +567,35 @@ export class LayoutEditor extends HTMLElement {
     await this.#copy_image(() => this.#render_full_sign(), 'Imagen completa');
   }
 
+  // The 3D page shows what the editor shows without pressing anything: the sign is published when the editor opens
+  // (so changes to the default layout reach it too) and shortly after every change. Only the local dev server saves.
+  async #publish_when_loaded() {
+    if (window.location.hostname !== 'localhost') return;
+    await Promise.all([...this.#images.values()].map((image) => image.decode().catch(() => null)));
+    this.#publish();
+  }
+
+  #schedule_publish() {
+    if (window.location.hostname !== 'localhost') return;
+    clearTimeout(this.#publish_timer);
+    this.#publish_timer = setTimeout(() => this.#publish(), LayoutEditor.publish_delay);
+  }
+
   // The dev server (tools/dev_server.py) saves the sign as the board's finished layout, rebuilds the 3D page's
-  // images and writes the print PDF at the board's real size.
-  async #publish() {
-    this.#say('Guardando…');
+  // images and writes the print PDF at the board's real size; the open 3D page then reloads itself.
+  // Publishes run one after another, so an older sign never overwrites a newer one.
+  #publish() {
+    this.#publishing = this.#publishing.then(() => this.#send_sign());
+    return this.#publishing;
+  }
+
+  async #send_sign() {
+    this.#say('Guardando en 3D y PDF…');
     try {
       const response = await fetch(`/publish_layout?sign=${active_sign_key}`, { method: 'POST', body: await this.#render_full_sign() });
       const reply = await response.text();
       if (!response.ok) throw new Error(reply);
-      this.#say(`Guardado. Recarga ${window.location.origin}/ para verlo en 3D. PDF: ${reply}`);
+      this.#say(`Guardado en 3D (${window.location.origin}/ se recarga solo) y PDF: ${reply}`);
     } catch (publish_error) {
       this.#say(`No se pudo guardar (¿está corriendo tools/dev_server.py?): ${publish_error.message}`);
     }

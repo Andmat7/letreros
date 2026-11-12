@@ -47,5 +47,5 @@ With the dev server running, open http://localhost:8020/tools/layout_editor/ to 
 ### From the editor to the 3D page and the print PDF
 
 1. Arrange each sign in the editor: http://localhost:8020/tools/layout_editor/?sign=carrera_7 and http://localhost:8020/tools/layout_editor/?sign=calle_12.
-2. Press "Guardar en 3D y PDF". The dev server saves the sign as `images/signs/propuestas/<sign>_layout.webp`, rebuilds `src/generated/photo_bundle.js` and writes `impresion/<sign>_<width>x<height>_cm.pdf`, sized from the image at 3200 px per meter (0.30 × 1.40 m and 0.60 × 2.00 m).
-3. Reload http://localhost:8020/ to see it on the 3D board. `.venv/Scripts/python tools/make_print_pdfs.py` writes both PDFs again from the saved layouts.
+2. While the editor is open it saves the sign by itself, when it opens and a moment after every change (the "Guardar en 3D y PDF" button does it at once): the dev server saves it as `images/signs/propuestas/<sign>_layout.webp`, rebuilds `src/generated/photo_bundle.js` and writes `impresion/<sign>_<width>x<height>_cm.pdf`, sized from the image at 3200 px per meter (0.30 × 1.40 m and 0.60 × 2.00 m).
+3. An open http://localhost:8020/ reloads itself and shows the new board. `.venv/Scripts/python tools/make_print_pdfs.py` writes both PDFs again from the saved layouts.
