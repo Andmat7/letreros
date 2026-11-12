@@ -1,5 +1,5 @@
-"""Draws plain backgrounds for the Nequi, Bancolombia and Davivienda bands of the Calle 12 sign, in each brand's
-color with a soft diagonal shading. The cut bands keep faint traces of the texts and logos that were lifted off
+"""Draws plain backgrounds for the Nequi, Bancolombia and Davivienda bands of the Calle 12 sign and the top-ups
+panel, in each brand's color with a soft diagonal shading. The cut bands keep faint traces of the texts and logos that were lifted off
 them, which show once a piece is left out. Run from the project root: .venv/Scripts/python tools/make_plain_bands.py
 """
 from pathlib import Path
@@ -15,6 +15,8 @@ BANDS = {
     "02_nequi": ((1920, 937), (34, 10, 56), (64, 20, 104)),
     "03_bancolombia": ((1920, 740), (16, 16, 16), (38, 37, 36)),
     "05_davivienda": ((1920, 951), (184, 4, 4), (236, 24, 26)),
+    # Not a band: the panel behind the top-ups column of the services section, so it reads apart from the bills.
+    "panel_recargas": ((700, 1260), (14, 14, 14), (48, 47, 46)),
 }
 
 

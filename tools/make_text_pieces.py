@@ -16,7 +16,7 @@ BANCOLOMBIA_YELLOW = (242, 185, 21, 255)
 # biggest line fills the width; the others are drawn at their share of its letter size.
 PIECES = {
     "texto_paga_tus": (1360, [("PAGA TUS", 1, WHITE), ("SERVICIOS PÚBLICOS", 1, WHITE)]),
-    "texto_recargas_operadores": (560, [("Y TAMBIÉN", 1, WHITE), ("RECARGAS A", 1, WHITE)]),
+    "texto_recargas_operadores": (520, [("RECARGAS", 1, WHITE)]),
     "texto_retiros_recargas": (1300, [("RETIROS Y RECARGAS", 1, WHITE)]),
     # The service is what matters, so it is big; whose agent it is goes small underneath.
     "texto_retiros_consignaciones": (920, [

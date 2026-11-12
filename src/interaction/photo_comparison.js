@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { photo_bundle } from '../generated/photo_bundle.js?v=9e5b6284bc';
-import { photo_edges } from '../generated/photo_edges.js?v=9e5b6284bc';
-import { create_model_edges, set_model_edges } from './model_edges.js?v=9e5b6284bc';
+import { photo_bundle } from '../generated/photo_bundle.js?v=9eb0133c39';
+import { photo_edges } from '../generated/photo_edges.js?v=9eb0133c39';
+import { create_model_edges, set_model_edges } from './model_edges.js?v=9eb0133c39';
 
 const default_fov = 50;
 
