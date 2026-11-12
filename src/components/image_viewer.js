@@ -1,5 +1,5 @@
-import { copy_image_to_clipboard } from './copy_image.js?v=bae77e1e95';
-import { image_viewer_styles } from './image_viewer.css.js?v=bae77e1e95';
+import { copy_image_to_clipboard } from './copy_image.js?v=747c14d6d2';
+import { image_viewer_styles } from './image_viewer.css.js?v=747c14d6d2';
 
 const template = /* html */ `
   <div class="header"><span class="title"></span><span class="buttons"><button class="copy">Copiar foto</button><button class="close">Cerrar</button></span></div>
