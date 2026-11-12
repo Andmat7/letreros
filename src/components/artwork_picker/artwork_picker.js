@@ -1,4 +1,4 @@
-import { artwork_picker_styles } from './artwork_picker.css.js?v=ffdf577f93';
+import { artwork_picker_styles } from './artwork_picker.css.js?v=b0aabeace9';
 
 const board_template = /* html */ `
   <div class="board_title"></div>
