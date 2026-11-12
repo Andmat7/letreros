@@ -1,5 +1,5 @@
-import { building } from '../data/building_measurements.js?v=ccda587acf';
-import { add_box, add_brick_box, standard_material } from './primitives.js?v=ccda587acf';
+import { building } from '../data/building_measurements.js?v=b391060793';
+import { add_box, add_brick_box, standard_material } from './primitives.js?v=b391060793';
 
 const cornice_material = standard_material({ color: 0x8c8378 });
 const cornice_height = 0.35;

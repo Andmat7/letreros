@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { brick_texture } from './textures.js?v=ccda587acf';
+import { brick_texture } from './textures.js?v=b391060793';
 
 export function standard_material(options) {
   return new THREE.MeshStandardMaterial({ roughness: 0.9, ...options });
