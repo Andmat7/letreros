@@ -22,7 +22,11 @@ class LayoutPublisher:
             raise ValueError(f"Unknown sign: {sign_key}")
         image = Image.open(io.BytesIO(png_bytes)).convert("RGB")
         with PUBLISH_LOCK:
-            image.save(PROJECT_ROOT / "images/signs/propuestas" / f"{sign_key}_layout.webp", lossless=True)
+            # Written beside it first and then swapped in, so a page reloading meanwhile never reads half a file.
+            target = PROJECT_ROOT / "images/signs/propuestas" / f"{sign_key}_layout.webp"
+            partial = target.with_name(f"{target.stem}.partial.webp")
+            image.save(partial, lossless=True)
+            partial.replace(target)
             PhotoBundleBuilder(PROJECT_ROOT).build()
             pdf = PrintPdfWriter().write(sign_key)
         return f"impresion/{pdf.name}"

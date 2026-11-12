@@ -5,6 +5,7 @@ import { align_joints, has_length, joint_root, thickness_holder } from './arrow_
 import { group_bounds, move_group, movable_names, scale_group, set_group, snapshot, with_companions } from './piece_groups.js';
 import { move_border, set_section_height, section_tops } from './section_space.js';
 import { group_share, set_group_share } from './group_space.js';
+import { draw_frame, frame_box, place_frames } from './group_frame.js';
 import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
 import { describe_signs, describe_size } from './physical_size.js';
 import { sign_catalog } from '../../src/data/sign_catalog.js';
@@ -99,6 +100,7 @@ export class LayoutEditor extends HTMLElement {
     const image = new Image();
     image.src = part.source;
     image.draggable = false;
+    image.classList.toggle('frame', Boolean(part.frame));
     image.addEventListener('load', () => this.#refresh_stage());
     image.addEventListener('pointerdown', (event) => this.#start_drag(event, part));
     image.addEventListener('wheel', (event) => this.#scale_with_wheel(event, part), { passive: false });
@@ -381,6 +383,8 @@ export class LayoutEditor extends HTMLElement {
   }
 
   #refresh_stage() {
+    place_frames(parts_catalog, this.#heights, this.#layout);
+    this.#redraw_frames();
     align_joints(parts_catalog, this.#layout, (name) => this.#natural_size(name));
     const sizer = this.#element('.sizer');
     sizer.style.width = `${sign_size.width * this.#zoom}px`;
@@ -391,6 +395,17 @@ export class LayoutEditor extends HTMLElement {
     this.#place_handle();
     this.#place_dividers();
     this.#images.get('reference').style.display = this.#element('.show_reference').checked ? 'block' : 'none';
+  }
+
+  // A frame is redrawn only when its group changed height, since a new image reloads the stage.
+  #redraw_frames() {
+    for (const part of parts_catalog.filter((candidate) => candidate.frame)) {
+      const image = this.#images.get(part.name);
+      const height = frame_box(part.frame, this.#heights).height;
+      if (Number(image.dataset.height) === height) continue;
+      image.dataset.height = height;
+      image.src = draw_frame(part.frame, height);
+    }
   }
 
   #place_dividers() {

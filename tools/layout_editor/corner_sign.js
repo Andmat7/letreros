@@ -1,5 +1,7 @@
 // The Calle 12 corner sign, cut into bands and pieces by tools/cut_corner_sign_parts.py; the services band and
-// its pieces come from new art cut by tools/cut_servicios_parts.py.
+// its pieces come from new art cut by tools/cut_servicios_parts.py, the copy shop from tools/cut_fotocopias_parts.py.
+import { frame_parts } from './group_frame.js';
+
 export const corner_sign_key = 'calle_12';
 
 const sign_folder = '../../images/signs/partes/esquina_calle_12_nueva';
@@ -12,13 +14,14 @@ const bands = [
   ['03_bancolombia', 1673],
   ['04_servicios_publicos', 2420],
   ['05_davivienda', 3735],
-  ['06_seccion_nueva', 4655],
+  ['06_fotocopiadora', 4655],
 ];
 const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. servicios', '5. davivienda', '6. fotocopias'];
 // Under the header the sign has two parts: the banking agent services and the copy shop. The editor sets how much
-// of that height each part gets (70 % and 30 % to start).
+// of that height each part gets (70 % and 30 % to start). The banking part sits in an Ésika red frame with rounded
+// corners, so its four sections read as one block while each keeps its own colors.
 export const section_groups = [
-  { title: 'Corresponsal', sections: [1, 2, 3, 4] },
+  { title: 'Corresponsal', sections: [1, 2, 3, 4], frame: { name: 'marco_corresponsal', padding: 56, radius: 96, color: 'rgb(190, 4, 4)' } },
   { title: 'Fotocopiadora', sections: [5] },
 ];
 // Pieces as [section index, folder, name, x, y], in pixels of the sign, back to front.
@@ -43,14 +46,17 @@ const pieces = [
   [4, 'logos', 'logo_davivienda', 321, 3787],
   [4, 'logos', 'logo_daviplata', 316, 4152],
   [4, 'fotos', 'celular_davivienda', 1208, 3724],
-  [4, 'textos', 'texto_envia', 221, 4531],
-  [5, 'textos', 'texto_fotocopias', 76, 4930],
-  [5, 'logos', 'flecha_primer_local', 76, 5622],
-  [5, 'textos', 'texto_en_el_primer_local', 783, 5669],
+  [4, 'textos', 'texto_envia', 221, 4500],
+  [5, 'logos', 'flecha_fotocopias', 174, 4823],
+  [5, 'textos', 'texto_fotocopias_documentos', 467, 4793],
+  [5, 'textos', 'texto_primer_local_izquierda', 462, 4920],
+  [5, 'fotos', 'impresora', 125, 5367],
+  [5, 'fotos', 'panel_fotocopias', 909, 5186],
 ];
 
-// Scale and stretch of the pieces at the 70 % / 30 % split.
+// Scale and stretch of the pieces at the 70 % / 30 % split. The frame lies over everything.
 export const default_adjustments = {
+  marco_corresponsal: { order: 1000 },
   flecha_cuerpo: { scale: 0.95, widen: 0.91, length: 0.91 },
   flecha_punta: { scale: 0.95 },
   texto_azul: { scale: 0.94 },
@@ -58,7 +64,6 @@ export const default_adjustments = {
   '03_bancolombia': { stretch: 1.0094594594594595 },
   '04_servicios_publicos': { stretch: 1.0419968304278922 },
   '05_davivienda': { stretch: 0.9674027339642481 },
-  '06_seccion_nueva': { stretch: 0.9088541666666666 },
   texto_recarga: { scale: 0.781 },
   logo_nequi: { scale: 0.773 },
   texto_hazlo_facil: { scale: 0.822 },
@@ -75,9 +80,6 @@ export const default_adjustments = {
   logo_daviplata: { scale: 0.823 },
   celular_davivienda: { scale: 1.16 },
   texto_envia: { scale: 0.823 },
-  texto_fotocopias: { scale: 1.105 },
-  flecha_primer_local: { scale: 1.547 },
-  texto_en_el_primer_local: { scale: 1.105 },
 };
 
 export const sign_size = { width: 1920, height: sign_height };
@@ -95,7 +97,7 @@ const joints = { flecha_cuerpo: { to: 'flecha_punta', anchor: 'right_middle' } }
 const piece_parts = pieces.map(([index, folder, name, x, y]) => ({
   name, source: piece_source(folder, name), joint: joints[name], x, y, is_background: false, section: band_titles[index],
 }));
-export const parts_catalog = [...band_parts, ...piece_parts];
+export const parts_catalog = [...band_parts, ...piece_parts, ...frame_parts(section_groups, 1920)];
 
 // Every band stretches to its slot, the red header too.
 export const sections = bands.map(([name], index) => ({
