@@ -41,17 +41,17 @@ const pieces = [
   [3, 'logos', 'logo_davivienda', 221, 2566],
   [3, 'logos', 'logo_daviplata', 143, 2904],
   [3, 'fotos', 'celular_davivienda', 1135, 2409],
-  // Two columns: paying the bills on the left, phone top-ups on the right with the carriers in a 2 x 2 grid
-  // (split by tools/split_operator_logos.py).
+  // Two columns: paying the bills on the left, phone top-ups on the right with the carriers in an even 2 x 2 grid,
+  // each as big as the others and centered in its cell (split by tools/split_operator_logos.py).
   [4, 'fondos_lisos', 'panel_recargas', 1220, 3340],
   [4, 'textos', 'texto_paga_tus', 91, 3441],
   [4, 'textos', 'texto_luz_agua_gas', 221, 4344],
   [4, 'fotos', 'facturas_servicios', -21, 3764],
   [4, 'textos', 'texto_recargas_operadores', 1258, 3560],
-  [4, 'logos', 'logo_claro', 1306, 3796],
-  [4, 'logos', 'logo_tigo', 1570, 3819],
-  [4, 'logos', 'logo_movistar', 1289, 4202],
-  [4, 'logos', 'logo_wom', 1587, 4240],
+  [4, 'logos', 'logo_claro', 1255, 3800],
+  [4, 'logos', 'logo_tigo', 1574, 3831],
+  [4, 'logos', 'logo_movistar', 1254, 4182],
+  [4, 'logos', 'logo_wom', 1576, 4180],
   [5, 'logos', 'flecha_fotocopias', 174, 4773],
   [5, 'textos', 'texto_fotocopias_documentos', 467, 4742],
   [5, 'textos', 'texto_primer_local_izquierda', 462, 4873],
@@ -82,10 +82,10 @@ export const default_adjustments = {
   texto_paga_tus: { scale: 0.74 },
   texto_luz_agua_gas: { scale: 0.822 },
   facturas_servicios: { scale: 0.77 },
-  logo_claro: { scale: 1.62 },
-  logo_tigo: { scale: 0.88 },
-  logo_movistar: { scale: 1.63 },
-  logo_wom: { scale: 1.22 },
+  logo_claro: { scale: 1.58 },
+  logo_tigo: { scale: 1.48 },
+  logo_movistar: { scale: 1.73 },
+  logo_wom: { scale: 1.56 },
 };
 
 export const sign_size = { width: 1920, height: sign_height };

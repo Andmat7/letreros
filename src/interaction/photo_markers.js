@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { photo_viewpoints } from '../data/photo_viewpoints.js?v=9eb0133c39';
-import { canvas_texture } from '../scene/textures.js?v=9eb0133c39';
+import { photo_viewpoints } from '../data/photo_viewpoints.js?v=cdfc812cda';
+import { canvas_texture } from '../scene/textures.js?v=cdfc812cda';
 
 const marker_color = 0xc8102e;
 
