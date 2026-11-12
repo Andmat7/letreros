@@ -10,9 +10,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TEXTS = PROJECT_ROOT / "images/signs/partes/esquina_calle_12_nueva/textos"
 FONTS = PROJECT_ROOT / "tools/fonts"
 WHITE = (255, 255, 255, 255)
-# The yellow of the Bancolombia texts and the red of the copy shop title, both sampled from the art.
+# The yellow of the Bancolombia texts, sampled from the art.
 BANCOLOMBIA_YELLOW = (242, 185, 21, 255)
-COPY_SHOP_RED = (226, 22, 30, 255)
 # Each piece as its width in pixels of the sign at scale 1, an outline color (or None) and its lines as
 # (text, relative size, color, Poppins weight). The biggest line fills the width; the others are drawn at their
 # share of its letter size.
@@ -26,7 +25,7 @@ PIECES = {
         ("RETIROS Y", 1, BANCOLOMBIA_YELLOW, "ExtraBold"), ("CONSIGNACIONES", 1, BANCOLOMBIA_YELLOW, "ExtraBold"),
         ("Corresponsal Bancolombia", 0.45, WHITE, "SemiBold"),
     ]),
-    "texto_fotocopias_titulo": (1240, None, [("FOTOCOPIAS Y", 1, COPY_SHOP_RED, "Black"), ("REDACCIÓN DE DOCUMENTOS", 1, COPY_SHOP_RED, "Black")]),
+    "texto_fotocopias_titulo": (1240, None, [("FOTOCOPIAS Y", 1, WHITE, "Black"), ("REDACCIÓN DE DOCUMENTOS", 1, WHITE, "Black")]),
     "texto_fotocopias_direccion": (1100, None, [("(PRIMER LOCAL A LA IZQUIERDA)", 1, WHITE, "Bold")]),
 }
 LINE_GAP = 0.2
