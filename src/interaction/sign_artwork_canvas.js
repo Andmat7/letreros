@@ -1,4 +1,4 @@
-import { photo_bundle } from '../generated/photo_bundle.js?v=83cd91cb1d';
+import { photo_bundle } from '../generated/photo_bundle.js?v=c98ca9af71';
 
 const pixels_per_meter = 1000;
 const scale_for_fit = { contain: Math.min, cover: Math.max };
