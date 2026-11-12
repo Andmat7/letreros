@@ -12,11 +12,11 @@ const bands = [
   ['01_cabecera', 0],
   ['02_nequi', 583],
   ['03_bancolombia', 1673],
-  ['04_servicios_publicos', 2420],
-  ['05_davivienda', 3735],
+  ['05_davivienda', 2420],
+  ['04_servicios_publicos', 3340],
   ['06_fotocopiadora', 4655],
 ];
-const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. servicios', '5. davivienda', '6. fotocopias'];
+const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. davivienda', '5. servicios', '6. fotocopias'];
 // Under the header the sign has two parts: the banking agent services and the copy shop. The editor sets how much
 // of that height each part gets (70 % and 30 % to start). The banking part sits in an Ésika red frame with rounded
 // corners, so its four sections read as one block while each keeps its own colors.
@@ -38,15 +38,16 @@ const pieces = [
   [2, 'fotos', 'tarjeta_bancolombia', 237, 1823],
   [2, 'logos', 'logo_bancolombia', 675, 1870],
   [2, 'textos', 'texto_corresponsal', 915, 2175],
-  [3, 'textos', 'texto_paga_aqui', 378, 2429],
-  [3, 'textos', 'texto_luz_agua_gas', 530, 2723],
-  [3, 'fotos', 'facturas_servicios', 280, 2827],
-  [3, 'textos', 'texto_tambien_recargas', 523, 3467],
-  [3, 'logos', 'logos_operadores', 679, 3558],
-  [4, 'logos', 'logo_davivienda', 321, 3787],
-  [4, 'logos', 'logo_daviplata', 316, 4152],
-  [4, 'fotos', 'celular_davivienda', 1208, 3724],
-  [4, 'textos', 'texto_envia', 221, 4500],
+  [3, 'logos', 'logo_davivienda', 321, 2472],
+  [3, 'logos', 'logo_daviplata', 316, 2837],
+  [3, 'fotos', 'celular_davivienda', 1208, 2409],
+  [3, 'textos', 'texto_envia', 221, 3216],
+  // Services close the framed block, so their pieces sit a little higher to stay clear of the frame's bottom edge.
+  [4, 'textos', 'texto_paga_aqui', 378, 3334],
+  [4, 'textos', 'texto_luz_agua_gas', 530, 3628],
+  [4, 'fotos', 'facturas_servicios', 280, 3732],
+  [4, 'textos', 'texto_tambien_recargas', 523, 4372],
+  [4, 'logos', 'logos_operadores', 679, 4463],
   [5, 'logos', 'flecha_fotocopias', 174, 4823],
   [5, 'textos', 'texto_fotocopias_documentos', 467, 4793],
   [5, 'textos', 'texto_primer_local_izquierda', 462, 4920],

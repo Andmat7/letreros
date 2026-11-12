@@ -586,7 +586,7 @@ export class LayoutEditor extends HTMLElement {
   // (so changes to the default layout reach it too) and shortly after every change. Only the local dev server saves.
   async #publish_when_loaded() {
     if (window.location.hostname !== 'localhost') return;
-    await Promise.all([...this.#images.values()].map((image) => image.decode().catch(() => null)));
+    await Promise.all([...this.#images.values()].map((image) => loaded(image)));
     this.#publish();
   }
 
@@ -650,6 +650,16 @@ export class LayoutEditor extends HTMLElement {
   #element(selector) {
     return this.shadowRoot.querySelector(selector);
   }
+}
+
+// Load events instead of decode(), because a browser may hold back decoding in a background tab and the sign would
+// never be published. A failed image counts as done, so one missing file does not stop the rest.
+function loaded(image) {
+  if (image.complete && image.naturalWidth) return Promise.resolve();
+  return new Promise((resolve) => {
+    image.addEventListener('load', resolve, { once: true });
+    image.addEventListener('error', resolve, { once: true });
+  });
 }
 
 customElements.define('layout-editor', LayoutEditor);

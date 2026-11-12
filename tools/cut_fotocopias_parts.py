@@ -17,9 +17,10 @@ SECTION_HEIGHT = 1745
 BAND_BOTTOM = 152
 BAND_COLOR = (25, 25, 25)
 BACKGROUND_COLOR = (239, 239, 239)
-# The strip on top of the section that holds the dotted line.
+# The strip on top of the section that holds the dotted line: white dots on the Ésika red of the Corresponsal frame.
 SEPARATOR_HEIGHT = 70
-DOT_COLOR = (120, 120, 120)
+SEPARATOR_COLOR = (190, 4, 4)
+DOT_COLOR = (255, 255, 255)
 DOT_LENGTH, DOT_GAP, DOT_THICKNESS = 40, 26, 12
 # Boxes in pixels of the art (left, top, right, bottom), with a small margin around each element.
 PIECES = {
@@ -48,6 +49,7 @@ class FotocopiasPartsCutter:
     # whole sign width.
     def _background(self, scale):
         background = Image.new("RGB", (SIGN_WIDTH, SECTION_HEIGHT), BACKGROUND_COLOR)
+        background.paste(SEPARATOR_COLOR, (0, 0, SIGN_WIDTH, SEPARATOR_HEIGHT))
         background.paste(BAND_COLOR, (0, SEPARATOR_HEIGHT, SIGN_WIDTH, SEPARATOR_HEIGHT + round(BAND_BOTTOM * scale)))
         dot_top = (SEPARATOR_HEIGHT - DOT_THICKNESS) // 2
         for dot_left in range(DOT_GAP // 2, SIGN_WIDTH, DOT_LENGTH + DOT_GAP):
