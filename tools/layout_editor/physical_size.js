@@ -3,7 +3,7 @@ import { active_sign_key, sign_size } from './active_sign.js';
 import { sign_size as column_sign_size } from './parts_catalog.js';
 
 // The column board is the reference: its width gives the real size of every pixel, and the corner sign uses the same scale.
-const column_board = sign_catalog.find(({ key }) => key === 'columna_esquina');
+const column_board = sign_catalog.find(({ key }) => key === 'carrera_7');
 const centimeters_per_pixel = (column_board.width * 100) / column_sign_size.width;
 
 export function describe_size(height_in_pixels) {

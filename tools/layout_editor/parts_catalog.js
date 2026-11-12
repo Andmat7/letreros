@@ -6,7 +6,7 @@ const daviplata_folder = '../../images/signs/partes/daviplata_nueva_1x0_5';
 const header_folder = '../../images/signs/partes/encabezado_tienda_esika';
 
 // The printed board is 0.30 × 1.40 m, so the sign keeps that proportion; the extra height goes to the bottom band.
-const column_board = sign_catalog.find(({ key }) => key === 'columna_esquina');
+const column_board = sign_catalog.find(({ key }) => key === 'carrera_7');
 const sign_width = 960;
 export const sign_size = { width: sign_width, height: Math.round((sign_width * column_board.height) / column_board.width) };
 export const original_image = '../../images/signs/propuestas/bancolombia_nueva_1x4_6.webp';

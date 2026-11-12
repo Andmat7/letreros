@@ -10,7 +10,7 @@ from build_photo_bundle import PhotoBundleBuilder
 from make_print_pdfs import PrintPdfWriter
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SIGN_KEYS = {"columna_esquina", "esquina_calle_12"}
+SIGN_KEYS = {"carrera_7", "calle_12"}
 
 
 class LayoutPublisher:

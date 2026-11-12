@@ -1,8 +1,8 @@
 // Designs that can be tried on a board. Each key is an image of the photo bundle; "" is the blank board.
 export const sign_artwork = [
   { key: '', title: 'Blanco' },
-  { key: 'columna_esquina_layout', title: 'Columna de la esquina – disposición del editor (0.30 × 1.40 m)' },
-  { key: 'esquina_calle_12_layout', title: 'Esquina Calle 12 – disposición del editor (0.60 × 2.00 m)' },
+  { key: 'carrera_7_layout', title: 'Pendón Carrera 7 – disposición del editor (0.30 × 1.40 m)' },
+  { key: 'calle_12_layout', title: 'Pendón Calle 12 – disposición del editor (0.60 × 2.00 m)' },
   { key: 'bancolombia_nueva_1x4_6', title: 'Esquina Bancolombia – nueva, con flechas blancas' },
   { key: 'esquina_calle_12_nueva_0x6_1x4', title: 'Esquina Calle 12 – nueva (0.60 × 1.40 m)' },
   { key: 'bancolombia_oscuro_1x4_6', title: 'Esquina Bancolombia – columna, fondo oscuro y flecha roja' },

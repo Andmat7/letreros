@@ -12,7 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # Both layout editors draw the boards at 3200 px per meter, so the pixels give the printed size.
 PIXELS_PER_CENTIMETER = 32
 POINTS_PER_CENTIMETER = 72 / 2.54
-SIGN_KEYS = ["columna_esquina", "esquina_calle_12"]
+SIGN_KEYS = ["carrera_7", "calle_12"]
 
 
 class PrintPdfWriter:

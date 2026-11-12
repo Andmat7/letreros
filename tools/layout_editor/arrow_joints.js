@@ -1,6 +1,6 @@
-// Arrow pieces hang from the piece before them (the body from the tip, or from the turn), so the arrow always
-// stays in one piece: a joined piece takes the scale of the piece it hangs from and stays centered on it.
-// Only its "ancho" is its own, so the body can be made longer or shorter.
+// Arrow pieces hang from the piece before them (the body from the tip, or from the turn): a joined piece takes the
+// scale of the piece it hangs from and stays centered on it. It can still slide along its own direction (its offset)
+// and its "ancho" is its own, so the body can be moved and made longer or shorter without leaving the center line.
 
 // Same overlap as BODY_OVERLAP in tools/make_store_header_parts.py, so no seam shows between the pieces.
 const overlap = 3;
@@ -11,10 +11,9 @@ export function align_joints(parts, layout, size_of) {
   }
 }
 
-// Dragging any piece of an arrow moves the whole arrow, which hangs from its first piece.
-export function joint_root(parts, name) {
-  const part = parts.find((candidate) => candidate.name === name);
-  return part?.joint ? joint_root(parts, part.joint.to) : name;
+// The direction a joined piece may slide in: along a body leaving to the right, or down from the tip for the turn.
+export function sliding_axis(part) {
+  return part.joint.anchor === 'below_center' ? 'y' : 'x';
 }
 
 function align(part, layout, size_of) {
@@ -29,7 +28,9 @@ function align(part, layout, size_of) {
     right_bottom: [leader.right - gap, leader.bottom - own.height],
     below_center: [leader.left + (leader.width - stem * follower.scale) / 2, leader.bottom - gap],
   };
-  [follower.x, follower.y] = positions[anchor].map(Math.round);
+  const [x, y] = positions[anchor];
+  const slide = follower.offset * follower.scale;
+  [follower.x, follower.y] = (sliding_axis(part) === 'x' ? [x + slide, y] : [x, y + slide]).map(Math.round);
 }
 
 function box(placement, size) {

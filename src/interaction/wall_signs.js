@@ -1,13 +1,15 @@
 import * as THREE from 'three';
-import { building } from '../data/building_measurements.js?v=5cdded33b2';
-import { sign_artwork } from '../data/sign_artwork.js?v=5cdded33b2';
-import { sign_catalog } from '../data/sign_catalog.js?v=5cdded33b2';
-import { create_board_canvas, load_artwork_image, paint_board } from './sign_artwork_canvas.js?v=5cdded33b2';
+import { building } from '../data/building_measurements.js?v=004b5624e8';
+import { sign_artwork } from '../data/sign_artwork.js?v=004b5624e8';
+import { sign_catalog } from '../data/sign_catalog.js?v=004b5624e8';
+import { create_board_canvas, load_artwork_image, paint_board } from './sign_artwork_canvas.js?v=004b5624e8';
 
 const storage_key = 'letreros-positions-v9';
 const artwork_storage_key = 'letreros-artwork-v3';
 const blank_artwork = { key: '', fit: 'contain', rotated: false };
-const default_artwork_keys = { columna_esquina: 'columna_esquina_layout', esquina_calle_12: 'esquina_calle_12_layout' };
+const default_artwork_keys = { carrera_7: 'carrera_7_layout', calle_12: 'calle_12_layout' };
+// The signs and their editor layouts were renamed after the street they face; choices saved under the old names carry over.
+const renamed_keys = { columna_esquina: 'carrera_7', esquina_calle_12: 'calle_12', columna_esquina_layout: 'carrera_7_layout', esquina_calle_12_layout: 'calle_12_layout' };
 const fallback_artwork_key = 'bancolombia_nueva_1x4_6';
 const wall_offset = 0.06;
 const sidewalk_margin = 0.4;
@@ -74,7 +76,14 @@ export function save_placements(signs) {
 }
 
 function load_stored(name) {
-  try { return JSON.parse(localStorage.getItem(name) || '{}'); } catch (storage_error) { return {}; }
+  try { return with_new_names(JSON.parse(localStorage.getItem(name) || '{}')); } catch (storage_error) { return {}; }
+}
+
+function with_new_names(stored) {
+  return Object.fromEntries(Object.entries(stored).map(([key, value]) => [
+    renamed_keys[key] ?? key,
+    value?.key in renamed_keys ? { ...value, key: renamed_keys[value.key] } : value,
+  ]));
 }
 
 function save_stored(name, value) {

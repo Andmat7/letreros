@@ -17,7 +17,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SOURCE = "images/signs/propuestas/servicios_publicos_nueva.webp"
 OUTPUT = "images/signs/partes/esquina_calle_12_nueva"
 BAND_NAME = "04_servicios_publicos"
-RENDERED_LAYOUT = "images/signs/propuestas/esquina_calle_12_layout.webp"
+RENDERED_LAYOUT = "images/signs/propuestas/calle_12_layout.webp"
 # Where the services section sits on the 1920 x 4480 sign (default section heights of the layout editor).
 SLOT_TOP, SLOT_HEIGHT, BOARD_WIDTH = 2263, 1262, 1920
 # Rows of the art that hold content, and areas (left, top, right, bottom) with faint marks to paint out.

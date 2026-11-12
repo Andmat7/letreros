@@ -1,7 +1,7 @@
 import { layout_editor_styles } from './layout_editor.css.js';
 import { active_sign_key, original_image, original_section_heights, parts_catalog, sections, sign_size } from './active_sign.js';
 import { render_section_blob } from './section_image.js';
-import { align_joints, joint_root } from './arrow_joints.js';
+import { align_joints, sliding_axis } from './arrow_joints.js';
 import { move_border, set_section_height, section_tops } from './section_space.js';
 import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
 import { describe_signs, describe_size } from './physical_size.js';
@@ -150,11 +150,12 @@ export class LayoutEditor extends HTMLElement {
   #start_drag(event, part) {
     this.#select(part.name);
     if (this.#is_locked(part)) return;
-    const placement = this.#layout[joint_root(parts_catalog, part.name)];
-    const origin = { pointer_x: event.clientX, pointer_y: event.clientY, x: placement.x, y: placement.y };
+    const placement = this.#layout[part.name];
+    const origin = { pointer_x: event.clientX, pointer_y: event.clientY, x: placement.x, y: placement.y, offset: placement.offset };
     const move = (moved) => {
-      placement.x = Math.round(origin.x + (moved.clientX - origin.pointer_x) / this.#zoom);
-      placement.y = Math.round(origin.y + (moved.clientY - origin.pointer_y) / this.#zoom);
+      const distance = { x: (moved.clientX - origin.pointer_x) / this.#zoom, y: (moved.clientY - origin.pointer_y) / this.#zoom };
+      if (part.joint) placement.offset = Math.round(origin.offset + distance[sliding_axis(part)] / placement.scale);
+      else Object.assign(placement, { x: Math.round(origin.x + distance.x), y: Math.round(origin.y + distance.y) });
       this.#refresh_stage();
       this.#fill_fields();
     };
@@ -185,13 +186,17 @@ export class LayoutEditor extends HTMLElement {
     event.preventDefault();
   }
 
+  // Joined arrow pieces take their thickness from the tip, so their handle changes their length ("ancho") instead.
   #start_resize(event) {
     const placement = this.#layout[this.#selected_name];
+    const is_joined = Boolean(parts_catalog.find((part) => part.name === this.#selected_name).joint);
     const natural_width = this.#images.get(this.#selected_name).naturalWidth;
     const stage = this.#element('.stage');
     const move = (moved) => {
       const pointer_x = (moved.clientX - stage.getBoundingClientRect().left) / this.#zoom;
-      placement.scale = Math.max(0.05, Math.round(((pointer_x - placement.x) / (natural_width * placement.widen)) * 100) / 100);
+      const ratio = Math.max(0.05, Math.round(((pointer_x - placement.x) / natural_width) * 100) / 100);
+      if (is_joined) placement.widen = Math.max(0.05, Math.round((ratio / placement.scale) * 100) / 100);
+      else placement.scale = Math.max(0.05, Math.round((ratio / placement.widen) * 100) / 100);
       this.#refresh_stage();
       this.#fill_fields();
     };
@@ -225,7 +230,9 @@ export class LayoutEditor extends HTMLElement {
     if (!steps || !this.#selected_name) return;
     const distance = event.shiftKey ? 10 : 1;
     const placement = this.#layout[this.#selected_name];
-    this.#edit_selected({ x: placement.x + steps[0] * distance, y: placement.y + steps[1] * distance });
+    const part = parts_catalog.find((candidate) => candidate.name === this.#selected_name);
+    if (part.joint) this.#edit_selected({ offset: placement.offset + steps[sliding_axis(part) === 'x' ? 0 : 1] * distance });
+    else this.#edit_selected({ x: placement.x + steps[0] * distance, y: placement.y + steps[1] * distance });
     event.preventDefault();
   }
 

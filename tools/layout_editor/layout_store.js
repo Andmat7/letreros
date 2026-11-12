@@ -5,7 +5,7 @@ const heights_key = `${storage_key}:section_heights`;
 
 export function original_layout() {
   return Object.fromEntries(parts_catalog.map((part, index) => [
-    part.name, { x: part.x, y: part.y, scale: 1, stretch: 1, widen: 1, visible: true, deleted: false, order: index, note: '', ...default_adjustments[part.name] },
+    part.name, { x: part.x, y: part.y, scale: 1, stretch: 1, widen: 1, offset: 0, visible: true, deleted: false, order: index, note: '', ...default_adjustments[part.name] },
   ]));
 }
 

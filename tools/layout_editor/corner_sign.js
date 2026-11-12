@@ -1,6 +1,6 @@
 // The Calle 12 corner sign, cut into bands and pieces by tools/cut_corner_sign_parts.py; the services band and
 // its pieces come from new art cut by tools/cut_servicios_parts.py.
-export const corner_sign_key = 'esquina_calle_12';
+export const corner_sign_key = 'calle_12';
 
 const sign_folder = '../../images/signs/partes/esquina_calle_12_nueva';
 const header_folder = '../../images/signs/partes/encabezado_tienda_esika';
