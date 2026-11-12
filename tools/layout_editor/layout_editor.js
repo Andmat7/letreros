@@ -36,6 +36,7 @@ const template = /* html */ `
         <label class="joined_field" title="Grosor del rectángulo de la flecha: 1 es el normal">grosor<input class="field_thickness" type="number" step="0.05" min="0.1"></label>
         <label class="joined_field length_field" title="Largo del rectángulo de la flecha: 1 es el normal">largo<input class="field_length" type="number" step="0.05" min="0.1"></label>
       </div>
+      <div class="key_hint">Flechas del teclado: mueven 1 px (con Shift, 10 px). + y −: escalan.</div>
       <div class="group_hint">Arrástralas para moverlas juntas; el cuadrito, la rueda o + y − las escalan juntas.</div>
       <div class="row"><button class="make_group" title="Guarda estas piezas como grupo: un clic en cualquiera elige todas">Agrupar</button><button class="break_group">Desagrupar</button></div>
       <div class="row single_only"><button class="to_front">Al frente</button><button class="to_back">Al fondo</button><button class="delete_piece">Eliminar imagen</button></div>
@@ -165,7 +166,11 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.viewport').addEventListener('pointerdown', (event) => {
       if (!event.target.closest('img, .handle, .divider')) this.#clear_choice();
     });
-    this.addEventListener('keydown', (event) => this.#nudge(event));
+    // Keys are heard on the whole page, so they keep working after a click on the panel; typing in a field is left
+    // alone.
+    window.addEventListener('keydown', (event) => {
+      if (!is_typing(event)) this.#nudge(event);
+    });
     this.tabIndex = 0;
   }
 
@@ -650,6 +655,13 @@ export class LayoutEditor extends HTMLElement {
   #element(selector) {
     return this.shadowRoot.querySelector(selector);
   }
+}
+
+// A text, number or zoom field uses the arrows itself; a checkbox does not.
+function is_typing(event) {
+  const target = event.composedPath()[0];
+  if (target instanceof HTMLInputElement) return target.type !== 'checkbox';
+  return target instanceof HTMLElement && (target.isContentEditable || ['TEXTAREA', 'SELECT'].includes(target.tagName));
 }
 
 // Load events instead of decode(), because a browser may hold back decoding in a background tab and the sign would
