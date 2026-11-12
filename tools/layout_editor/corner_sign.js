@@ -49,7 +49,7 @@ const pieces = [
   [4, 'fotos', 'facturas_servicios', -21, 3764],
   [4, 'textos', 'texto_recargas_operadores', 1258, 3560],
   [4, 'logos', 'logo_claro', 1255, 3800],
-  [4, 'logos', 'logo_tigo', 1574, 3831],
+  [4, 'logos', 'logo_tigo', 1574, 3800],
   [4, 'logos', 'logo_movistar', 1254, 4182],
   [4, 'logos', 'logo_wom', 1576, 4180],
   [5, 'logos', 'flecha_fotocopias', 174, 4773],
@@ -83,7 +83,7 @@ export const default_adjustments = {
   texto_luz_agua_gas: { scale: 0.822 },
   facturas_servicios: { scale: 0.77 },
   logo_claro: { scale: 1.58 },
-  logo_tigo: { scale: 1.48 },
+  logo_tigo: { scale: 0.438 },
   logo_movistar: { scale: 1.73 },
   logo_wom: { scale: 1.56 },
 };
@@ -103,8 +103,9 @@ const band_parts = bands.map(([name, y], index) => ({
   name, source: band_source(name), x: 0, y, is_background: true, section: band_titles[index],
 }));
 // The header pieces live in their own folder, shared with the column sign's art.
-// The DaviPlata logo is used without its red box (tools/key_daviplata_logo.py), so it sits on the plain band.
-const keyed_files = { logo_daviplata: 'logo_daviplata_sin_fondo' };
+// The DaviPlata logo is used without its red box (tools/key_daviplata_logo.py), so it sits on the plain band, and
+// Tigo is the round logo cut by tools/cut_tigo_logo.py.
+const keyed_files = { logo_daviplata: 'logo_daviplata_sin_fondo', logo_tigo: 'logo_tigo_circulo' };
 const piece_source = (folder, name) => (folder === 'header' ? `${header_folder}/ancho/${name}.webp` : `${sign_folder}/${folder}/${keyed_files[name] ?? name}.webp`);
 // The body stays centered on the tip; see arrow_joints.js.
 const joints = { flecha_cuerpo: { to: 'flecha_punta', anchor: 'right_middle' } };
