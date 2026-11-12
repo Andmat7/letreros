@@ -24,10 +24,14 @@ class PrintPdfWriter:
     def write(self, sign_key: str) -> Path:
         image = self._load_flattened(PROJECT_ROOT / "images/signs/propuestas" / f"{sign_key}_layout.webp")
         width_cm, height_cm = (round(side / PIXELS_PER_CENTIMETER) for side in image.size)
-        for old_pdf in (PROJECT_ROOT / "impresion").glob(f"{sign_key}_*x*_cm.pdf"):
-            old_pdf.unlink()
         target = PROJECT_ROOT / "impresion" / f"{sign_key}_{width_cm}x{height_cm}_cm.pdf"
-        target.write_bytes(self._build_pdf(image, width_cm * POINTS_PER_CENTIMETER, height_cm * POINTS_PER_CENTIMETER))
+        # Built beside the target and swapped in, so the PDF is never missing or half written.
+        partial = target.with_suffix(".partial")
+        partial.write_bytes(self._build_pdf(image, width_cm * POINTS_PER_CENTIMETER, height_cm * POINTS_PER_CENTIMETER))
+        partial.replace(target)
+        for old_pdf in (PROJECT_ROOT / "impresion").glob(f"{sign_key}_*x*_cm.pdf"):
+            if old_pdf != target:
+                old_pdf.unlink()
         print(f"{target.name}: {image.width}x{image.height} px, {target.stat().st_size / 1e6:.1f} MB")
         return target
 

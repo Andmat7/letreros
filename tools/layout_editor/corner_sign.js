@@ -19,9 +19,9 @@ const bands = [
 const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. davivienda', '5. servicios', '6. fotocopias'];
 // Under the header the sign has two parts: the banking agent services and the copy shop. The editor sets how much
 // of that height each part gets (69 % and 31 % as last arranged). The banking part sits in an Ésika red frame with rounded
-// corners and a white border, so its four sections read as one block while each keeps its own colors.
+// corners and a border in Nequi's purple, so its four sections read as one block while each keeps its own colors.
 export const section_groups = [
-  { title: 'Corresponsal', sections: [1, 2, 3, 4], frame: { name: 'marco_corresponsal', padding: 56, radius: 96, color: 'rgb(190, 4, 4)', border: { width: 16, color: '#fff' } } },
+  { title: 'Corresponsal', sections: [1, 2, 3, 4], frame: { name: 'marco_corresponsal', padding: 56, radius: 96, color: 'rgb(190, 4, 4)', border: { width: 16, color: '#5c1d8f' } } },
   { title: 'Fotocopiadora', sections: [5] },
 ];
 // Pieces as [section index, folder, name, x, y], in pixels of the sign, back to front.
@@ -42,11 +42,13 @@ const pieces = [
   [3, 'logos', 'logo_daviplata', 143, 2864],
   [3, 'fotos', 'celular_davivienda', 1217, 2409],
   [3, 'textos', 'texto_envia', 121, 3125],
-  [4, 'textos', 'texto_paga_aqui', 387, 3377],
-  [4, 'textos', 'texto_luz_agua_gas', 530, 3616],
-  [4, 'fotos', 'facturas_servicios', 171, 3759],
-  [4, 'textos', 'texto_tambien_recargas', 559, 4269],
-  [4, 'logos', 'logos_operadores', 624, 4425],
+  // The title and the top-ups line are drawn by tools/make_services_texts.py; the top-ups line stays clear of the
+  // invoices so it reads well.
+  [4, 'textos', 'texto_paga_tus', 411, 3372],
+  [4, 'textos', 'texto_luz_agua_gas', 531, 3595],
+  [4, 'fotos', 'facturas_servicios', 291, 3700],
+  [4, 'textos', 'texto_recargas_operadores', 492, 4250],
+  [4, 'logos', 'logos_operadores', 635, 4365],
   [5, 'logos', 'flecha_fotocopias', 174, 4773],
   [5, 'textos', 'texto_fotocopias_documentos', 467, 4742],
   [5, 'textos', 'texto_primer_local_izquierda', 462, 4873],
@@ -76,11 +78,11 @@ export const default_adjustments = {
   logo_daviplata: { scale: 0.823 },
   celular_davivienda: { scale: 1.27 },
   texto_envia: { scale: 0.823 },
-  texto_paga_aqui: { scale: 0.822 },
+  texto_paga_tus: { scale: 0.78 },
   texto_luz_agua_gas: { scale: 0.822 },
-  facturas_servicios: { scale: 0.97 },
-  texto_tambien_recargas: { scale: 0.822 },
-  logos_operadores: { scale: 0.822 },
+  facturas_servicios: { scale: 0.8 },
+  texto_recargas_operadores: { scale: 0.75 },
+  logos_operadores: { scale: 0.9 },
 };
 
 export const sign_size = { width: 1920, height: sign_height };
