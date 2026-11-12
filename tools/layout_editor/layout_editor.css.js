@@ -15,6 +15,8 @@ layout_editor_styles.replaceSync(/* css */ `
   .panel { display: flex; flex-direction: column; gap: 10px; padding: 12px; overflow: auto; background: #fff; border-left: 1px solid #ccc; }
   .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .row label { display: flex; gap: 4px; align-items: center; }
+  .group_share[hidden] { display: none; }
+  .share_field { width: 4em; }
   button { padding: 6px 10px; border: 1px solid #999; border-radius: 6px; background: #f4f4f7; cursor: pointer; }
   button.primary { background: #1a73e8; color: #fff; border-color: #1a73e8; }
   ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }

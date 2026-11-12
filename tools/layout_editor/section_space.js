@@ -40,7 +40,7 @@ function fit_section(section, old_slot, new_slot, layout, size_of) {
   }
 }
 
-function fit_background(section, placement, size, new_slot) {
+export function fit_background(section, placement, size, new_slot) {
   const shown_height = size.height * placement.scale;
   if (section.stretch_background) {
     placement.y = new_slot.top;

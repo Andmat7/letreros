@@ -12,11 +12,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = PROJECT_ROOT / "images/signs/partes/encabezado_tienda_esika"
 FONT_PATH = Path("C:/Windows/Fonts/bahnschrift.ttf")
 FONT_STYLE = b"Bold Condensed"
-# Colors sampled from the reference image.
+# The store red from the reference image fills the header and the letters and arrow are white on it.
+# The pieces keep their first names (texto_rojo, texto_azul) so layouts saved in the editor still find them.
 STORE_RED = (190, 4, 4, 255)
-DIRECTION_BLUE = (4, 30, 78, 255)
 TRANSPARENT = (0, 0, 0, 0)
 WHITE = (255, 255, 255, 255)
+LETTERING = WHITE
 # Header sizes in pixels of each board (3200 px per meter): width, height, side margin.
 WIDE_HEADER = (1920, 583, 90)
 COLUMN_HEADER = (960, 400, 36)
@@ -39,16 +40,16 @@ class StoreHeaderMaker:
     def _wide_text(self):
         width = 1600
         return {
-            "texto_rojo": self._fitted_line("EN LA TIENDA ÉSIKA", width, STORE_RED),
-            "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, DIRECTION_BLUE),
+            "texto_rojo": self._fitted_line("EN LA TIENDA ÉSIKA", width, LETTERING),
+            "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, LETTERING),
         }
 
     # One line per sentence here too; the column is narrow, so the arrow is taller than the two lines.
     def _column_text(self):
         width = 600
         return {
-            "texto_rojo": self._fitted_line("A LA VUELTA EN LA TIENDA ÉSIKA", width, STORE_RED),
-            "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, DIRECTION_BLUE),
+            "texto_rojo": self._fitted_line("A LA VUELTA EN LA TIENDA ÉSIKA", width, LETTERING),
+            "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, LETTERING),
         }
 
     # The arrow beside the stacked texts, as tall as its share of them, all centered in the header.
@@ -81,10 +82,12 @@ class StoreHeaderMaker:
             top += piece.height + gap
         return scaled
 
-    # Each board gets its own folder, with the pieces under the names the layout editor shows.
+    # Each board gets its own folder, with the pieces under the names the layout editor shows and the plain red
+    # "fondo" the editor uses as the header band.
     def _save_header(self, folder, size, places):
         (OUTPUT / folder).mkdir(parents=True, exist_ok=True)
-        header = Image.new("RGBA", size[:2], WHITE)
+        header = Image.new("RGBA", size[:2], STORE_RED)
+        self._save(header.copy(), f"{folder}/fondo")
         for name, (piece, x, y) in places.items():
             header.alpha_composite(piece, (x, y))
             self._save(piece, f"{folder}/{name}")
@@ -95,7 +98,7 @@ class StoreHeaderMaker:
     def _straight_arrow(self, height):
         thickness = round(height * 0.46)
         tip = self._polygon((round(height * 0.5), height), [(0, 0.5), (1, 0), (1, 1)])
-        body = Image.new("RGBA", (round(height * 0.7), thickness), STORE_RED)
+        body = Image.new("RGBA", (round(height * 0.7), thickness), LETTERING)
         return {"flecha_cuerpo": (body, tip.width - BODY_OVERLAP, (height - thickness) // 2), "flecha_punta": (tip, 0, 0)}
 
     # The turning arrow: the tip points up, the turn hangs centered under it and the straight body leaves to the right.
@@ -103,7 +106,7 @@ class StoreHeaderMaker:
         thickness = round(height / 3.6)
         tip = self._polygon((round(thickness * 2.15), round(thickness * 1.4)), [(0.5, 0), (1, 1), (0, 1)])
         turn = self._turn(thickness)
-        body = Image.new("RGBA", (round(thickness * 1.6), thickness), STORE_RED)
+        body = Image.new("RGBA", (round(thickness * 1.6), thickness), LETTERING)
         turn_left, turn_top = (tip.width - thickness) // 2, tip.height - BODY_OVERLAP
         return {
             "flecha_curva": (turn, turn_left, turn_top),
@@ -117,17 +120,17 @@ class StoreHeaderMaker:
         outer = inner + thickness
         canvas = Image.new("RGBA", (outer * SUPERSAMPLE, (stem + outer) * SUPERSAMPLE), TRANSPARENT)
         draw = ImageDraw.Draw(canvas)
-        draw.rectangle([0, 0, thickness * SUPERSAMPLE - 1, stem * SUPERSAMPLE], fill=STORE_RED)
-        for radius, color in ((outer, STORE_RED), (inner, TRANSPARENT)):
+        draw.rectangle([0, 0, thickness * SUPERSAMPLE - 1, stem * SUPERSAMPLE], fill=LETTERING)
+        for radius, color in ((outer, LETTERING), (inner, TRANSPARENT)):
             center_x, center_y, reach = outer * SUPERSAMPLE, stem * SUPERSAMPLE, radius * SUPERSAMPLE
             draw.pieslice([center_x - reach, center_y - reach, center_x + reach, center_y + reach], 90, 180, fill=color)
         return canvas.resize((outer, stem + outer), Image.LANCZOS)
 
-    # A red polygon whose corners are given as fractions of its size.
+    # A white polygon whose corners are given as fractions of its size.
     def _polygon(self, size, corners):
         width, height = size
         canvas = Image.new("RGBA", (width * SUPERSAMPLE, height * SUPERSAMPLE), TRANSPARENT)
-        ImageDraw.Draw(canvas).polygon([(x * width * SUPERSAMPLE, y * height * SUPERSAMPLE) for x, y in corners], fill=STORE_RED)
+        ImageDraw.Draw(canvas).polygon([(x * width * SUPERSAMPLE, y * height * SUPERSAMPLE) for x, y in corners], fill=LETTERING)
         return canvas.resize(size, Image.LANCZOS)
 
     def _stack(self, lines):

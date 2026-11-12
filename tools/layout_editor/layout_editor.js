@@ -1,9 +1,10 @@
 import { layout_editor_styles } from './layout_editor.css.js';
-import { active_sign_key, original_image, original_section_heights, parts_catalog, sections, sign_size } from './active_sign.js';
+import { active_sign_key, original_image, original_section_heights, parts_catalog, section_groups, sections, sign_size } from './active_sign.js';
 import { render_section_blob } from './section_image.js';
 import { align_joints, has_length, joint_root, thickness_holder } from './arrow_joints.js';
 import { group_bounds, move_group, movable_names, scale_group, set_group, snapshot, with_companions } from './piece_groups.js';
 import { move_border, set_section_height, section_tops } from './section_space.js';
+import { group_share, set_group_share } from './group_space.js';
 import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
 import { describe_signs, describe_size } from './physical_size.js';
 import { sign_catalog } from '../../src/data/sign_catalog.js';
@@ -20,6 +21,7 @@ const template = /* html */ `
       <label><input class="clean_view" type="checkbox"> Vista final</label>
     </div>
     <div class="row"><label>Letrero <select class="sign_choice">${sign_options}</select></label></div>
+    <div class="row group_share" title="Parte del alto bajo la cabecera para cada grupo de secciones"><label><span class="first_group"></span> <input class="share_field" type="number" min="10" max="90" step="1"> %</label><span class="second_group"></span></div>
     <div class="sign_size">${describe_signs().map((line) => `<div>${line}</div>`).join('')}</div>
     <ul class="list"></ul>
     <div class="row"><button class="copy_all primary">Copiar imagen completa</button><button class="publish primary" title="Guarda el letrero en el proyecto: se ve en la página 3D y genera el PDF de impresión">Guardar en 3D y PDF</button></div>
@@ -151,6 +153,7 @@ export class LayoutEditor extends HTMLElement {
       this.#changed();
     });
     this.#element('.load').addEventListener('click', () => this.#load_pasted());
+    this.#element('.share_field').addEventListener('change', (event) => this.#set_share(Number(event.target.value)));
     this.#element('.make_group').addEventListener('click', () => this.#save_group(`grupo_${Date.now()}`, 'Grupo guardado: un clic en cualquiera de sus piezas lo elige entero.'));
     this.#element('.break_group').addEventListener('click', () => this.#save_group('', 'Grupo deshecho.'));
     this.#element('.viewport').addEventListener('pointerdown', (event) => {
@@ -367,6 +370,7 @@ export class LayoutEditor extends HTMLElement {
     this.#refresh_stage();
     this.#refresh_list();
     this.#fill_fields();
+    this.#fill_share();
     this.#element('.selected_controls').hidden = !this.#selected_name;
     this.#element('.selected_controls').classList.toggle('many', this.#is_many());
   }
@@ -471,6 +475,24 @@ export class LayoutEditor extends HTMLElement {
   #set_height(section, requested_height) {
     set_section_height(sections, this.#heights, this.#layout, (name) => this.#natural_size(name), sections.indexOf(section), requested_height);
     this.#changed();
+  }
+
+  // The share of the first group of sections; the second gets the rest.
+  #set_share(percent) {
+    const share = Math.min(90, Math.max(10, percent)) / 100;
+    const sign = { sections, heights: this.#heights, size_of: (name) => this.#natural_size(name), width: sign_size.width };
+    set_group_share(section_groups, sign, this.#layout, share);
+    this.#changed();
+  }
+
+  #fill_share() {
+    const row = this.#element('.group_share');
+    row.hidden = section_groups.length !== 2;
+    if (row.hidden) return;
+    const percent = Math.round(group_share(section_groups, this.#heights) * 100);
+    this.#element('.first_group').textContent = section_groups[0].title;
+    if (this.shadowRoot.activeElement !== this.#element('.share_field')) this.#element('.share_field').value = percent;
+    this.#element('.second_group').textContent = `${section_groups[1].title} ${100 - percent} %`;
   }
 
   #select_section(section) {
