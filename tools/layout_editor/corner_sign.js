@@ -19,9 +19,9 @@ const bands = [
 const band_titles = ['1. cabecera', '2. nequi', '3. bancolombia', '4. davivienda', '5. servicios', '6. fotocopias'];
 // Under the header the sign has two parts: the banking agent services and the copy shop. The editor sets how much
 // of that height each part gets (69 % and 31 % as last arranged). The banking part sits in an Ésika red frame with rounded
-// corners, so its four sections read as one block while each keeps its own colors.
+// corners and a white border, so its four sections read as one block while each keeps its own colors.
 export const section_groups = [
-  { title: 'Corresponsal', sections: [1, 2, 3, 4], frame: { name: 'marco_corresponsal', padding: 56, radius: 96, color: 'rgb(190, 4, 4)' } },
+  { title: 'Corresponsal', sections: [1, 2, 3, 4], frame: { name: 'marco_corresponsal', padding: 56, radius: 96, color: 'rgb(190, 4, 4)', border: { width: 16, color: '#fff' } } },
   { title: 'Fotocopiadora', sections: [5] },
 ];
 // Pieces as [section index, folder, name, x, y], in pixels of the sign, back to front.

@@ -23,7 +23,8 @@ export function frame_box(frame, heights) {
   return { top: tops[first], height: tops[last] + heights[last] - tops[first] };
 }
 
-// The frame as an image: the color everywhere except a rounded window inside the padding.
+// The frame as an image: the color everywhere except a rounded window inside the padding, with an optional border
+// drawn just outside the window so it never covers the sections.
 export function draw_frame(frame, height) {
   const canvas = document.createElement('canvas');
   Object.assign(canvas, { width: frame.width, height });
@@ -31,8 +32,24 @@ export function draw_frame(frame, height) {
   context.fillStyle = frame.color;
   context.fillRect(0, 0, frame.width, height);
   context.globalCompositeOperation = 'destination-out';
-  context.beginPath();
-  context.roundRect(frame.padding, frame.padding, frame.width - 2 * frame.padding, height - 2 * frame.padding, frame.radius);
+  rounded_window(context, frame, height, 0);
   context.fill();
+  context.globalCompositeOperation = 'source-over';
+  if (frame.border) draw_border(context, frame, height);
   return canvas.toDataURL('image/png');
+}
+
+function draw_border(context, frame, height) {
+  const { width, color } = frame.border;
+  context.strokeStyle = color;
+  context.lineWidth = width;
+  rounded_window(context, frame, height, width / 2);
+  context.stroke();
+}
+
+// The window inside the padding, grown by `grow` on every side.
+function rounded_window(context, frame, height, grow) {
+  const inset = frame.padding - grow;
+  context.beginPath();
+  context.roundRect(inset, inset, frame.width - 2 * inset, height - 2 * inset, frame.radius + grow);
 }
