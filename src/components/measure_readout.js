@@ -1,4 +1,4 @@
-import { measure_readout_styles } from './measure_readout.css.js?v=b0aabeace9';
+import { measure_readout_styles } from './measure_readout.css.js?v=e33916da94';
 
 const template = /* html */ `
   <div class="distance"></div>

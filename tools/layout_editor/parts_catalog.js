@@ -10,13 +10,13 @@ const calle_12_folder = '../../images/signs/partes/esquina_calle_12_nueva';
 const calle_12_texts = `${calle_12_folder}/textos`;
 // The top-ups strip closes the Davivienda section, under DaviPlata.
 const shared_pieces = [
-  ['textos/texto_paga_tus', 'texto_paga_tus', 58, 2385],
-  ['fondos_lisos/panel_recargas_columna', 'panel_recargas_columna', 0, 3767],
-  ['textos/texto_recargas_operadores', 'texto_recargas_operadores', 253, 3783],
-  ['logos/logo_claro', 'logo_claro', 76, 3943],
-  ['logos/logo_tigo_circulo', 'logo_tigo', 295, 3943],
-  ['logos/logo_movistar', 'logo_movistar', 515, 3945],
-  ['logos/logo_wom_circulo', 'logo_wom', 735, 3943],
+  ['textos/texto_paga_tus', 'texto_paga_tus', 58, 2328],
+  ['fondos_lisos/panel_recargas_columna', 'panel_recargas_columna', 0, 3820],
+  ['textos/texto_recargas_operadores', 'texto_recargas_operadores', 256, 3841],
+  ['logos/logo_claro', 'logo_claro', 76, 3998],
+  ['logos/logo_tigo_circulo', 'logo_tigo', 295, 3998],
+  ['logos/logo_movistar', 'logo_movistar', 515, 4000],
+  ['logos/logo_wom_circulo', 'logo_wom', 735, 3998],
 ];
 const top_ups_names = shared_pieces.slice(1).map(([, name]) => name);
 
@@ -30,46 +30,46 @@ export const original_image = '../../images/signs/propuestas/bancolombia_nueva_1
 // The Davivienda band and its pieces come from the Daviplata art, which is as tall as that band.
 const bands = [
   ['01_flecha_superior', 0, header_folder],
-  ['02_nequi', 400, bancolombia_folder],
+  ['02_nequi', 338, bancolombia_folder],
   ['03_bancolombia', 1480, bancolombia_folder],
-  ['04_servicios', 2350, bancolombia_folder],
-  ['05_davivienda', 3099, daviplata_folder],
-  ['06_flecha_inferior', 4157, header_folder],
+  ['04_servicios', 2292, bancolombia_folder],
+  ['05_davivienda', 3146, daviplata_folder],
+  ['06_flecha_inferior', 4213, header_folder],
 ];
 const pieces = [
-  ['logos', 'destellos_izquierda', 145, 841],
-  ['logos', 'destellos_derecha', 625, 892],
-  ['textos', 'texto_recarga', 50, 460],
-  ['logos', 'logo_nequi', 125, 568],
-  ['logos', 'logo_bancolombia', 104, 1900],
-  ['fotos', 'facturas', 191, 2585],
-  ['fotos', 'tarjeta_bancolombia', 235, 1500],
-  ['fotos', 'celular_nequi', 225, 799],
+  ['logos', 'destellos_izquierda', 132, 827],
+  ['logos', 'destellos_derecha', 625, 858],
+  ['textos', 'texto_recarga', 64, 389],
+  ['logos', 'logo_nequi', 136, 516],
+  ['logos', 'logo_bancolombia', 139, 1950],
+  ['fotos', 'facturas', 191, 2563],
+  ['fotos', 'tarjeta_bancolombia', 199, 1510],
+  ['fotos', 'celular_nequi', 207, 780],
 ];
 const davivienda_pieces = [
-  ['logos', 'logo_davivienda', 125, 3156],
-  ['logos', 'logo_daviplata', 100, 3446],
-  ['fotos', 'celular_davivienda', 574, 3107],
+  ['logos', 'logo_davivienda', 39, 3261],
+  ['logos', 'logo_daviplata', 28, 3502],
+  ['fotos', 'celular_davivienda', 501, 3089],
 ];
 // The "a la vuelta, en la tienda ÉSIKA, segundo local a la izquierda" header, drawn by tools/make_store_header_parts.py.
 // The same pieces appear in the top and the bottom arrow, each at its own place in its section. Each arrow is a
 // tip, a turn and a straight body; "ancho" on the body lengthens the arrow without bending the tip.
 const top_arrow_pieces = [
-  ['flecha_curva', 73, 175],
-  ['flecha_cuerpo', 184, 248],
-  ['flecha_punta', 36, 87],
-  ['texto_rojo', 442, 122],
-  ['texto_tienda', 337, 169],
-  ['texto_azul', 366, 234],
+  ['flecha_curva', 81, 144],
+  ['flecha_cuerpo', 169, 202],
+  ['flecha_punta', 51, 74],
+  ['texto_rojo', 382, 58],
+  ['texto_tienda', 325, 135],
+  ['texto_azul', 335, 235],
 ];
-// The bottom band is shorter than the header art, so its pieces sit higher to stay centered.
+// Positions inside the bottom band, from its top.
 const bottom_arrow_pieces = [
-  ['flecha_curva', 73, 137],
-  ['flecha_cuerpo', 184, 210],
-  ['flecha_punta', 36, 49],
-  ['texto_rojo', 442, 84],
-  ['texto_tienda', 337, 131],
-  ['texto_azul', 366, 196],
+  ['flecha_curva', 74, 109],
+  ['flecha_cuerpo', 152, 160],
+  ['flecha_punta', 48, 47],
+  ['texto_rojo', 415, 27],
+  ['texto_tienda', 306, 94],
+  ['texto_azul', 339, 180],
 ];
 // The turn hangs centered under the tip (its stem is as thick as the body, 65 px) and the body leaves the turn;
 // both share the thickness kept on the turn.
@@ -99,23 +99,33 @@ export const sections = [
 // Scale, stretch, hidden or deleted images and a moved background from the layout last saved in the editor.
 // Browsers that already saved a layout keep their own copy until it is reset.
 export const default_adjustments = {
-  '06_flecha_inferior': { stretch: 323 / 400 },
-  '02_nequi': { stretch: 0.8709677419354839 },
-  '03_bancolombia': { stretch: 1.0754017305315204 },
-  '04_servicios': { stretch: 0.6413 },
-  '05_davivienda': { stretch: 2.2134 },
-  logo_bancolombia: { scale: 0.85 },
+  '01_flecha_superior': { stretch: 0.845 },
+  '02_nequi': { stretch: 0.9209677419354839 },
+  '03_bancolombia': { stretch: 1.003708281829419 },
+  '04_servicios': { stretch: 0.7311643835616438 },
+  '05_davivienda': { stretch: 2.1731160896130346 },
+  '06_flecha_inferior': { stretch: 0.6675 },
+  logo_nequi: { scale: 0.96 },
+  logo_bancolombia: { scale: 0.77 },
   facturas: { scale: 0.62 },
+  tarjeta_bancolombia: { scale: 1.21 },
+  celular_nequi: { scale: 0.85 },
+  texto_retiros_consignaciones: { scale: 0.66 },
   texto_paga_tus: { scale: 0.6 },
-  texto_recargas_operadores: { scale: 0.8 },
+  texto_recargas_operadores: { scale: 0.83 },
   logo_claro: { scale: 0.987 },
   logo_tigo: { scale: 0.273 },
   logo_movistar: { scale: 1.079 },
   logo_wom: { scale: 0.339 },
-  tarjeta_bancolombia: { scale: 1 },
-  celular_nequi: { scale: 0.84 },
-  celular_davivienda: { scale: 1.23 },
-  texto_retiros_consignaciones: { scale: 0.82 },
+  celular_davivienda: { scale: 1.47 },
+  encabezado_flecha_punta: { scale: 0.79 },
+  encabezado_flecha_curva: { scale: 0.79 },
+  encabezado_flecha_cuerpo: { scale: 0.79 },
+  encabezado_texto_rojo: { scale: 1.17 },
+  encabezado_texto_azul: { scale: 1.02 },
+  pie_flecha_punta: { scale: 0.7 },
+  pie_flecha_curva: { scale: 0.7 },
+  pie_flecha_cuerpo: { scale: 0.7 },
 };
 
 // Both flecha bands use the one red header background drawn by tools/make_store_header_parts.py.
@@ -126,7 +136,7 @@ const section_of = Object.fromEntries(sections.flatMap((section) => section.piec
 export const parts_catalog = [
   ...bands.map(([name, y, folder]) => ({ name, source: band_source(name, folder), x: 0, y, is_background: true })),
   ...pieces.map(([folder, name, x, y]) => ({ name, source: `${bancolombia_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
-  { name: 'texto_retiros_consignaciones', source: `${calle_12_texts}/texto_retiros_consignaciones.webp`, x: 83, y: 2070, is_background: false },
+  { name: 'texto_retiros_consignaciones', source: `${calle_12_texts}/texto_retiros_consignaciones.webp`, x: 179, y: 2103, is_background: false },
   ...shared_pieces.map(([file, name, x, y]) => ({ name, source: `${calle_12_folder}/${file}.webp`, x, y, is_background: false })),
   ...davivienda_pieces.map(([folder, name, x, y]) => ({ name, source: `${daviplata_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
   ...top_arrow_pieces.map(([file, x, y]) => ({ name: `${top_prefix}${file}`, source: `${header_folder}/columna/${file}.webp`, x, y, is_background: false })),

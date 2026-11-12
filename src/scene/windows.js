@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { building, calle_12_windows, carrera_7_windows, streets, upper_windows } from '../data/building_measurements.js?v=b0aabeace9';
-import { standard_material } from './primitives.js?v=b0aabeace9';
-import { brick_texture, canvas_texture } from './textures.js?v=b0aabeace9';
+import { building, calle_12_windows, carrera_7_windows, streets, upper_windows } from '../data/building_measurements.js?v=e33916da94';
+import { standard_material } from './primitives.js?v=e33916da94';
+import { brick_texture, canvas_texture } from './textures.js?v=e33916da94';
 
 const frame_thickness = 0.07;
 const facades = {
