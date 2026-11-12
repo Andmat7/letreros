@@ -13,7 +13,7 @@ export const active_sign_key = is_corner ? corner_sign.corner_sign_key : 'carrer
 // The column layout was saved under its first name, so that name keeps its saved work.
 // The Calle 12 layout is saved under its former sign name plus a version that goes up each time its sections are
 // reordered or replaced, because a layout saved before would put the pieces in the wrong sections.
-export const active_storage_name = is_corner ? 'esquina_calle_12_v6' : 'bancolombia_nueva_1x4_6';
+export const active_storage_name = is_corner ? 'esquina_calle_12_v7' : 'bancolombia_nueva_1x4_6';
 export const { parts_catalog, sections, sign_size, original_image, original_section_heights } = active;
 export const default_adjustments = active.default_adjustments ?? {};
 export const section_groups = active.section_groups ?? [];

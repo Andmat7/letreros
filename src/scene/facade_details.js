@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { building, esika_shop, streets } from '../data/building_measurements.js?v=f0122a211a';
-import { add_box, add_wall_plane, standard_material } from './primitives.js?v=f0122a211a';
-import { canvas_texture } from './textures.js?v=f0122a211a';
+import { building, esika_shop, streets } from '../data/building_measurements.js?v=83cd91cb1d';
+import { add_box, add_wall_plane, standard_material } from './primitives.js?v=83cd91cb1d';
+import { canvas_texture } from './textures.js?v=83cd91cb1d';
 
 // Positions on Calle 12 are distances from the corner, fitted from the photos "costado" and
 // "calle_12_frontal"; heights are above the road.
