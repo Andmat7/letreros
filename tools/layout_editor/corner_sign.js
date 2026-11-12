@@ -51,7 +51,7 @@ const pieces = [
   [4, 'logos', 'logo_claro', 1255, 3800],
   [4, 'logos', 'logo_tigo', 1574, 3800],
   [4, 'logos', 'logo_movistar', 1254, 4182],
-  [4, 'logos', 'logo_wom', 1576, 4180],
+  [4, 'logos', 'logo_wom', 1574, 4180],
   [5, 'logos', 'flecha_fotocopias', 174, 4773],
   [5, 'textos', 'texto_fotocopias_documentos', 467, 4742],
   [5, 'textos', 'texto_primer_local_izquierda', 462, 4873],
@@ -85,7 +85,7 @@ export const default_adjustments = {
   logo_claro: { scale: 1.58 },
   logo_tigo: { scale: 0.438 },
   logo_movistar: { scale: 1.73 },
-  logo_wom: { scale: 1.56 },
+  logo_wom: { scale: 0.543 },
 };
 
 export const sign_size = { width: 1920, height: sign_height };
@@ -104,8 +104,8 @@ const band_parts = bands.map(([name, y], index) => ({
 }));
 // The header pieces live in their own folder, shared with the column sign's art.
 // The DaviPlata logo is used without its red box (tools/key_daviplata_logo.py), so it sits on the plain band, and
-// Tigo is the round logo cut by tools/cut_tigo_logo.py.
-const keyed_files = { logo_daviplata: 'logo_daviplata_sin_fondo', logo_tigo: 'logo_tigo_circulo' };
+// Tigo and WOM are the round logos cut by tools/cut_round_logos.py.
+const keyed_files = { logo_daviplata: 'logo_daviplata_sin_fondo', logo_tigo: 'logo_tigo_circulo', logo_wom: 'logo_wom_circulo' };
 const piece_source = (folder, name) => (folder === 'header' ? `${header_folder}/ancho/${name}.webp` : `${sign_folder}/${folder}/${keyed_files[name] ?? name}.webp`);
 // The body stays centered on the tip; see arrow_joints.js.
 const joints = { flecha_cuerpo: { to: 'flecha_punta', anchor: 'right_middle' } };

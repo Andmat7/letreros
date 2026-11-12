@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { building, reference_person, streets } from '../data/building_measurements.js?v=0ee7a13679';
-import { add_box, standard_material } from './primitives.js?v=0ee7a13679';
-import { canvas_texture } from './textures.js?v=0ee7a13679';
+import { building, reference_person, streets } from '../data/building_measurements.js?v=4e8391bdd0';
+import { add_box, standard_material } from './primitives.js?v=4e8391bdd0';
+import { canvas_texture } from './textures.js?v=4e8391bdd0';
 
 const curb_height = streets.curb_height;
 const umbrella_colors = [0xd8342a, 0xf0c419, 0x2e9e5b, 0x2c6db5];
