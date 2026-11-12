@@ -10,8 +10,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = PROJECT_ROOT / "images/signs/partes/encabezado_tienda_esika"
-FONT_PATH = Path("C:/Windows/Fonts/bahnschrift.ttf")
-FONT_STYLE = b"Bold Condensed"
+# Poppins from Google Fonts, kept in tools/fonts so the header looks the same on any computer.
+FONT_PATH = PROJECT_ROOT / "tools/fonts/Poppins-ExtraBold.ttf"
 # The store red from the reference image fills the header and the letters and arrow are white on it.
 # The pieces keep their first names (texto_rojo, texto_azul) so layouts saved in the editor still find them.
 STORE_RED = (190, 4, 4, 255)
@@ -157,9 +157,7 @@ class StoreHeaderMaker:
         return line
 
     def _font(self, size):
-        font = ImageFont.truetype(str(FONT_PATH), size)
-        font.set_variation_by_name(FONT_STYLE)
-        return font
+        return ImageFont.truetype(str(FONT_PATH), size)
 
     def _save(self, image, name):
         image.save(OUTPUT / f"{name}.webp", lossless=True)

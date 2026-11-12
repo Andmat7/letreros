@@ -42,28 +42,32 @@ const davivienda_pieces = [
 // The same pieces appear in the top and the bottom arrow, each at its own place in its section. Each arrow is a
 // tip, a turn and a straight body; "ancho" on the body lengthens the arrow without bending the tip.
 const top_arrow_pieces = [
-  ['flecha_curva', 66, 180],
-  ['flecha_cuerpo', 154, 238],
-  ['flecha_punta', 36, 110],
-  ['texto_rojo', 285, 138],
-  ['texto_azul', 286, 205],
+  ['flecha_curva', 58, 185],
+  ['flecha_cuerpo', 121, 227],
+  ['flecha_punta', 36, 135],
+  ['texto_rojo', 242, 154],
+  ['texto_azul', 238, 201],
 ];
 const bottom_arrow_pieces = [
-  ['flecha_curva', 66, 165],
-  ['flecha_cuerpo', 154, 223],
-  ['flecha_punta', 36, 95],
-  ['texto_rojo', 285, 123],
-  ['texto_azul', 286, 190],
+  ['flecha_curva', 58, 150],
+  ['flecha_cuerpo', 121, 192],
+  ['flecha_punta', 36, 100],
+  ['texto_rojo', 242, 119],
+  ['texto_azul', 238, 166],
 ];
-// The turn hangs centered under the tip (its stem is as thick as the body, 52 px) and the body leaves the turn;
+// The turn hangs centered under the tip (its stem is as thick as the body, 38 px) and the body leaves the turn;
 // both share the thickness kept on the turn.
 const arrow_joints = (prefix) => ({
-  [`${prefix}flecha_curva`]: { to: `${prefix}flecha_punta`, anchor: 'below_center', stem: 52 },
+  [`${prefix}flecha_curva`]: { to: `${prefix}flecha_punta`, anchor: 'below_center', stem: 38 },
   [`${prefix}flecha_cuerpo`]: { to: `${prefix}flecha_curva`, anchor: 'right_bottom', thickness_from: `${prefix}flecha_curva` },
 });
-const joints = { ...arrow_joints('sup_'), ...arrow_joints('inf_') };
-const top_arrow_names = top_arrow_pieces.map(([file]) => `sup_${file}`);
-const bottom_arrow_names = bottom_arrow_pieces.map(([file]) => `inf_${file}`);
+// The header pieces were redrawn in Poppins at new sizes; new name prefixes let them start from these places while
+// the rest of a saved column layout is kept.
+const top_prefix = 'arriba_';
+const bottom_prefix = 'abajo_';
+const joints = { ...arrow_joints(top_prefix), ...arrow_joints(bottom_prefix) };
+const top_arrow_names = top_arrow_pieces.map(([file]) => `${top_prefix}${file}`);
+const bottom_arrow_names = bottom_arrow_pieces.map(([file]) => `${bottom_prefix}${file}`);
 
 // Sections from top to bottom. Each owns one background band that defines its slot of the sign and stretches to it;
 // the flecha bands are the plain red of the header, with white letters on it.
@@ -101,8 +105,8 @@ export const parts_catalog = [
   ...bands.map(([name, y, folder]) => ({ name, source: band_source(name, folder), x: 0, y, is_background: true })),
   ...pieces.map(([folder, name, x, y]) => ({ name, source: `${bancolombia_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
   ...davivienda_pieces.map(([folder, name, x, y]) => ({ name, source: `${daviplata_folder}/${folder}/${name}.webp`, x, y, is_background: false })),
-  ...top_arrow_pieces.map(([file, x, y]) => ({ name: `sup_${file}`, source: `${header_folder}/columna/${file}.webp`, x, y, is_background: false })),
-  ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `inf_${file}`, source: `${header_folder}/columna/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
+  ...top_arrow_pieces.map(([file, x, y]) => ({ name: `${top_prefix}${file}`, source: `${header_folder}/columna/${file}.webp`, x, y, is_background: false })),
+  ...bottom_arrow_pieces.map(([file, x, y]) => ({ name: `${bottom_prefix}${file}`, source: `${header_folder}/columna/${file}.webp`, x, y: y + bands[5][1], is_background: false })),
 ].map((part) => ({ ...part, section: section_of[part.name], joint: joints[part.name] }));
 
 // Height of every section slot in the original proposal, from top to bottom.

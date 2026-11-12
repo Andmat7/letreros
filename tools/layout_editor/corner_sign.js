@@ -27,10 +27,10 @@ export const section_groups = [
 // Pieces as [section index, folder, name, x, y], in pixels of the sign, back to front.
 const pieces = [
   // The arrow is a tip and a straight body, so "ancho" on the body lengthens it without bending the tip.
-  [0, 'header', 'flecha_cuerpo', 198, 212],
-  [0, 'header', 'flecha_punta', 45, 128],
-  [0, 'header', 'texto_rojo', 512, 83],
-  [0, 'header', 'texto_azul', 547, 344],
+  [0, 'header', 'flecha_cuerpo', 209, 235],
+  [0, 'header', 'flecha_punta', 90, 169],
+  [0, 'header', 'texto_rojo', 464, 169],
+  [0, 'header', 'texto_azul', 467, 326],
   // Each service shows only its name and what can be done there; the plain texts come from tools/make_text_pieces.py.
   [1, 'textos', 'texto_retiros_recargas', 230, 681],
   [1, 'logos', 'logo_nequi', 113, 1041],
@@ -45,7 +45,7 @@ const pieces = [
   // each as big as the others and centered in its cell (split by tools/split_operator_logos.py).
   [4, 'fondos_lisos', 'panel_recargas', 1220, 3340],
   [4, 'textos', 'texto_paga_tus', 91, 3441],
-  [4, 'textos', 'texto_luz_agua_gas', 221, 4344],
+  [4, 'textos', 'texto_tipos_servicios', 221, 4335],
   [4, 'fotos', 'facturas_servicios', -21, 3764],
   [4, 'textos', 'texto_recargas_operadores', 1258, 3560],
   [4, 'logos', 'logo_claro', 1255, 3800],
@@ -53,8 +53,9 @@ const pieces = [
   [4, 'logos', 'logo_movistar', 1254, 4182],
   [4, 'logos', 'logo_wom', 1574, 4180],
   [5, 'logos', 'flecha_fotocopias', 174, 4773],
-  [5, 'textos', 'texto_fotocopias_documentos', 467, 4742],
-  [5, 'textos', 'texto_primer_local_izquierda', 462, 4873],
+  // Both copy shop texts are drawn in Poppins by tools/make_text_pieces.py.
+  [5, 'textos', 'texto_fotocopias_titulo', 460, 4742],
+  [5, 'textos', 'texto_fotocopias_direccion', 460, 4865],
   [5, 'fotos', 'impresora', 125, 5334],
   [5, 'fotos', 'panel_fotocopias', 909, 5148],
 ];
@@ -62,9 +63,6 @@ const pieces = [
 // Scale and stretch of the pieces from the layout last arranged in the editor. The frame lies over everything.
 export const default_adjustments = {
   marco_corresponsal: { order: 1000 },
-  flecha_cuerpo: { scale: 0.95, widen: 0.91, length: 0.91 },
-  flecha_punta: { scale: 0.95 },
-  texto_azul: { scale: 0.94 },
   '02_nequi': { stretch: 1.1632870864461047 },
   '03_bancolombia': { stretch: 1.0094594594594595 },
   '05_davivienda': { stretch: 0.9674027339642481 },
@@ -80,7 +78,7 @@ export const default_adjustments = {
   logo_daviplata: { scale: 0.823 },
   celular_davivienda: { scale: 1.49 },
   texto_paga_tus: { scale: 0.74 },
-  texto_luz_agua_gas: { scale: 0.822 },
+  texto_tipos_servicios: { scale: 0.82 },
   facturas_servicios: { scale: 0.77 },
   logo_claro: { scale: 1.58 },
   logo_tigo: { scale: 0.438 },
