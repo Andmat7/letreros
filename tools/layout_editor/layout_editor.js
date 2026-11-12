@@ -2,6 +2,7 @@ import { layout_editor_styles } from './layout_editor.css.js';
 import { active_sign_key, original_image, original_section_heights, parts_catalog, sections, sign_size } from './active_sign.js';
 import { render_section_blob } from './section_image.js';
 import { align_joints, has_length, joint_root, thickness_holder } from './arrow_joints.js';
+import { group_bounds, move_group, movable_names, scale_group, set_group, snapshot, with_companions } from './piece_groups.js';
 import { move_border, set_section_height, section_tops } from './section_space.js';
 import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
 import { describe_signs, describe_size } from './physical_size.js';
@@ -32,8 +33,10 @@ const template = /* html */ `
         <label class="joined_field" title="Grosor del rectángulo de la flecha: 1 es el normal">grosor<input class="field_thickness" type="number" step="0.05" min="0.1"></label>
         <label class="joined_field length_field" title="Largo del rectángulo de la flecha: 1 es el normal">largo<input class="field_length" type="number" step="0.05" min="0.1"></label>
       </div>
-      <div class="row"><button class="to_front">Al frente</button><button class="to_back">Al fondo</button><button class="delete_piece">Eliminar imagen</button></div>
-      <textarea class="note" placeholder="Instrucción para esta pieza (ej. más grande, tapar la parte baja…)"></textarea>
+      <div class="group_hint">Arrástralas para moverlas juntas; el cuadrito, la rueda o + y − las escalan juntas.</div>
+      <div class="row"><button class="make_group" title="Guarda estas piezas como grupo: un clic en cualquiera elige todas">Agrupar</button><button class="break_group">Desagrupar</button></div>
+      <div class="row single_only"><button class="to_front">Al frente</button><button class="to_back">Al fondo</button><button class="delete_piece">Eliminar imagen</button></div>
+      <textarea class="note single_only" placeholder="Instrucción para esta pieza (ej. más grande, tapar la parte baja…)"></textarea>
     </div>
     <div class="row"><button class="copy primary">Copiar instrucciones</button><button class="reset">Restaurar original</button></div>
     <textarea class="import" placeholder="Pega aquí un layout para cargarlo"></textarea>
@@ -48,6 +51,8 @@ export class LayoutEditor extends HTMLElement {
   #heights = load_section_heights();
   #dividers = [];
   #selected_name = null;
+  // Every piece chosen right now: the clicked one, its arrow, its saved group and any added with Ctrl or Shift.
+  #chosen = new Set();
   #selected_section = null;
   #zoom = 0.3;
   static viewport_padding = 32;
@@ -146,22 +151,52 @@ export class LayoutEditor extends HTMLElement {
       this.#changed();
     });
     this.#element('.load').addEventListener('click', () => this.#load_pasted());
+    this.#element('.make_group').addEventListener('click', () => this.#save_group(`grupo_${Date.now()}`, 'Grupo guardado: un clic en cualquiera de sus piezas lo elige entero.'));
+    this.#element('.break_group').addEventListener('click', () => this.#save_group('', 'Grupo deshecho.'));
+    this.#element('.viewport').addEventListener('pointerdown', (event) => {
+      if (!event.target.closest('img, .handle, .divider')) this.#clear_choice();
+    });
     this.addEventListener('keydown', (event) => this.#nudge(event));
     this.tabIndex = 0;
   }
 
-  // Any piece of an arrow drags the whole arrow, which hangs from its tip.
+  // Dragging moves every chosen piece; arrow pieces move with their tip. Ctrl or Shift adds or takes out a piece.
   #start_drag(event, part) {
-    this.#select(part.name);
-    if (this.#is_locked(part)) return;
-    const placement = this.#layout[joint_root(parts_catalog, part.name)];
-    const origin = { pointer_x: event.clientX, pointer_y: event.clientY, x: placement.x, y: placement.y };
-    const move = (moved) => {
-      placement.x = Math.round(origin.x + (moved.clientX - origin.pointer_x) / this.#zoom);
-      placement.y = Math.round(origin.y + (moved.clientY - origin.pointer_y) / this.#zoom);
+    this.#select(part.name, event.ctrlKey || event.shiftKey || event.metaKey);
+    event.preventDefault();
+    if (this.#is_locked(part) || !this.#chosen.has(part.name)) return;
+    const before = snapshot(this.#layout, this.#movable_chosen());
+    this.#follow_pointer((moved) => {
+      move_group(this.#layout, before, { x: (moved.clientX - event.clientX) / this.#zoom, y: (moved.clientY - event.clientY) / this.#zoom });
       this.#refresh_stage();
       this.#fill_fields();
-    };
+    });
+  }
+
+  // The handle of several pieces scales them all from the top left corner of the box around them.
+  #start_group_resize(event) {
+    const bounds = this.#chosen_bounds();
+    const before = snapshot(this.#layout, this.#movable_chosen());
+    const stage = this.#element('.stage');
+    this.#follow_pointer((moved) => {
+      const pointer_x = (moved.clientX - stage.getBoundingClientRect().left) / this.#zoom;
+      const factor = Math.max(0.05, (pointer_x - bounds.left) / (bounds.right - bounds.left));
+      scale_group(this.#layout, before, factor, { x: bounds.left, y: bounds.top });
+      this.#refresh_stage();
+    });
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  // Wheel and + / − scale several pieces around the center of the box around them.
+  #scale_chosen(factor) {
+    const bounds = this.#chosen_bounds();
+    const center = { x: (bounds.left + bounds.right) / 2, y: (bounds.top + bounds.bottom) / 2 };
+    scale_group(this.#layout, snapshot(this.#layout, this.#movable_chosen()), factor, center);
+    this.#changed();
+  }
+
+  #follow_pointer(move) {
     const stop = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', stop);
@@ -169,7 +204,36 @@ export class LayoutEditor extends HTMLElement {
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', stop);
-    event.preventDefault();
+  }
+
+  #movable_chosen() {
+    return movable_names(parts_catalog, this.#chosen).filter((name) => !this.#is_locked(this.#part(name)));
+  }
+
+  #chosen_bounds() {
+    return group_bounds(this.#layout, [...this.#chosen], (name) => this.#natural_size(name));
+  }
+
+  // More than one piece that moves on its own (an arrow counts as one).
+  #is_many() {
+    return movable_names(parts_catalog, this.#chosen).length > 1;
+  }
+
+  #save_group(group_name, message) {
+    if (!this.#is_many() && group_name) return this.#say('Elige dos o más piezas con Ctrl+clic para agruparlas.');
+    set_group(parts_catalog, this.#layout, this.#chosen, group_name);
+    this.#changed();
+    this.#say(message);
+  }
+
+  #clear_choice() {
+    this.#chosen = new Set();
+    this.#selected_name = null;
+    this.#refresh();
+  }
+
+  #part(name) {
+    return parts_catalog.find((part) => part.name === name);
   }
 
   #start_divider_drag(event, index) {
@@ -191,6 +255,7 @@ export class LayoutEditor extends HTMLElement {
 
   // An arrow body's handle changes its length ("largo"); any other piece's handle changes its scale.
   #start_resize(event) {
+    if (this.#is_many()) return this.#start_group_resize(event);
     const placement = this.#layout[this.#selected_name];
     const is_joined = Boolean(parts_catalog.find((part) => part.name === this.#selected_name).joint);
     const tip_scale = this.#layout[joint_root(parts_catalog, this.#selected_name)].scale;
@@ -218,8 +283,12 @@ export class LayoutEditor extends HTMLElement {
   // The wheel scales only the selected piece; anywhere else it keeps scrolling the page.
   // On an arrow body the wheel changes its thickness instead.
   #scale_with_wheel(event, part) {
-    if (part.name !== this.#selected_name || this.#is_locked(part)) return;
     const factor = event.deltaY < 0 ? LayoutEditor.scale_step : 1 / LayoutEditor.scale_step;
+    if (this.#is_many() && this.#chosen.has(part.name)) {
+      event.preventDefault();
+      return this.#scale_chosen(factor);
+    }
+    if (part.name !== this.#selected_name || this.#is_locked(part)) return;
     if (part.joint) this.#set_thickness(Math.round(this.#layout[thickness_holder(part)].thickness * factor * 100) / 100);
     else this.#edit_selected({ scale: Math.round(this.#layout[part.name].scale * factor * 100) / 100 });
     event.preventDefault();
@@ -243,8 +312,7 @@ export class LayoutEditor extends HTMLElement {
     const steps = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
     if (!steps || !this.#selected_name) return;
     const distance = event.shiftKey ? 10 : 1;
-    const placement = this.#layout[joint_root(parts_catalog, this.#selected_name)];
-    Object.assign(placement, { x: placement.x + steps[0] * distance, y: placement.y + steps[1] * distance });
+    move_group(this.#layout, snapshot(this.#layout, this.#movable_chosen()), { x: steps[0] * distance, y: steps[1] * distance });
     this.#changed();
     event.preventDefault();
   }
@@ -258,12 +326,19 @@ export class LayoutEditor extends HTMLElement {
   #scale_with_key(event) {
     if (!this.#selected_name) return;
     const factor = event.key === '+' ? LayoutEditor.scale_step : 1 / LayoutEditor.scale_step;
+    if (this.#is_many()) return this.#scale_chosen(factor);
     this.#edit_selected({ scale: Math.round(this.#layout[this.#selected_name].scale * factor * 100) / 100 });
   }
 
-  #select(name) {
-    this.#selected_name = name;
-    this.#selected_section = parts_catalog.find((part) => part.name === name).section;
+  // A click picks the piece with its arrow and its saved group; with adding it joins the choice or leaves it.
+  // Clicking a piece that is already chosen keeps the whole choice, so it can be dragged together.
+  #select(name, adding = false) {
+    const companions = with_companions(parts_catalog, this.#layout, [name]);
+    if (adding && this.#chosen.has(name)) companions.forEach((member) => this.#chosen.delete(member));
+    else if (adding) companions.forEach((member) => this.#chosen.add(member));
+    else if (!this.#chosen.has(name)) this.#chosen = new Set(companions);
+    this.#selected_name = this.#chosen.has(name) ? name : ([...this.#chosen][0] ?? null);
+    this.#selected_section = this.#selected_name ? this.#part(this.#selected_name).section : null;
     this.#refresh();
     this.focus();
   }
@@ -293,6 +368,7 @@ export class LayoutEditor extends HTMLElement {
     this.#refresh_list();
     this.#fill_fields();
     this.#element('.selected_controls').hidden = !this.#selected_name;
+    this.#element('.selected_controls').classList.toggle('many', this.#is_many());
   }
 
   #refresh_stage() {
@@ -318,6 +394,7 @@ export class LayoutEditor extends HTMLElement {
   }
 
   #place_handle() {
+    if (this.#is_many()) return this.#place_group_handle();
     const part = parts_catalog.find((candidate) => candidate.name === this.#selected_name);
     const can_resize = part && !this.#is_locked(part) && !this.#layout[part.name].deleted && (!part.joint || has_length(part));
     this.#handle.style.display = can_resize ? 'block' : 'none';
@@ -330,6 +407,14 @@ export class LayoutEditor extends HTMLElement {
     this.#handle.style.top = `${placement.y + image.naturalHeight * placement.scale - size / 2}px`;
   }
 
+  #place_group_handle() {
+    const bounds = this.#chosen_bounds();
+    const size = 28 / this.#zoom;
+    Object.assign(this.#handle.style, {
+      display: 'block', width: `${size}px`, height: `${size}px`, left: `${bounds.right - size / 2}px`, top: `${bounds.bottom - size / 2}px`,
+    });
+  }
+
   #place_image(part, can_move_backgrounds) {
     const placement = this.#layout[part.name];
     const image = this.#images.get(part.name);
@@ -338,7 +423,7 @@ export class LayoutEditor extends HTMLElement {
     image.style.zIndex = placement.order;
     image.style.transform = `scale(${placement.scale * placement.widen}, ${placement.scale * placement.stretch})`;
     image.style.display = placement.visible && !placement.deleted ? 'block' : 'none';
-    image.classList.toggle('selected', part.name === this.#selected_name);
+    image.classList.toggle('selected', this.#chosen.has(part.name));
     image.classList.toggle('in_section', part.section === this.#selected_section);
     image.classList.toggle('locked', part.is_background && !can_move_backgrounds);
   }
@@ -391,6 +476,7 @@ export class LayoutEditor extends HTMLElement {
   #select_section(section) {
     this.#selected_section = section.title;
     this.#selected_name = null;
+    this.#chosen = new Set();
     this.#refresh();
   }
 
@@ -406,14 +492,15 @@ export class LayoutEditor extends HTMLElement {
       this.#layout[name].visible = visibility.checked;
       this.#changed();
     });
-    item.addEventListener('click', () => this.#select(name));
+    item.addEventListener('click', (event) => this.#select(name, event.ctrlKey || event.shiftKey || event.metaKey));
     return item;
   }
 
   #fill_fields() {
     const placement = this.#layout[this.#selected_name];
     this.#element('.selected_name').textContent = this.#selected_name ?? 'Ninguna pieza elegida';
-    if (!placement) return;
+    if (this.#is_many()) this.#element('.selected_name').textContent = `${movable_names(parts_catalog, this.#chosen).length} piezas elegidas`;
+    if (!placement || this.#is_many()) return;
     this.#element('.delete_piece').textContent = placement.deleted ? 'Restaurar imagen' : 'Eliminar imagen';
     this.#element('.field_x').value = placement.x;
     this.#element('.field_y').value = placement.y;
