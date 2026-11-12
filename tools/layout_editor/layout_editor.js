@@ -1,7 +1,7 @@
 import { layout_editor_styles } from './layout_editor.css.js';
 import { active_sign_key, original_image, original_section_heights, parts_catalog, sections, sign_size } from './active_sign.js';
 import { render_section_blob } from './section_image.js';
-import { align_joints, sliding_axis } from './arrow_joints.js';
+import { align_joints, has_length, joint_root, thickness_holder } from './arrow_joints.js';
 import { move_border, set_section_height, section_tops } from './section_space.js';
 import { load_layout, save_layout, load_section_heights, save_section_heights, original_layout, parse_layout, describe_layout, ordered_names } from './layout_store.js';
 import { describe_signs, describe_size } from './physical_size.js';
@@ -25,10 +25,12 @@ const template = /* html */ `
     <div class="selected_controls">
       <strong class="selected_name">Ninguna pieza elegida</strong>
       <div class="fields">
-        <label>x<input class="field_x" type="number"></label>
-        <label>y<input class="field_y" type="number"></label>
-        <label>escala<input class="field_scale" type="number" step="0.05" min="0.1"></label>
-        <label title="Estira la imagen a lo ancho: 1 es su ancho normal, 1.2 un 20 % más ancha">ancho<input class="field_widen" type="number" step="0.05" min="0.1"></label>
+        <label class="plain_field">x<input class="field_x" type="number"></label>
+        <label class="plain_field">y<input class="field_y" type="number"></label>
+        <label class="plain_field">escala<input class="field_scale" type="number" step="0.05" min="0.1"></label>
+        <label class="plain_field" title="Estira la imagen a lo ancho: 1 es su ancho normal, 1.2 un 20 % más ancha">ancho<input class="field_widen" type="number" step="0.05" min="0.1"></label>
+        <label class="joined_field" title="Grosor del rectángulo de la flecha: 1 es el normal">grosor<input class="field_thickness" type="number" step="0.05" min="0.1"></label>
+        <label class="joined_field length_field" title="Largo del rectángulo de la flecha: 1 es el normal">largo<input class="field_length" type="number" step="0.05" min="0.1"></label>
       </div>
       <div class="row"><button class="to_front">Al frente</button><button class="to_back">Al fondo</button><button class="delete_piece">Eliminar imagen</button></div>
       <textarea class="note" placeholder="Instrucción para esta pieza (ej. más grande, tapar la parte baja…)"></textarea>
@@ -126,9 +128,10 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.zoom').addEventListener('input', (event) => { this.#zoom = Number(event.target.value); this.#refresh(); });
     this.#element('.show_reference').addEventListener('change', () => this.#refresh());
     this.#element('.move_backgrounds').addEventListener('change', () => this.#refresh());
-    for (const field of ['x', 'y', 'scale', 'widen']) {
+    for (const field of ['x', 'y', 'scale', 'widen', 'length']) {
       this.#element(`.field_${field}`).addEventListener('input', (event) => this.#edit_selected({ [field]: Number(event.target.value) }));
     }
+    this.#element('.field_thickness').addEventListener('input', (event) => this.#set_thickness(Number(event.target.value)));
     this.#element('.note').addEventListener('input', (event) => this.#edit_selected({ note: event.target.value }));
     this.#element('.to_front').addEventListener('click', () => this.#edit_selected({ order: this.#extreme_order(Math.max) + 1 }));
     this.#element('.to_back').addEventListener('click', () => this.#edit_selected({ order: this.#extreme_order(Math.min) - 1 }));
@@ -147,15 +150,15 @@ export class LayoutEditor extends HTMLElement {
     this.tabIndex = 0;
   }
 
+  // Any piece of an arrow drags the whole arrow, which hangs from its tip.
   #start_drag(event, part) {
     this.#select(part.name);
     if (this.#is_locked(part)) return;
-    const placement = this.#layout[part.name];
-    const origin = { pointer_x: event.clientX, pointer_y: event.clientY, x: placement.x, y: placement.y, offset: placement.offset };
+    const placement = this.#layout[joint_root(parts_catalog, part.name)];
+    const origin = { pointer_x: event.clientX, pointer_y: event.clientY, x: placement.x, y: placement.y };
     const move = (moved) => {
-      const distance = { x: (moved.clientX - origin.pointer_x) / this.#zoom, y: (moved.clientY - origin.pointer_y) / this.#zoom };
-      if (part.joint) placement.offset = Math.round(origin.offset + distance[sliding_axis(part)] / placement.scale);
-      else Object.assign(placement, { x: Math.round(origin.x + distance.x), y: Math.round(origin.y + distance.y) });
+      placement.x = Math.round(origin.x + (moved.clientX - origin.pointer_x) / this.#zoom);
+      placement.y = Math.round(origin.y + (moved.clientY - origin.pointer_y) / this.#zoom);
       this.#refresh_stage();
       this.#fill_fields();
     };
@@ -186,16 +189,17 @@ export class LayoutEditor extends HTMLElement {
     event.preventDefault();
   }
 
-  // Joined arrow pieces take their thickness from the tip, so their handle changes their length ("ancho") instead.
+  // An arrow body's handle changes its length ("largo"); any other piece's handle changes its scale.
   #start_resize(event) {
     const placement = this.#layout[this.#selected_name];
     const is_joined = Boolean(parts_catalog.find((part) => part.name === this.#selected_name).joint);
+    const tip_scale = this.#layout[joint_root(parts_catalog, this.#selected_name)].scale;
     const natural_width = this.#images.get(this.#selected_name).naturalWidth;
     const stage = this.#element('.stage');
     const move = (moved) => {
       const pointer_x = (moved.clientX - stage.getBoundingClientRect().left) / this.#zoom;
-      const ratio = Math.max(0.05, Math.round(((pointer_x - placement.x) / natural_width) * 100) / 100);
-      if (is_joined) placement.widen = Math.max(0.05, Math.round((ratio / placement.scale) * 100) / 100);
+      const ratio = Math.max(0.05, (pointer_x - placement.x) / natural_width);
+      if (is_joined) placement.length = Math.max(0.05, Math.round((ratio / tip_scale) * 100) / 100);
       else placement.scale = Math.max(0.05, Math.round((ratio / placement.widen) * 100) / 100);
       this.#refresh_stage();
       this.#fill_fields();
@@ -212,11 +216,21 @@ export class LayoutEditor extends HTMLElement {
   }
 
   // The wheel scales only the selected piece; anywhere else it keeps scrolling the page.
+  // On an arrow body the wheel changes its thickness instead.
   #scale_with_wheel(event, part) {
     if (part.name !== this.#selected_name || this.#is_locked(part)) return;
     const factor = event.deltaY < 0 ? LayoutEditor.scale_step : 1 / LayoutEditor.scale_step;
-    this.#edit_selected({ scale: Math.round(this.#layout[part.name].scale * factor * 100) / 100 });
+    if (part.joint) this.#set_thickness(Math.round(this.#layout[thickness_holder(part)].thickness * factor * 100) / 100);
+    else this.#edit_selected({ scale: Math.round(this.#layout[part.name].scale * factor * 100) / 100 });
     event.preventDefault();
+  }
+
+  // The turn and the body of a turning arrow share one thickness, kept on the turn.
+  #set_thickness(thickness) {
+    const part = parts_catalog.find((candidate) => candidate.name === this.#selected_name);
+    if (!part?.joint) return;
+    this.#layout[thickness_holder(part)].thickness = thickness;
+    this.#changed();
   }
 
   #is_locked(part) {
@@ -229,10 +243,9 @@ export class LayoutEditor extends HTMLElement {
     const steps = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
     if (!steps || !this.#selected_name) return;
     const distance = event.shiftKey ? 10 : 1;
-    const placement = this.#layout[this.#selected_name];
-    const part = parts_catalog.find((candidate) => candidate.name === this.#selected_name);
-    if (part.joint) this.#edit_selected({ offset: placement.offset + steps[sliding_axis(part) === 'x' ? 0 : 1] * distance });
-    else this.#edit_selected({ x: placement.x + steps[0] * distance, y: placement.y + steps[1] * distance });
+    const placement = this.#layout[joint_root(parts_catalog, this.#selected_name)];
+    Object.assign(placement, { x: placement.x + steps[0] * distance, y: placement.y + steps[1] * distance });
+    this.#changed();
     event.preventDefault();
   }
 
@@ -306,7 +319,8 @@ export class LayoutEditor extends HTMLElement {
 
   #place_handle() {
     const part = parts_catalog.find((candidate) => candidate.name === this.#selected_name);
-    this.#handle.style.display = part && !this.#is_locked(part) && !this.#layout[part.name].deleted ? 'block' : 'none';
+    const can_resize = part && !this.#is_locked(part) && !this.#layout[part.name].deleted && (!part.joint || has_length(part));
+    this.#handle.style.display = can_resize ? 'block' : 'none';
     if (!part) return;
     const placement = this.#layout[part.name];
     const image = this.#images.get(part.name);
@@ -405,7 +419,19 @@ export class LayoutEditor extends HTMLElement {
     this.#element('.field_y').value = placement.y;
     this.#element('.field_scale').value = placement.scale;
     this.#element('.field_widen').value = placement.widen;
+    this.#fill_joined_fields();
     if (this.shadowRoot.activeElement !== this.#element('.note')) this.#element('.note').value = placement.note;
+  }
+
+  // An arrow body shows its thickness and length instead of position and scale; the turn has no length.
+  #fill_joined_fields() {
+    const part = parts_catalog.find((candidate) => candidate.name === this.#selected_name);
+    const fields = this.#element('.fields');
+    fields.classList.toggle('joined', Boolean(part.joint));
+    fields.classList.toggle('without_length', Boolean(part.joint) && !has_length(part));
+    if (!part.joint) return;
+    this.#element('.field_thickness').value = this.#layout[thickness_holder(part)].thickness;
+    this.#element('.field_length').value = this.#layout[part.name].length;
   }
 
   async #copy_instructions() {

@@ -34,6 +34,7 @@ layout_editor_styles.replaceSync(/* css */ `
   li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .fields { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .fields label { display: flex; flex-direction: column; font-size: 12px; gap: 2px; }
+  .fields.joined .plain_field, .fields:not(.joined) .joined_field, .fields.without_length .length_field { display: none; }
   input[type=number] { width: 100%; box-sizing: border-box; }
   textarea { width: 100%; box-sizing: border-box; min-height: 60px; }
   .section_name { font-size: 12px; color: #555; }

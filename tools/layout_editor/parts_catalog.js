@@ -55,10 +55,11 @@ const bottom_arrow_pieces = [
   ['texto_rojo', 285, 123],
   ['texto_azul', 286, 190],
 ];
-// The turn hangs centered under the tip (its stem is as thick as the body, 52 px) and the body leaves the turn.
+// The turn hangs centered under the tip (its stem is as thick as the body, 52 px) and the body leaves the turn;
+// both share the thickness kept on the turn.
 const arrow_joints = (prefix) => ({
   [`${prefix}flecha_curva`]: { to: `${prefix}flecha_punta`, anchor: 'below_center', stem: 52 },
-  [`${prefix}flecha_cuerpo`]: { to: `${prefix}flecha_curva`, anchor: 'right_bottom' },
+  [`${prefix}flecha_cuerpo`]: { to: `${prefix}flecha_curva`, anchor: 'right_bottom', thickness_from: `${prefix}flecha_curva` },
 });
 const joints = { ...arrow_joints('sup_'), ...arrow_joints('inf_') };
 const top_arrow_names = top_arrow_pieces.map(([file]) => `sup_${file}`);
