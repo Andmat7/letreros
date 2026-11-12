@@ -17,9 +17,9 @@ SECTION_HEIGHT = 1745
 BAND_BOTTOM = 152
 BAND_COLOR = (25, 25, 25)
 BACKGROUND_COLOR = (239, 239, 239)
-# The strip on top of the section that holds the dotted line: white dots on the Ésika red of the Corresponsal frame.
+# The strip on top of the section that holds the dotted line: white dots on the art's dark band, which starts there.
 SEPARATOR_HEIGHT = 70
-SEPARATOR_COLOR = (190, 4, 4)
+SEPARATOR_COLOR = BAND_COLOR
 DOT_COLOR = (255, 255, 255)
 DOT_LENGTH, DOT_GAP, DOT_THICKNESS = 40, 26, 12
 # Boxes in pixels of the art (left, top, right, bottom), with a small margin around each element.

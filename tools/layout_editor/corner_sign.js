@@ -52,12 +52,13 @@ const pieces = [
   [4, 'logos', 'logo_tigo', 1574, 3800],
   [4, 'logos', 'logo_movistar', 1254, 4182],
   [4, 'logos', 'logo_wom', 1574, 4180],
-  [5, 'logos', 'flecha_fotocopias', 174, 4773],
+  [5, 'logos', 'flecha_fotocopias', 174, 4767],
   // Both copy shop texts are drawn in Poppins by tools/make_text_pieces.py.
-  [5, 'textos', 'texto_fotocopias_titulo', 460, 4742],
-  [5, 'textos', 'texto_fotocopias_direccion', 460, 4865],
+  [5, 'textos', 'texto_fotocopias_titulo', 520, 4680],
+  [5, 'textos', 'texto_fotocopias_direccion', 616, 4895],
   [5, 'fotos', 'impresora', 125, 5307],
-  [5, 'fotos', 'panel_fotocopias', 991, 5121],
+  // The services panel is redrawn in Poppins without the laptop by tools/make_copy_shop_panel.py.
+  [5, 'fotos', 'panel_servicios_fotocopias', 963, 5339],
 ];
 
 // Scale and stretch of the pieces from the layout last arranged in the editor. The frame lies over everything.
@@ -68,6 +69,8 @@ export const default_adjustments = {
   '05_davivienda': { stretch: 0.9674027339642481 },
   '04_servicios_publicos': { stretch: 0.9984152139461173 },
   '06_fotocopiadora': { stretch: 1.0315186246418337 },
+  texto_fotocopias_titulo: { scale: 0.9 },
+  texto_fotocopias_direccion: { scale: 0.85 },
   texto_rojo: { scale: 0.98 },
   logo_nequi: { scale: 0.92 },
   texto_retiros_recargas: { scale: 1.15 },

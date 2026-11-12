@@ -1,4 +1,4 @@
-import { zoom_control_styles } from './zoom_control.css.js?v=b391060793';
+import { zoom_control_styles } from './zoom_control.css.js?v=d0394edb73';
 
 const template = /* html */ `
   <button class="in" aria-label="Acercar" title="Acercar">+</button>

@@ -26,7 +26,7 @@ PIECES = {
         ("RETIROS Y", 1, BANCOLOMBIA_YELLOW, "ExtraBold"), ("CONSIGNACIONES", 1, BANCOLOMBIA_YELLOW, "ExtraBold"),
         ("Corresponsal Bancolombia", 0.45, WHITE, "SemiBold"),
     ]),
-    "texto_fotocopias_titulo": (1240, WHITE, [("FOTOCOPIAS Y DOCUMENTOS", 1, COPY_SHOP_RED, "Black")]),
+    "texto_fotocopias_titulo": (1240, None, [("FOTOCOPIAS Y", 1, COPY_SHOP_RED, "Black"), ("REDACCIÓN DE DOCUMENTOS", 1, COPY_SHOP_RED, "Black")]),
     "texto_fotocopias_direccion": (1100, None, [("(PRIMER LOCAL A LA IZQUIERDA)", 1, WHITE, "Bold")]),
 }
 LINE_GAP = 0.2
