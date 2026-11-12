@@ -55,26 +55,26 @@ const davivienda_pieces = [
 // The same pieces appear in the top and the bottom arrow, each at its own place in its section. Each arrow is a
 // tip, a turn and a straight body; "ancho" on the body lengthens the arrow without bending the tip.
 const top_arrow_pieces = [
-  ['flecha_curva', 72, 176],
-  ['flecha_cuerpo', 179, 246],
-  ['flecha_punta', 36, 91],
-  ['texto_rojo', 438, 124],
-  ['texto_tienda', 333, 171],
-  ['texto_azul', 328, 236],
+  ['flecha_curva', 73, 175],
+  ['flecha_cuerpo', 184, 248],
+  ['flecha_punta', 36, 87],
+  ['texto_rojo', 442, 122],
+  ['texto_tienda', 337, 169],
+  ['texto_azul', 366, 234],
 ];
 // The bottom band is shorter than the header art, so its pieces sit higher to stay centered.
 const bottom_arrow_pieces = [
-  ['flecha_curva', 72, 138],
-  ['flecha_cuerpo', 179, 208],
-  ['flecha_punta', 36, 53],
-  ['texto_rojo', 438, 86],
-  ['texto_tienda', 333, 133],
-  ['texto_azul', 328, 198],
+  ['flecha_curva', 73, 137],
+  ['flecha_cuerpo', 184, 210],
+  ['flecha_punta', 36, 49],
+  ['texto_rojo', 442, 84],
+  ['texto_tienda', 337, 131],
+  ['texto_azul', 366, 196],
 ];
-// The turn hangs centered under the tip (its stem is as thick as the body, 63 px) and the body leaves the turn;
+// The turn hangs centered under the tip (its stem is as thick as the body, 65 px) and the body leaves the turn;
 // both share the thickness kept on the turn.
 const arrow_joints = (prefix) => ({
-  [`${prefix}flecha_curva`]: { to: `${prefix}flecha_punta`, anchor: 'below_center', stem: 63 },
+  [`${prefix}flecha_curva`]: { to: `${prefix}flecha_punta`, anchor: 'below_center', stem: 65 },
   [`${prefix}flecha_cuerpo`]: { to: `${prefix}flecha_curva`, anchor: 'right_bottom', thickness_from: `${prefix}flecha_curva` },
 });
 // The header pieces were redrawn (Poppins, then "A LA VUELTA" on its own line); new name prefixes let them start

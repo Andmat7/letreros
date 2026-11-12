@@ -44,7 +44,8 @@ class StoreHeaderMaker:
             "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, LETTERING),
         }
 
-    # "A LA VUELTA" and "EN LA TIENDA ÉSIKA" go on two lines of the same letter size, with the direction under them;
+    # "A LA VUELTA" and "EN LA TIENDA ÉSIKA" go on two lines of the same letter size, with the short direction
+    # ("2º local", so it can be bigger) under them;
     # the column is narrow, so the arrow is taller than the lines.
     def _column_text(self):
         width = 600
@@ -52,7 +53,7 @@ class StoreHeaderMaker:
         return {
             "texto_rojo": self._line("A LA VUELTA", size, LETTERING),
             "texto_tienda": self._line("EN LA TIENDA ÉSIKA", size, LETTERING),
-            "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, LETTERING),
+            "texto_azul": self._fitted_line("(2º LOCAL A LA IZQUIERDA)", round(width * 0.9), LETTERING),
         }
 
     # The arrow beside the stacked texts, as tall as its share of them, all centered in the header.

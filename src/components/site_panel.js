@@ -1,4 +1,4 @@
-import { site_panel_styles } from './site_panel.css.js?v=a5e454d95f';
+import { site_panel_styles } from './site_panel.css.js?v=ffdf577f93';
 
 const template = /* html */ `
   <button class="toggle" aria-label="Mostrar u ocultar el panel">☰</button>
