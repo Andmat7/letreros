@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { canvas_texture } from '../scene/textures.js?v=747c14d6d2';
+import { canvas_texture } from '../scene/textures.js?v=2f0e365084';
 
 const tape_color = '#0b6bcb';
 const snap_distance = 0.12;

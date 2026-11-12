@@ -44,11 +44,14 @@ class StoreHeaderMaker:
             "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, LETTERING),
         }
 
-    # One line per sentence here too; the column is narrow, so the arrow is taller than the two lines.
+    # "A LA VUELTA" and "EN LA TIENDA ÉSIKA" go on two lines of the same letter size, with the direction under them;
+    # the column is narrow, so the arrow is taller than the lines.
     def _column_text(self):
         width = 600
+        size = self._size_for_width("EN LA TIENDA ÉSIKA", width)
         return {
-            "texto_rojo": self._fitted_line("A LA VUELTA EN LA TIENDA ÉSIKA", width, LETTERING),
+            "texto_rojo": self._line("A LA VUELTA", size, LETTERING),
+            "texto_tienda": self._line("EN LA TIENDA ÉSIKA", size, LETTERING),
             "texto_azul": self._fitted_line("(SEGUNDO LOCAL A LA IZQUIERDA)", width, LETTERING),
         }
 

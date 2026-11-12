@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { streets } from '../data/building_measurements.js?v=747c14d6d2';
-import { add_box, add_ground_plane, standard_material } from './primitives.js?v=747c14d6d2';
-import { asphalt_texture, brick_texture, canvas_texture } from './textures.js?v=747c14d6d2';
+import { streets } from '../data/building_measurements.js?v=2f0e365084';
+import { add_box, add_ground_plane, standard_material } from './primitives.js?v=2f0e365084';
+import { asphalt_texture, brick_texture, canvas_texture } from './textures.js?v=2f0e365084';
 
 const street_length = 120;
 const block_length = 60;

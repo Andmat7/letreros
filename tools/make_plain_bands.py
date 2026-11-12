@@ -17,6 +17,8 @@ BANDS = {
     "05_davivienda": ((1920, 951), (184, 4, 4), (236, 24, 26)),
     # Not a band: the panel behind the top-ups column of the services section, so it reads apart from the bills.
     "panel_recargas": ((700, 1260), (14, 14, 14), (48, 47, 46)),
+    # The same panel as a strip across the bottom of the column sign's services section.
+    "panel_recargas_columna": ((960, 390), (14, 14, 14), (48, 47, 46)),
 }
 
 
